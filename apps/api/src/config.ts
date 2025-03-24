@@ -1,3 +1,4 @@
+import { PrismaClient } from '@prisma/client';
 import { config } from 'dotenv';
 import { resolve } from 'path';
 
@@ -12,3 +13,5 @@ config({ path: resolve(__dirname, `../${envFile}.local`), override: true });
 
 export const PORT = process.env.PORT || 8000;
 export const DATABASE_URL = process.env.DATABASE_URL || '';
+
+export const prisma = new PrismaClient();
