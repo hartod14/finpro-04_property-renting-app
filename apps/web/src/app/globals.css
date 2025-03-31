@@ -110,3 +110,34 @@ a {
     color-scheme: dark;
   }
 }
+
+.swiper-button-next,
+.swiper-button-prev {
+  background-color: rgba(211, 211, 211, 0.568)/* Light gray */;
+  border-radius: 50%;
+  width: 45px !important;
+  height: 45px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: background-color 0.3s ease;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  background-color: rgba(180, 180, 180, 0.9); /* Slightly darker on hover */
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 20px !important;
+  font-weight: bold;
+  color: rgba(0, 0, 0, 0.79);
+  width: auto !important;
+  height: auto !important;
+  line-height: normal !important;
+}
+
+.hotel-carousel {
+  overflow: visible; /* Ensure overflow is visible */
+}
