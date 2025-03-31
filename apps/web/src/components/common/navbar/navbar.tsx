@@ -24,9 +24,8 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`fixed w-full px-6 md:px-16 py-4 flex items-center justify-between z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white shadow-md' : 'bg-transparent'
-      }`}
+      className={`fixed w-full px-6 md:px-16 py-4 flex items-center justify-between z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md' : 'bg-transparent'
+        }`}
     >
       <Link href={'/'}>
         <Image
@@ -39,20 +38,23 @@ export default function Navbar() {
       </Link>
 
       {/* Hamburger Button */}
-      <div
-        className="md:hidden cursor-pointer z-50"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <div className="w-6 h-1 bg-primary2 my-1"></div>
-        <div className="w-6 h-1 bg-primary2 my-1"></div>
-        <div className="w-6 h-1 bg-primary2 my-1"></div>
-      </div>
+      {!isOpen && (
+        <div
+          className="md:hidden cursor-pointer z-50"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <div className={`w-6 h-1 my-1 ${isScrolled ? 'bg-primary2' : 'bg-white'}`}></div>
+          <div className={`w-6 h-1 my-1 ${isScrolled ? 'bg-primary2' : 'bg-white'}`}></div>
+          <div className={`w-6 h-1 my-1 ${isScrolled ? 'bg-primary2' : 'bg-white'}`}></div>
+        </div>
+      )}
 
       {/* Full-screen Popup Navigation */}
       {isOpen && (
         <div className="fixed inset-0 bg-white z-40 transition-all duration-300">
-          {/* <button className="absolute top-6 right-6 text-3xl" onClick={() => setIsOpen(false)}>&times;</button> */}
-          <div className="text-lg flex flex-col wrap items-start mt-20">
+          <button className="absolute top-6 right-6 text-4xl" onClick={() => setIsOpen(false)}>&times;</button>
+          <div className="text-lg flex flex-col wrap items-start ms-6 mt-20 gap-5">
+            <h3 className='font-bold text-2xl ms-4 mb-3'>Menus</h3>
             <Button color="white" name="Register" textColor="black"></Button>
             <Button color="white" name="Login" textColor="black"></Button>
             <Button color="white" name="For Tenant" textColor="black"></Button>

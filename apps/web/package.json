@@ -10,10 +10,11 @@
     "test": "npx cypress verify & cypress run --component"
   },
   "dependencies": {
+    "cross-env": "^7.0.3",
     "next": "15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "cross-env": "^7.0.3"
+    "swiper": "^11.1.15"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -22,7 +23,7 @@
     "cypress": "^13.6.2",
     "eslint": "^9",
     "eslint-config-next": "15.1.0",
-    "typescript": "^5",
-    "tailwindcss": "^3.4.1"
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
   }
 }
