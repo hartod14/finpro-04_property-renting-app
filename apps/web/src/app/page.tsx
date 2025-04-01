@@ -4,6 +4,7 @@ import BestDealsCaraosel from '@/components/homepage/bestDealsCaraosel';
 import HotelRecommendation from '@/components/homepage/hotelRecommendation';
 import Image from 'next/image';
 import Link from 'next/link';
+import { FaArrowRight } from 'react-icons/fa';
 
 export default function Home() {
   return (
@@ -89,12 +90,14 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="text-end">
+            <div className="flex justify-end w-full">
               <Button
                 color="primary"
-                name="Search Hotel"
                 textColor="white"
-              ></Button>
+                iconPosition="after"
+                name="Search Hotel"
+                icon={<FaArrowRight />}
+              />
             </div>
           </div>
         </div>
@@ -126,7 +129,6 @@ export default function Home() {
       <section className="px-6 md:px-24 py-12">
         <h1 className="font-bold text-xl mb-3">Why book with Stayza?</h1>
         <div className="lg:flex gap-5 w-full">
-          {/* Reason 1 */}
           <div className="flex gap-2 w-full items-center bg-white shadow-lg border border-gray-200 p-4 rounded-lg mb-4">
             <Image
               alt="reasons"
@@ -146,7 +148,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Reason 2 */}
           <div className="flex gap-2 w-full items-center bg-white shadow-lg border border-gray-200 p-4 rounded-lg mb-4">
             <Image
               alt="reasons"
@@ -164,7 +165,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Reason 3 */}
           <div className="flex gap-2 w-full items-center bg-white shadow-lg border border-gray-200 p-4 rounded-lg mb-4">
             <Image
               alt="reasons"

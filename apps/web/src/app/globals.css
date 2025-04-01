@@ -137,7 +137,3 @@ a {
   height: auto !important;
   line-height: normal !important;
 }
-
-.hotel-carousel {
-  overflow: visible; /* Ensure overflow is visible */
-}

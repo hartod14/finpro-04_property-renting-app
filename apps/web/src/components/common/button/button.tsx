@@ -1,3 +1,5 @@
+import React from 'react';
+
 interface PanelButtonProps {
   color: 'primary' | 'secondary' | 'danger' | 'white' | 'transparent' | 'black';
   name: string;
@@ -8,8 +10,9 @@ interface PanelButtonProps {
     | 'danger'
     | 'white'
     | 'transparent'
-    | 'black'
-    | null;
+    | 'black';
+  icon?: React.ReactNode;
+  iconPosition?: 'before' | 'after';
 }
 
 const classMapping: Record<
@@ -59,18 +62,22 @@ export default function Button({
   name,
   textColor,
   border,
+  icon,
+  iconPosition = 'before',
 }: PanelButtonProps) {
   return (
     <button
       type="button"
-      className={`rounded px-4 py-3 text-sm 
+      className={`rounded px-3 py-2 text-sm flex items-center gap-2
         ${border ? `border border-solid ${classMapping[border].border}` : ''} 
         ${classMapping[color].bg} 
         ${classMapping[textColor].text}
         ${classMapping[color].onHover}
         `}
     >
-      {name}
+      {icon && iconPosition == 'before' && <span>{icon}</span>}
+      <span>{name}</span>
+      {icon && iconPosition == 'after' && <span>{icon}</span>}
     </button>
   );
 }
