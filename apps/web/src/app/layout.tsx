@@ -1,10 +1,14 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Poppins } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/common/navbar/navbar';
 import Footer from '@/components/common/footer/footer';
 
-const inter = Inter({ subsets: ['latin'] });
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+  variable: '--font-poppins',
+});
 
 export const metadata: Metadata = {
   title: 'Stayza - Renting property',
@@ -18,11 +22,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <Navbar />
-        {children}
-        <Footer />
-      </body>
+      <body className={`${poppins.variable} font-sans`}>{children}</body>
     </html>
   );
 }

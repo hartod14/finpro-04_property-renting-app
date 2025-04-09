@@ -69,7 +69,9 @@ export default function Navbar() {
           <div className="text-lg flex flex-col wrap items-start ms-6 mt-20 gap-5">
             <h3 className="font-bold text-2xl ms-4 mb-3">Menus</h3>
             <Button color="white" name="Register" textColor="black"></Button>
-            <Button color="white" name="Login" textColor="black"></Button>
+            <Link href="/user/login">
+              <Button color="white" name="Login" textColor="black"></Button>
+            </Link>
             <Button color="white" name="For Tenant" textColor="black"></Button>
           </div>
         </div>
@@ -82,15 +84,19 @@ export default function Navbar() {
           color={isScrolled ? 'white' : 'transparent'}
           textColor={isScrolled ? 'black' : 'white'}
         />
-        <Button
-          name="Login"
-          color={isScrolled ? 'white' : 'transparent'}
-          textColor={isScrolled ? 'black' : 'white'}
-          border={isScrolled ? 'primary' : 'white'}
-          icon={<FaUser />}
-          iconPosition="before"
-        />
-        <Button name="Register" color="primary" textColor="white" />
+        <Link href="/user/login">
+          <Button
+            name="Login"
+            color={isScrolled ? 'white' : 'transparent'}
+            textColor={isScrolled ? 'black' : 'white'}
+            border={isScrolled ? 'primary' : 'white'}
+            icon={<FaUser />}
+            iconPosition="before"
+          />
+        </Link>
+        <Link href="/user/register">
+          <Button name="Register" color="primary" textColor="white" />
+        </Link>
       </div>
     </nav>
   );

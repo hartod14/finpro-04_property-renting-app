@@ -1,4 +1,5 @@
 import Button from '@/components/common/button/button';
+import Footer from '@/components/common/footer/footer';
 import Navbar from '@/components/common/navbar/navbar';
 import BestDealsCaraosel from '@/components/homepage/bestDealsCaraosel';
 import HotelRecommendation from '@/components/homepage/hotelRecommendation';
@@ -9,6 +10,7 @@ import { FaArrowRight } from 'react-icons/fa';
 export default function Home() {
   return (
     <div>
+      <Navbar />
       <section className="relative h-[520px]">
         <div className="absolute w-full h-full z-auto">
           <Image
@@ -185,6 +187,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 }
