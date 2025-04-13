@@ -85,11 +85,24 @@ model Facility {
   id                  Int                   @id @default(autoincrement())
   type                FaciltyType
   name                String
-  deleted_at          DateTime
+  deleted_at          DateTime?
   PropertyHasFacility PropertyHasFacility[]
   RoomHasFacility     RoomHasFacility[]
 
   @@map("facilites")
+}
+
+model RoomImage {
+  id         Int       @id @default(autoincrement())
+  room_id    Int
+  path       String    @db.Text
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt
+  deleted_at DateTime?
+
+  room       Room @relation(fields: [room_id], references: [id])
+
+  @@map("room_images")
 }
 
 model Property {
@@ -113,8 +126,22 @@ model Property {
   rooms                 Room[]
   peakSeasonRates       PeakSeasonRate[]
   reviews               Review[]
+  propertyImages        PropertyImage[]
 
   @@map("properties")
+}
+
+model PropertyImage {
+  id          Int       @id @default(autoincrement())
+  property_id Int
+  path        String    @db.Text
+  created_at  DateTime  @default(now())
+  updated_at  DateTime? @updatedAt
+  deleted_at  DateTime?
+
+  property Property @relation(fields: [property_id], references: [id])
+
+  @@map("property_images")
 }
 
 model PropertyHasFacility {
@@ -164,6 +191,7 @@ model Room {
   roomHasFacilities    RoomHasFacility[]
   roomUnavailableDates RoomUnavailableDate[]
   bookings             Booking[]
+  RoomImage            RoomImage[]
 
   @@map("rooms")
 }

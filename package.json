@@ -9,7 +9,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "prepare": "husky install",
     "postprepare": "bash -c 'chmod ug+x .husky/*'"
-  },
+  },  
   "devDependencies": {
     "@commitlint/cli": "^18.4.2",
     "@commitlint/config-conventional": "^18.4.2",

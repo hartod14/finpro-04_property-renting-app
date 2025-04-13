@@ -1,0 +1,102 @@
+[
+  {
+    "id": 1,
+    "type": "PROPERTY",
+    "name": "Area Parkir"
+  },
+  {
+    "id": 2,
+    "type": "PROPERTY",
+    "name": "Check-out Express"
+  },
+  {
+    "id": 3,
+    "type": "PROPERTY",
+    "name": "Lift"
+  },
+  {
+    "id": 4,
+    "type": "PROPERTY",
+    "name": "Layanan Kamar 24 Jam"
+  },
+  {
+    "id": 5,
+    "type": "PROPERTY",
+    "name": "Restoran"
+  },
+  {
+    "id": 6,
+    "type": "PROPERTY",
+    "name": "Kolam Renang"
+  },
+  {
+    "id": 7,
+    "type": "PROPERTY",
+    "name": "Resepsionis 24 Jam"
+  },
+  {
+    "id": 8,
+    "type": "PROPERTY",
+    "name": "Keamanan 24 Jam"
+  },
+  {
+    "id": 9,
+    "type": "PROPERTY",
+    "name": "Penitipan Bagasi"
+  },
+  {
+    "id": 10,
+    "type": "PROPERTY",
+    "name": "Laundry"
+  },
+  {
+    "id": 11,
+    "type": "ROOM",
+    "name": "AC"
+  },
+  {
+    "id": 12,
+    "type": "ROOM",
+    "name": "Pembuat Kopi/Teh"
+  },
+  {
+    "id": 13,
+    "type": "ROOM",
+    "name": "Televisi"
+  },
+  {
+    "id": 14,
+    "type": "ROOM",
+    "name": "Hair Dryer"
+  },
+  {
+    "id": 15,
+    "type": "ROOM",
+    "name": "Shower"
+  },
+  {
+    "id": 16,
+    "type": "ROOM",
+    "name": "Brankas Kamar"
+  },
+  {
+    "id": 17,
+    "type": "ROOM",
+    "name": "Kulkas"
+  },
+  {
+    "id": 18,
+    "type": "ROOM",
+    "name": "Setrika"
+  },
+  {
+    "id": 19,
+    "type": "ROOM",
+    "name": "Minibar"
+  },
+  {
+    "id": 20,
+    "type": "ROOM",
+    "name": "Balkon/Teras"
+  }
+]
