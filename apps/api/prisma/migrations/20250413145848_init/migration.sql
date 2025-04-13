@@ -54,9 +54,21 @@ CREATE TABLE "facilites" (
     "id" SERIAL NOT NULL,
     "type" "FaciltyType" NOT NULL,
     "name" TEXT NOT NULL,
-    "deleted_at" TIMESTAMP(3) NOT NULL,
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "facilites_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "room_images" (
+    "id" SERIAL NOT NULL,
+    "room_id" INTEGER NOT NULL,
+    "path" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3),
+    "deleted_at" TIMESTAMP(3),
+
+    CONSTRAINT "room_images_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -75,6 +87,18 @@ CREATE TABLE "properties" (
     "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "properties_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "property_images" (
+    "id" SERIAL NOT NULL,
+    "property_id" INTEGER NOT NULL,
+    "path" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3),
+    "deleted_at" TIMESTAMP(3),
+
+    CONSTRAINT "property_images_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -199,6 +223,9 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 CREATE UNIQUE INDEX "bookings_payment_id_key" ON "bookings"("payment_id");
 
 -- AddForeignKey
+ALTER TABLE "room_images" ADD CONSTRAINT "room_images_room_id_fkey" FOREIGN KEY ("room_id") REFERENCES "rooms"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "properties" ADD CONSTRAINT "properties_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -206,6 +233,9 @@ ALTER TABLE "properties" ADD CONSTRAINT "properties_category_id_fkey" FOREIGN KE
 
 -- AddForeignKey
 ALTER TABLE "properties" ADD CONSTRAINT "properties_city_id_fkey" FOREIGN KEY ("city_id") REFERENCES "cities"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "property_images" ADD CONSTRAINT "property_images_property_id_fkey" FOREIGN KEY ("property_id") REFERENCES "properties"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "property_has_facilities" ADD CONSTRAINT "property_has_facilities_facility_id_fkey" FOREIGN KEY ("facility_id") REFERENCES "facilites"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
