@@ -117,24 +117,24 @@ export const getAccessToken = async () => {
   }
 }
 
-export const checkResetPasswordToken = async (token: string) => {
-  return await api(
-    `/auth/reset-password?token=${encodeURIComponent(token)}`,
-    'GET',
-    undefined
-  );
-};
+// export const checkResetPasswordToken = async (token: string) => {
+//   return await api(
+//     `/auth/reset-password?token=${encodeURIComponent(token)}`,
+//     'GET',
+//     undefined
+//   );
+// };
 
-export const resetPassword = async (id: number, body: {
-  password: string,
-  token: string
-}) => {
-  return await api(
-    `/auth/reset-password/${id}`,
-    `POST`,
-    {
-      body,
-      contentType: "application/json",
-    },
-  )
-}
+// export const resetPassword = async (id: number, body: {
+//   password: string,
+//   token: string
+// }) => {
+//   return await api(
+//     `/auth/reset-password/${id}`,
+//     `POST`,
+//     {
+//       body,
+//       contentType: "application/json",
+//     },
+//   )
+// }

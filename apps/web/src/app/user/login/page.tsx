@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import Snackbar from '@mui/material/Snackbar';
 import { Alert } from '@mui/material';
 import { login } from '@/app/action/auth';
+import { log } from 'console';
 
 export default function Page() {
   const { push } = useRouter();
@@ -22,6 +23,8 @@ export default function Page() {
     onSubmit: async (values) => {
       setErrMessage('');
       await login(values).then((res) => {
+        console.log(res);
+
         if (res?.error) {
           setErrMessage(res.error);
         } else {

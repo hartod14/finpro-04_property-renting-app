@@ -52,7 +52,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (account?.provider == "google") {
         return profile?.email_verified || false;
       }
-      return true; // Do different verification for other providers that don't have `email_verified`
+      return true;
     },
     async jwt({ token, user, trigger }) {
       if (user) {
@@ -71,11 +71,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const user = jwtDecode(token.access_token!) as User;
         session.user.id = user.id as string;
         session.user.email = user.email as string;
-        session.user.profile_photo = user.profile_photo as string;
+        session.user.profile_picture = user.profile_picture as string;
         session.user.name = user.name as string;
-        session.user.point = user.point as string;
         session.user.role = user.role as string;
-        session.user.referral_code = user.referral_code as string;
         session.user.access_token = token.access_token as string;
         session.user.phone = user.phone as string;
       }
@@ -84,6 +82,3 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
 });
-
-//access_token = untuk mengakses service di dalam api
-//refresh_token = untuk mengupdate access_token yang baru

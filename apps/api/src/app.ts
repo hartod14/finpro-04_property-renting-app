@@ -9,6 +9,7 @@ import express, {
 } from 'express';
 import cors from 'cors';
 import { PORT } from './config';
+import { authRouter } from './routers/auth.router';
 // import { SampleRouter } from './routers/sample.router';
 
 export default class App {
@@ -56,6 +57,9 @@ export default class App {
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
     });
+    
+    //global
+    this.app.use('/api/auth', authRouter());
 
     // this.app.use('/api/samples', sampleRouter.getRouter());
   }
