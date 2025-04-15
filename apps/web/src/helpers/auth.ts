@@ -5,7 +5,7 @@ import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import { jwtDecode } from "jwt-decode";
 import { InvalidAuthError } from "../interfaces/auth.error";
-import { login, refreshToken } from "../handlers/auth";
+import { login, refreshToken } from "@/handlers/auth";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: {
@@ -27,7 +27,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
   session: {
     strategy: "jwt",
-    maxAge: 60 * 60,
+    maxAge: 60 * 20,
   },
   providers: [
     Credentials({
@@ -52,7 +52,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (account?.provider == "google") {
         return profile?.email_verified || false;
       }
-      return true;
+      return true; // Do different verification for other providers that don't have `email_verified`
     },
     async jwt({ token, user, trigger }) {
       if (user) {
@@ -75,10 +75,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.name = user.name as string;
         session.user.role = user.role as string;
         session.user.access_token = token.access_token as string;
-        session.user.phone = user.phone as string;
       }
-      
+
       return session;
     },
   },
 });
+
+//access_token = untuk mengakses service di dalam api
+//refresh_token = untuk mengupdate access_token yang baru

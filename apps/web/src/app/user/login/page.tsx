@@ -10,10 +10,10 @@ import { Alert } from '@mui/material';
 import { login } from '@/app/action/auth';
 import { log } from 'console';
 
-export default function Page() {
+export default function LoginPage() {
   const { push } = useRouter();
   const open = useRef(false);
-  const [errMessage, setErrMessage] = useState('');
+  const [errMessage, setErrMessage] = React.useState("");
 
   const formik = useFormik({
     initialValues: {
@@ -23,8 +23,6 @@ export default function Page() {
     onSubmit: async (values) => {
       setErrMessage('');
       await login(values).then((res) => {
-        console.log(res);
-
         if (res?.error) {
           setErrMessage(res.error);
         } else {
@@ -67,7 +65,7 @@ export default function Page() {
             onChange={formik.handleChange}
           />
           {errMessage && <p className="text-sm text-red-600">{errMessage}</p>}
-          <button
+          <button type='submit'
             className={`w-full p-3 rounded-md text-white font-semibold transition-all duration-200 ease-in-out ${
               formik.isSubmitting
                 ? 'bg-gray-400 cursor-not-allowed'

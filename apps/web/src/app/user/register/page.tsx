@@ -9,7 +9,7 @@ import { register } from '@/handlers/auth';
 import { useRouter } from 'next/navigation';
 import { registerInit } from '@/helpers/formiks/formik.init';
 
-export default function Page() {
+export default function RegisterPage() {
   const [errMessage, setErrMessage] = React.useState('');
   const open = useRef(false);
   const router = useRouter();

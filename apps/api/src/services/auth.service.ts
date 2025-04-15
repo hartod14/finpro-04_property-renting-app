@@ -20,9 +20,10 @@ interface AuthenticatedRequest extends Request {
 
 class AuthService {
   async signIn(req: Request) {
-    const { email, password } = req.body;
+    const { email, password } = req.body;  
 
     const user = (await getUserByEmail(email)) as IUserLogin;
+    
     if (!user) throw new ErrorHandler('wrong email', 401);
     else if (!(await compare(password, user.password as string)))
       throw new ErrorHandler('wrong password', 401);

@@ -5,10 +5,12 @@ import Image from 'next/image';
 import Button from '../button/button';
 import Link from 'next/link';
 import { FaUser } from 'react-icons/fa';
+import { signOut, useSession } from 'next-auth/react';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const { data: session } = useSession();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -78,25 +80,27 @@ export default function Navbar() {
       )}
 
       {/* Desktop Navigation */}
-      <div className="hidden md:flex items-center gap-4">
-        <Button
-          name="For Tenant"
-          color={isScrolled ? 'white' : 'transparent'}
-          textColor={isScrolled ? 'black' : 'white'}
-        />
-        <Link href="/user/login">
+      <div className={`${session?.user?.id ? 'hidden' : ''}`}>
+        <div className="hidden md:flex items-center gap-4">
           <Button
-            name="Login"
+            name="For Tenant"
             color={isScrolled ? 'white' : 'transparent'}
             textColor={isScrolled ? 'black' : 'white'}
-            border={isScrolled ? 'primary' : 'white'}
-            icon={<FaUser />}
-            iconPosition="before"
           />
-        </Link>
-        <Link href="/user/register">
-          <Button name="Register" color="primary" textColor="white" />
-        </Link>
+          <Link href="/user/login">
+            <Button
+              name="Login"
+              color={isScrolled ? 'white' : 'transparent'}
+              textColor={isScrolled ? 'black' : 'white'}
+              border={isScrolled ? 'primary' : 'white'}
+              icon={<FaUser />}
+              iconPosition="before"
+            />
+          </Link>
+          <Link href="/user/register">
+            <Button name="Register" color="primary" textColor="white" />
+          </Link>
+        </div>
       </div>
     </nav>
   );

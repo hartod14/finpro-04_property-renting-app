@@ -17,8 +17,8 @@ export const authRouter = () => {
   // router.get("/reset-password", authController.resetPasswordCheck)
   // router.post("/reset-password/:id", authController.resetPassword)
 
-  router.patch('/update', verifyUser, authController.updateUser);
-  router.patch('/password/change', verifyUser, authController.changePassword)
+  // router.patch('/update', verifyUser, authController.updateUser);
+  // router.patch('/password/change', verifyUser, authController.changePassword)
 
   return router;
 };

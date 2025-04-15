@@ -13,6 +13,6 @@
     }
   },
   // "include": ["src/**/*"],
-  "include": ["**/*.ts"],
+  "include": ["**/*.ts", "../web/next.config.ts"],
   "exclude": ["node_modules"]
 }
