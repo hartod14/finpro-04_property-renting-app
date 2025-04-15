@@ -9,7 +9,7 @@ import { FaArrowRight } from 'react-icons/fa';
 
 export default function Home() {
   return (
-    <div>
+    <>
       <Navbar />
       <section className="relative h-[520px]">
         <div className="absolute w-full h-full z-auto">
@@ -189,6 +189,6 @@ export default function Home() {
       </section>
 
       <Footer />
-    </div>
+    </>
   );
 }

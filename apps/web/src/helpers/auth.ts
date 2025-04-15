@@ -1,24 +1,24 @@
 /** @format */
 
-import NextAuth, { User } from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import Google from "next-auth/providers/google";
-import { jwtDecode } from "jwt-decode";
-import { InvalidAuthError } from "../interfaces/auth.error";
-import { login, refreshToken } from "@/handlers/auth";
+import NextAuth, { User } from 'next-auth';
+import Credentials from 'next-auth/providers/credentials';
+import Google from 'next-auth/providers/google';
+import { jwtDecode } from 'jwt-decode';
+import { InvalidAuthError } from '../interfaces/auth.error';
+import { login, refreshToken } from '@/handlers/auth';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: {
-    signIn: "/login",
+    signIn: '/login',
   },
   cookies: {
     sessionToken: {
-      name: "next-auth.session-token",
+      name: 'next-auth.session-token',
       options: {
         domain: process.env.AUTH_DOMAIN as string,
-        path: "/",
+        path: '/',
         httpOnly: true,
-        sameSite: "lax",
+        sameSite: 'lax',
         secure: true,
       },
     },
@@ -26,8 +26,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.AUTH_SECRET as string,
   trustHost: true,
   session: {
-    strategy: "jwt",
-    maxAge: 60 * 20,
+    strategy: 'jwt',
+    maxAge: 60 * 60 * 3,
   },
   providers: [
     Credentials({
@@ -41,15 +41,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
     Google({
       authorization: {
-        prompt: "consent",
-        access_type: "offline",
-        response_type: "code",
+        prompt: 'consent',
+        access_type: 'offline',
+        response_type: 'code',
       },
     }),
   ],
   callbacks: {
     signIn({ account, profile }) {
-      if (account?.provider == "google") {
+      if (account?.provider == 'google') {
         return profile?.email_verified || false;
       }
       return true; // Do different verification for other providers that don't have `email_verified`
@@ -58,7 +58,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         const { access_token, refresh_token } = user;
         return { access_token, refresh_token };
-      } else if (token.access_token || trigger == "update") {
+      } else if (token.access_token || trigger == 'update') {
         const newToken = await refreshToken();
 
         return newToken;

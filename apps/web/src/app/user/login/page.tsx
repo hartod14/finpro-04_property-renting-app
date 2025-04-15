@@ -27,7 +27,9 @@ export default function LoginPage() {
           setErrMessage(res.error);
         } else {
           open.current = true;
-          push('/');
+          setTimeout(() => {
+            push('/');
+          }, 1500);
         }
       });
     },

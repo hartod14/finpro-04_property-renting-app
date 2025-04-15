@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import './globals.css';
-import Navbar from '@/components/common/navbar/navbar';
-import Footer from '@/components/common/footer/footer';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -17,9 +15,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="en">
       <body className={`${poppins.variable} font-sans`}>{children}</body>
