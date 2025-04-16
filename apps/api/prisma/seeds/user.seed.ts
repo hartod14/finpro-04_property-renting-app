@@ -11,7 +11,7 @@ export const userSeed: Prisma.UserCreateManyInput[] = [
     password: '$2a$12$s04QDF9eMHocZ92VCRdwEOUpR6QrkLzU6JCwyae9JyWonQPkAHoXG',
     profile_picture:
       'https://res.cloudinary.com/dv1ehfskz/image/upload/v1739848466/oq064fyxu0pfcmybph1f.jpg',
-    is_verified: true,
+    email_verified: true,
     role: 'USER',
   },
   {
@@ -22,7 +22,7 @@ export const userSeed: Prisma.UserCreateManyInput[] = [
     password: '$2a$12$s04QDF9eMHocZ92VCRdwEOUpR6QrkLzU6JCwyae9JyWonQPkAHoXG',
     profile_picture:
       'https://res.cloudinary.com/dv1ehfskz/image/upload/v1739848466/oq064fyxu0pfcmybph1f.jpg',
-    is_verified: true,
+    email_verified: true,
     role: 'TENANT',
   },
   {
@@ -33,7 +33,7 @@ export const userSeed: Prisma.UserCreateManyInput[] = [
     password: '$2a$12$s04QDF9eMHocZ92VCRdwEOUpR6QrkLzU6JCwyae9JyWonQPkAHoXG',
     profile_picture:
       'https://res.cloudinary.com/dv1ehfskz/image/upload/v1739848466/oq064fyxu0pfcmybph1f.jpg',
-    is_verified: true,
+    email_verified: true,
     role: 'USER',
   },
 ];

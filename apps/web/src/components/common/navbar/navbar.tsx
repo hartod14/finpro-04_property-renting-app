@@ -88,10 +88,10 @@ export default function Navbar() {
             <h3 className="font-bold text-2xl ms-4 mb-3">Menus</h3>
             {!session?.user?.id ? (
               <>
-                <Link href="/user/register">
+                <Link href="/auth/user/register">
                   <Button color="white" name="Register" textColor="black" />
                 </Link>
-                <Link href="/user/login">
+                <Link href="/auth/user/login">
                   <Button color="white" name="Login" textColor="black" />
                 </Link>
                 <Button color="white" name="For Tenant" textColor="black" />
@@ -142,7 +142,7 @@ export default function Navbar() {
             color={isScrolled ? 'white' : 'transparent'}
             textColor={isScrolled ? 'black' : 'white'}
           />
-          <Link href="/user/login">
+          <Link href="/auth/user/login">
             <Button
               name="Login"
               color={isScrolled ? 'white' : 'transparent'}
@@ -152,7 +152,7 @@ export default function Navbar() {
               iconPosition="before"
             />
           </Link>
-          <Link href="/user/register">
+          <Link href="/auth/user/register">
             <Button name="Register" color="primary" textColor="white" />
           </Link>
         </div>

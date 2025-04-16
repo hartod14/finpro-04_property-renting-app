@@ -42,7 +42,7 @@ export default function LoginPage() {
           <h4 className="text-2xl font-bold mb-2">Login</h4>
           <p className="text-gray-600">
             Don't have an account?{' '}
-            <Link href="/user/register" className="text-primary font-semibold">
+            <Link href="/auth/user/register" className="text-primary font-semibold">
               Sign up here
             </Link>
           </p>

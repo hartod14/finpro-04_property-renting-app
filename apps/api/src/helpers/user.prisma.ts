@@ -9,7 +9,7 @@ export const getUserByEmail = (email: string) =>
       phone: true,
       password: true,
       profile_picture: true,
-      is_verified: true,
+      email_verified: true,
       role: true,
     },
     where: {

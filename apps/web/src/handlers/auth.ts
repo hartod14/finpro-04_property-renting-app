@@ -8,7 +8,7 @@ import { auth_secret } from '@/helpers/config';
 
 export const login = async (credentials: Partial<Record<string, unknown>>) => {
   console.log(credentials);
-  
+
   const res = await api('/auth', 'POST', {
     body: credentials,
     contentType: 'application/json',
@@ -22,9 +22,10 @@ export const login = async (credentials: Partial<Record<string, unknown>>) => {
 
 export const register = async (newUser: {
   email: string;
-  name: string;
-  phone: string;
-  password: string;
+  role: string;
+  // name: string;
+  // phone: string;
+  // password: string;
 }) =>
   await api('/auth/new', 'POST', {
     body: newUser,
@@ -82,4 +83,25 @@ export const getAccessToken = async () => {
   } else {
     return;
   }
+};
+
+export const checkVerificationToken = async (token: string) => {
+  return await api(
+    `/auth/check-verification?token=${encodeURIComponent(token)}`,
+    'GET',
+    undefined,
+  );
+};
+
+export const verificationAndSetPassword = async (
+  token: string,
+  values: any,
+) => {
+  return await api(`/auth/verification-set-password`, 'PATCH', {
+    body: {
+      token,
+      password: values.password,
+    },
+    contentType: 'application/json',
+  });
 };

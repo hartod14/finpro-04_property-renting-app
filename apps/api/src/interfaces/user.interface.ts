@@ -7,6 +7,6 @@ export interface IUserLogin {
   phone?: string | null;
   password?: string;
   profile_picture?: string | null;
-  is_verified: boolean;
+  email_verified: boolean;
   role: Role;
 }

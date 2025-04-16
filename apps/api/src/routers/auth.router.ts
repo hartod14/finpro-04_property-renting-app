@@ -11,6 +11,10 @@ export const authRouter = () => {
   router.post('/', authController.signIn);
 
   router.post("/token", verifyRefreshToken, authController.refreshToken);
+
+  router.get('/check-verification', authController.checkVerificationToken);
+  router.patch('/verification-set-password', authController.verificationSetPassword);
+  
   // router.patch('/:id', verifyUser, authController.updateUser);
 
   // router.post("/forget-password", authController.forgetPassword)

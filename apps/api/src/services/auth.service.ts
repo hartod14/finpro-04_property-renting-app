@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import { jwt_secret, prisma } from '../config';
-import { Prisma } from '@prisma/client';
+import { Prisma, Role } from '@prisma/client';
 import { hashedPassword } from '../helpers/bcrypt';
 import { compare } from 'bcrypt';
 import { getUserByEmail } from '../helpers/user.prisma';
@@ -13,6 +13,10 @@ import { transporter } from '../helpers/nodemailer';
 import { hbs } from '../helpers/handlebars';
 import { generateRandomString } from '@/helpers/random-string';
 import { log } from 'console';
+import {
+  decodeVerificationJwt,
+  verificationJwt,
+} from '@/helpers/verification.jwt';
 
 interface AuthenticatedRequest extends Request {
   user?: IUserLogin;
@@ -20,10 +24,10 @@ interface AuthenticatedRequest extends Request {
 
 class AuthService {
   async signIn(req: Request) {
-    const { email, password } = req.body;  
+    const { email, password } = req.body;
 
     const user = (await getUserByEmail(email)) as IUserLogin;
-    
+
     if (!user) throw new ErrorHandler('wrong email', 401);
     else if (!(await compare(password, user.password as string)))
       throw new ErrorHandler('wrong password', 401);
@@ -32,19 +36,18 @@ class AuthService {
   }
 
   async signUp(req: Request) {
-      const { email, password, phone, name } = req.body;
+    const { email, role } = req.body;
 
     const result = await prisma.$transaction(async (tx) => {
+      const token = verificationJwt(email);
       const newUser = await tx.user.create({
         data: {
           email,
-          password: await hashedPassword(password),
-          phone,
-          name,
-          is_verified: true,
-          role: 'USER',
+          role,
         },
       });
+
+      await this.sendEmailVerifAndSetPass(email, token);
 
       return newUser;
     });
@@ -177,6 +180,68 @@ class AuthService {
 
   //   }
   // }
+
+  async sendEmailVerifAndSetPass(email: string, token: string) {
+    try {
+      const compiledTemplate = hbs('verification-and-set-password.hbs');
+      const html = compiledTemplate({
+        email,
+        token,
+        FRONTEND_URL: process.env.FRONTEND_URL,
+      });
+
+      transporter.sendMail({
+        to: email,
+        subject: 'Verification and Set Password',
+        html,
+      });
+      return 'Success send email';
+    } catch (error) {
+      throw new ErrorHandler('Failed send email');
+    }
+  }
+
+  async checkVerificationToken(req: Request) {
+    const { token } = req.query;
+    const decoded = decodeVerificationJwt(token as string);
+
+    if (decoded && typeof decoded === 'object' && 'iat' in decoded) {
+      const issuedAt = new Date((decoded.iat as number) * 1000);
+      const currentTime = new Date();
+      const hoursPassed =
+        (currentTime.getTime() - issuedAt.getTime()) / (1000 * 60 * 60);
+
+      if (hoursPassed > 1) {
+        return 'token invalid';
+      }
+    }
+
+    return decoded;
+  }
+
+  async verificationSetPassword(req: Request) {
+    const { token, password } = req.body;
+    const decoded = decodeVerificationJwt(token as string) as { email: string };
+    try {
+      await this.updatePassword(decoded.email, password);
+    } catch (error) {
+      throw new ErrorHandler(error as string);
+    }
+  }
+
+  async updatePassword(email: string, password: string) {
+    try {
+      return await prisma.user.update({
+        where: { email },
+        data: {
+          password: await hashedPassword(password),
+          email_verified: true,
+        },
+      });
+    } catch (error) {
+      throw new ErrorHandler('Failed update password');
+    }
+  }
 }
 
 export default new AuthService();

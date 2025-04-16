@@ -8,10 +8,10 @@ class AuthController {
   async signIn(req: Request, res: Response, next: NextFunction) {
     try {
       // console.log(req);
-      
+
       const data = await authService.signIn(req);
       // console.log(data);
-      
+
       responseHandler(res, 'login success', data);
     } catch (error) {
       next(error);
@@ -48,6 +48,32 @@ class AuthController {
     try {
       const data = await authService.refreshToken(req);
       responseHandler(res, 'refresh token success', data);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async checkVerificationToken(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const data = await authService.checkVerificationToken(req);
+      responseHandler(res, 'verification token success', data);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async verificationSetPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const data = await authService.verificationSetPassword(req);
+      responseHandler(res, 'verification set password success', data);
     } catch (error) {
       next(error);
     }

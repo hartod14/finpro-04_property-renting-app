@@ -11,17 +11,17 @@
     "postprepare": "bash -c 'chmod ug+x .husky/*'"
   },
   "devDependencies": {
-    "@commitlint/cli": "^18.4.2",
-    "@commitlint/config-conventional": "^18.4.2",
+    "@commitlint/cli": "^18.6.1",
+    "@commitlint/config-conventional": "^18.6.3",
     "@types/express": "^5.0.1",
-    "autoprefixer": "^10.4.20",
-    "eslint": "^8.48.0",
-    "husky": "^8.0.0",
-    "lint-staged": "^15.1.0",
-    "postcss": "^8.5.1",
-    "prettier": "^3.1.0",
-    "tsc-alias": "^1.8.10",
-    "tsconfig": "*",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^8.57.1",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.5.1",
+    "postcss": "^8.5.3",
+    "prettier": "^3.5.3",
+    "tsc-alias": "^1.8.15",
+    "tsconfig": "^7.0.0",
     "turbo": "latest"
   },
   "name": "finpro-nextjs-express-prisma",
@@ -36,7 +36,7 @@
     }
   },
   "dependencies": {
-    "@types/axios": "^0.14.0",
-    "axios": "^1.7.2"
+    "@types/axios": "^0.14.4",
+    "axios": "^1.8.4"
   }
 }

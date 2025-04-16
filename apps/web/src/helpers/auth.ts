@@ -41,19 +41,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
     Google({
       authorization: {
-        prompt: 'consent',
-        access_type: 'offline',
-        response_type: 'code',
+        params: {
+          prompt: 'consent',
+          access_type: 'offline',
+          response_type: 'code',
+        },
       },
     }),
   ],
   callbacks: {
-    signIn({ account, profile }) {
-      if (account?.provider == 'google') {
-        return profile?.email_verified || false;
-      }
-      return true; // Do different verification for other providers that don't have `email_verified`
-    },
+    // async signIn({ account, profile }) {
+    //   if (account?.provider === 'google') {
+    //     return (
+    //       profile?.email_verified && profile?.email?.endsWith('@example.com')
+    //     );
+    //   }
+    //   return true; // Do different verification for other providers that don't have `email_verified`
+    // },
     async jwt({ token, user, trigger }) {
       if (user) {
         const { access_token, refresh_token } = user;
