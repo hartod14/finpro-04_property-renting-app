@@ -7,8 +7,6 @@ import { log } from 'console';
 import { auth_secret } from '@/helpers/config';
 
 export const login = async (credentials: Partial<Record<string, unknown>>) => {
-  console.log(credentials);
-
   const res = await api('/auth', 'POST', {
     body: credentials,
     contentType: 'application/json',
@@ -20,13 +18,7 @@ export const login = async (credentials: Partial<Record<string, unknown>>) => {
   };
 };
 
-export const register = async (newUser: {
-  email: string;
-  role: string;
-  // name: string;
-  // phone: string;
-  // password: string;
-}) =>
+export const register = async (newUser: { email: string; role: string }) =>
   await api('/auth/new', 'POST', {
     body: newUser,
     contentType: 'application/json',
@@ -104,4 +96,51 @@ export const verificationAndSetPassword = async (
     },
     contentType: 'application/json',
   });
+};
+
+export const resendVerificationEmail = async (email: string) => {
+  return await api('/auth/resend-verification', 'POST', {
+    body: { email },
+    contentType: 'application/json',
+  }).catch((err) => (err instanceof Error ? { error: err.message } : err));
+};
+
+export const forgetPassword = async (email: string) => {
+  return await api(`/auth/forget-password`, 'POST', {
+    body: { email },
+    contentType: 'application/json',
+  }).catch((err) => (err instanceof Error ? { error: err.message } : err));
+};
+
+export const googleAuth = async (profileData: {
+  email: string;
+  name?: string;
+  google_id: string;
+  profile_picture?: string;
+}) => {
+  try {
+    const response = await api('/auth/google', 'POST', {
+      body: {
+        ...profileData,
+        role: 'USER',
+      },
+      contentType: 'application/json',
+    });
+
+    return {
+      data: {
+        access_token: response.data.access_token,
+        refresh_token: response.data.refresh_token,
+      },
+    };
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const updatePassword = async (token: string, values: any) => {
+  return await api(`/auth/update-password?token=${encodeURIComponent(token)}`, 'PATCH', {
+    body: { password: values.password },
+    contentType: 'application/json',
+  }).catch((err) => (err instanceof Error ? { error: err.message } : err));
 };

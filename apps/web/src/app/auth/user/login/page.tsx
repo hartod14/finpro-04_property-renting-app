@@ -7,13 +7,13 @@ import React, { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Snackbar from '@mui/material/Snackbar';
 import { Alert } from '@mui/material';
-import { login } from '@/app/action/auth';
-import { log } from 'console';
+import { googleLogin, login } from '@/app/action/auth';
+import GoogleImage from '@/../public/google.png';
 
 export default function LoginPage() {
   const { push } = useRouter();
   const open = useRef(false);
-  const [errMessage, setErrMessage] = React.useState("");
+  const [errMessage, setErrMessage] = React.useState('');
 
   const formik = useFormik({
     initialValues: {
@@ -42,7 +42,10 @@ export default function LoginPage() {
           <h4 className="text-2xl font-bold mb-2">Login</h4>
           <p className="text-gray-600">
             Don't have an account?{' '}
-            <Link href="/auth/user/register" className="text-primary font-semibold">
+            <Link
+              href="/auth/user/register"
+              className="text-primary font-semibold"
+            >
               Sign up here
             </Link>
           </p>
@@ -67,7 +70,8 @@ export default function LoginPage() {
             onChange={formik.handleChange}
           />
           {errMessage && <p className="text-sm text-red-600">{errMessage}</p>}
-          <button type='submit'
+          <button
+            type="submit"
             className={`w-full p-3 rounded-md text-white font-semibold transition-all duration-200 ease-in-out ${
               formik.isSubmitting
                 ? 'bg-gray-400 cursor-not-allowed'
@@ -80,26 +84,66 @@ export default function LoginPage() {
         </form>
         <div className="mt-4 text-center">
           <Link
-            href={'/forget-password'}
+            href={'/auth/forget-password'}
             className="text-primary font-semibold"
           >
             Forgot password?
           </Link>
         </div>
+        <Snackbar
+          className="!bg-primary"
+          open={open.current}
+          autoHideDuration={1500}
+          onClose={() => {
+            open.current = false;
+          }}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+          <Alert severity="success" variant="filled" sx={{ width: '100%' }}>
+            Login Success
+          </Alert>
+        </Snackbar>
+        <center>
+          <h5 className="mt-6 mb-2 text-gray-500 flex items-center justify-center gap-2">
+            <hr className="w-full border-gray-300" />
+            <p className="text-gray-500 w-[900px]">
+              or use one of these options
+            </p>
+            <hr className="w-full border-gray-300" />
+          </h5>
+
+          <div className="flex items-center justify-center gap-4">
+            {/* <div>
+              <div className="border p-6 w-full mx-[5] my-[10] rounded-md cursor-pointer">
+                <Image
+                  alt=""
+                  src={FacebookImage}
+                  width={16}
+                  height={8}
+                  className="h-4 w-2"
+                />
+              </div>
+            </div> */}
+
+            <div>
+              <div
+                className="border p-4 w-full mx-[5] my-[10] rounded-md cursor-pointer"
+                onClick={() => {
+                  googleLogin();
+                }}
+              >
+                <Image
+                  alt="Google"
+                  src={GoogleImage}
+                  width={15}
+                  height={15}
+                  className="h-[15] w-[15]"
+                />
+              </div>
+            </div>
+          </div>
+        </center>
       </div>
-      <Snackbar
-        className="!bg-primary"
-        open={open.current}
-        autoHideDuration={1500}
-        onClose={() => {
-          open.current = false;
-        }}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert severity="success" variant="filled" sx={{ width: '100%' }}>
-          Login Success
-        </Alert>
-      </Snackbar>
     </div>
   );
 }

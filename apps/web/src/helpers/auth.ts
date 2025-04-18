@@ -2,14 +2,16 @@
 
 import NextAuth, { User } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-import Google from 'next-auth/providers/google';
+import GoogleProvider from 'next-auth/providers/google';
 import { jwtDecode } from 'jwt-decode';
 import { InvalidAuthError } from '../interfaces/auth.error';
-import { login, refreshToken } from '@/handlers/auth';
+import { login, refreshToken, googleAuth } from '@/handlers/auth';
+import Google from 'next-auth/providers/google';
+import { log, profile } from 'console';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: {
-    signIn: '/login',
+    signIn: '/auth/user/login',
   },
   cookies: {
     sessionToken: {
@@ -33,13 +35,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     Credentials({
       async authorize(credentials) {
         try {
-          return await login(credentials);
+          const result = await login(credentials);
+          return result;
         } catch (error: unknown) {
           throw new InvalidAuthError(error);
         }
       },
     }),
     Google({
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
       authorization: {
         params: {
           prompt: 'consent',
@@ -50,14 +55,28 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    // async signIn({ account, profile }) {
-    //   if (account?.provider === 'google') {
-    //     return (
-    //       profile?.email_verified && profile?.email?.endsWith('@example.com')
-    //     );
-    //   }
-    //   return true; // Do different verification for other providers that don't have `email_verified`
-    // },
+    async signIn({ account, profile, user }) {
+      if (account?.provider == 'google' && profile?.email) {
+        try {
+          const { sub, email, name, picture } = profile;
+          const auth = await googleAuth({
+            email: email as string,
+            name: name as string,
+            google_id: sub || '',
+            profile_picture: picture || '',
+          });
+
+          if (auth?.data?.access_token) {
+            user.access_token = auth.data.access_token;
+            user.refresh_token = auth.data.refresh_token;
+          }
+        } catch (error) {
+          return false;
+        }
+      }
+      return true;
+    },
+
     async jwt({ token, user, trigger }) {
       if (user) {
         const { access_token, refresh_token } = user;
@@ -71,11 +90,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
 
     async session({ session, token }) {
+
       if (token.access_token) {
         const user = jwtDecode(token.access_token!) as User;
         session.user.id = user.id as string;
         session.user.email = user.email as string;
         session.user.profile_picture = user.profile_picture as string;
+        session.user.is_verified = user.is_verified as boolean;
         session.user.name = user.name as string;
         session.user.role = user.role as string;
         session.user.access_token = token.access_token as string;
@@ -85,6 +106,3 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
 });
-
-//access_token = untuk mengakses service di dalam api
-//refresh_token = untuk mengupdate access_token yang baru

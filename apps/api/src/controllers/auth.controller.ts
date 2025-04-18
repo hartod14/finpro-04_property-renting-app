@@ -3,14 +3,12 @@
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler, responseHandler } from '../helpers/response.handler';
 import authService from '@/services/auth.service';
+import { decodeVerificationJwt } from '@/helpers/verification.jwt';
 
 class AuthController {
   async signIn(req: Request, res: Response, next: NextFunction) {
     try {
-      // console.log(req);
-
       const data = await authService.signIn(req);
-      // console.log(data);
 
       responseHandler(res, 'login success', data);
     } catch (error) {
@@ -44,6 +42,15 @@ class AuthController {
     }
   }
 
+  async googleAuth(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await authService.googleAuth(req);
+      responseHandler(res, 'google auth success', data);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async refreshToken(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await authService.refreshToken(req);
@@ -60,7 +67,7 @@ class AuthController {
   ) {
     try {
       const data = await authService.checkVerificationToken(req);
-      responseHandler(res, 'verification token success', data);
+      responseHandler(res, 'check verification token success', data);
     } catch (error) {
       next(error);
     }
@@ -72,22 +79,48 @@ class AuthController {
     next: NextFunction,
   ) {
     try {
-      const data = await authService.verificationSetPassword(req);
-      responseHandler(res, 'verification set password success', data);
+      await authService.verificationSetPassword(req);
+      responseHandler(res, 'update password success');
     } catch (error) {
       next(error);
     }
   }
 
-  //   async forgetPassword(req: Request, res: Response, next: NextFunction) {
-  //     try {
-  //       const user = await authService.forgetPassword(req);
-  //       await authService.sendEmailForgetPassword(user.email, String(user.forget_password_token));
-  //       responseHandler(res, "reset password has been sent to email")
-  //     } catch (error) {
-  //       next(error)
-  //     }
-  //   }
+  async resendVerificationEmail(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      await authService.resendVerificationEmail(req.body.email);
+      responseHandler(res, 'resend verification email success');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async forgetPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      await authService.forgetPassword(req.body.email);
+      responseHandler(res, 'forget password success');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updatePassword(req: Request, res: Response, next: NextFunction) {
+    console.log(req.query);
+    try {
+      const token = req.query.token as string;
+      const decoded = decodeVerificationJwt(token) as {
+        email: string;
+      };
+      await authService.updatePassword(decoded.email, req.body.password);
+      responseHandler(res, 'update password success');
+    } catch (error) {
+      next(error);
+    }
+  }
 
   //   async resetPasswordCheck(req: Request, res: Response, next: NextFunction) {
   //     try {

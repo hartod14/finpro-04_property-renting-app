@@ -11,7 +11,7 @@ declare module "next-auth" {
     access_token?: string | undefined;
     refresh_token?: string | undefined;
     role?: string | undefined;
-    email_verified?: boolean | undefined;
+    is_verified?: boolean | undefined;
   }
 
   interface Session {

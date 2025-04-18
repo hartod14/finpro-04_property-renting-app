@@ -46,8 +46,9 @@ model User {
   password        String?   @db.Text
   name            String?   @default("User")
   profile_picture String?   @db.Text
-  email_verified  Boolean   @default(false)
+  is_verified     Boolean   @default(false)
   role            Role
+  google_id       String?   @unique @db.Text
   created_at      DateTime  @default(now())
   updated_at      DateTime? @updatedAt
   deleted_at      DateTime?

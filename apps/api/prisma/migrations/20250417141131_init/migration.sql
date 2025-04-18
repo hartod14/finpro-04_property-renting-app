@@ -21,8 +21,9 @@ CREATE TABLE "users" (
     "password" TEXT,
     "name" TEXT DEFAULT 'User',
     "profile_picture" TEXT,
-    "email_verified" BOOLEAN NOT NULL DEFAULT false,
+    "is_verified" BOOLEAN NOT NULL DEFAULT false,
     "role" "Role" NOT NULL,
+    "google_id" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3),
     "deleted_at" TIMESTAMP(3),
@@ -218,6 +219,9 @@ CREATE TABLE "Banner" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "users_google_id_key" ON "users"("google_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "bookings_payment_id_key" ON "bookings"("payment_id");

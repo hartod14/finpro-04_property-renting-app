@@ -5,7 +5,7 @@ import { useFormik } from 'formik';
 import Link from 'next/link';
 import React, { useRef } from 'react';
 import { registerValidator } from '@/validators/auth.validator';
-import { register } from '@/handlers/auth';
+import { register, resendVerificationEmail } from '@/handlers/auth';
 import { useRouter } from 'next/navigation';
 import { registerInit } from '@/helpers/formiks/formik.init';
 import Google from 'next-auth/providers/google';
@@ -13,6 +13,7 @@ import Image from 'next/image';
 import FacebookImage from '@/../public/facebook.png';
 import GoogleImage from '@/../public/google.png';
 import Swal from 'sweetalert2';
+import { googleLogin } from '@/app/action/auth';
 
 export default function RegisterPage() {
   const [errMessage, setErrMessage] = React.useState('');
@@ -25,8 +26,40 @@ export default function RegisterPage() {
     onSubmit: async (values) => {
       setErrMessage('');
       await register(values).then((res) => {
-        if (res?.error) setErrMessage(res.error);
-        else {
+        if (res?.error) {
+          if (res.error == 'email already used') {
+            setErrMessage(res.error);
+          } else if (
+            res.error == 'email already registered, but not verified'
+          ) {
+            Swal.fire({
+              title: 'Registration Failed',
+              text: 'It seems you have already registered, but not verified your email, please check your email for verification or click Resend below to resend verification email',
+              icon: 'warning',
+              confirmButtonColor: '#0194f3',
+              confirmButtonText: 'Resend Verification',
+              showCancelButton: true,
+            }).then(async (result) => {
+              if (result.isConfirmed) {
+                try {
+                  await resendVerificationEmail(values.email);
+                  Swal.fire({
+                    title: 'Verification Email Sent',
+                    text: 'Please check your email for verification',
+                    confirmButtonColor: '#0194f3',
+                  });
+                } catch (error) {
+                  Swal.fire({
+                    title: 'Verification Email Failed',
+                    text: 'Please try again',
+                    icon: 'error',
+                    confirmButtonColor: '#0194f3',
+                  });
+                }
+              }
+            });
+          }
+        } else {
           Swal.fire({
             title: 'Registration Success',
             text: 'Please check your email for verification',
@@ -41,16 +74,19 @@ export default function RegisterPage() {
   });
 
   return (
-    <div className="flex items-center justify-center">
-      <div className=" p-8 bg-white shadow-lg rounded-lg overflow-y-auto">
-        <div className="mb-4">
+    <div>
+      <div className="w-full max-w-md bg-white p-8 shadow-lg rounded-lg">
+        <div className="mb-6 text-center">
           <h4 className="text-2xl font-bold mb-2">Register</h4>
-          <h5 className="mb-4">
+          <p className="text-gray-600">
             {'Already have an account? '}
-            <Link href={'/auth/user/login'} className="text-primary font-semibold">
+            <Link
+              href={'/auth/user/login'}
+              className="text-primary font-semibold"
+            >
               Sign in here
             </Link>
-          </h5>
+          </p>
         </div>
         <form className="space-y-3" onSubmit={formik.handleSubmit}>
           <input
@@ -68,52 +104,6 @@ export default function RegisterPage() {
             value={formik.values.email}
             onChange={formik.handleChange}
           />
-          {/* <input
-            type="text"
-            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary"
-            placeholder="Your Phone (optional)"
-            name="phone"
-            value={formik.values.phone}
-            onChange={formik.handleChange}
-          /> */}
-          {/* <div>
-            <input
-              type="text"
-              required
-              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary"
-              placeholder="Your Name"
-              name="name"
-              value={formik.values.name}
-              onChange={formik.handleChange}
-            />
-            <p className="text-sm text-red-600 my-0">{formik.errors.name}</p>
-          </div> */}
-          {/* <div>
-            <input
-              type="password"
-              className="w-full p-3 border rounded-md focus:ring-2 focus:ring-primary"
-              placeholder="Password"
-              name="password"
-              required
-              value={formik.values.password}
-              onChange={formik.handleChange}
-            />
-            <p className="text-sm text-red-600">{formik.errors.password}</p>
-          </div> */}
-          {/* <div>
-            <input
-              type="password"
-              className="w-full p-3 border rounded-md focus:ring-2 focus:ring-primary"
-              placeholder="Confirm Password"
-              name="confirmPassword"
-              required
-              value={formik.values.confirmPassword}
-              onChange={formik.handleChange}
-            />
-            <p className="text-sm text-red-600">
-              {formik.errors.confirmPassword}
-            </p>
-          </div> */}
           <p className="text-sm text-red-600">{errMessage}</p>
           <p className="text-xs text-gray-600">
             {"By registering, I agree to Eventic's "}
@@ -126,14 +116,11 @@ export default function RegisterPage() {
               !(formik.isValid && formik.dirty) || formik.isSubmitting
                 ? 'bg-gray-300 text-gray-400'
                 : 'bg-primary text-white'
-            } font-semibold p-4 w-full rounded-full transition duration-300 hover:bg-green-700 disabled:bg-gray-300`}
+            } font-semibold p-4 w-full rounded-md transition duration-300 hover:bg-primary/80 disabled:bg-gray-300`}
             disabled={!(formik.isValid && formik.dirty) || formik.isSubmitting}
           >
             {formik.isSubmitting ? 'Processing...' : 'Register'}
           </button>
-          <p className="text-center text-gray-500 text-sm">
-            Your data will be protected and will not be shared
-          </p>
         </form>
         <Snackbar
           open={open.current}
@@ -148,7 +135,13 @@ export default function RegisterPage() {
           </Alert>
         </Snackbar>
         <center>
-          <h5 className="mt-6 mb-2">Login instantly using your social media</h5>
+          <h5 className="mt-6 mb-2 text-gray-500 flex items-center justify-center gap-2">
+            <hr className="w-full border-gray-300" />
+            <p className="text-gray-500 w-[900px]">
+              or use one of these options
+            </p>
+            <hr className="w-full border-gray-300" />
+          </h5>
 
           <div className="flex items-center justify-center gap-4">
             {/* <div>
@@ -163,21 +156,23 @@ export default function RegisterPage() {
               </div>
             </div> */}
 
-            {/* <div> */}
-            <div
-              className="border p-6 w-full mx-[5] my-[10] rounded-md cursor-pointer"
-              onClick={() => {}}
-            >
-              <Image
-                alt=""
-                src={GoogleImage}
-                width={15}
-                height={15}
-                className="h-[15] w-[15]"
-              />
+            <div>
+              <div
+                className="border p-4 w-full mx-[5] my-[10] rounded-md cursor-pointer"
+                onClick={() => {
+                  googleLogin();
+                }}
+              >
+                <Image
+                  alt="Google"
+                  src={GoogleImage}
+                  width={15}
+                  height={15}
+                  className="h-[15] w-[15]"
+                />
+              </div>
             </div>
           </div>
-          {/* </div> */}
         </center>
       </div>
     </div>
