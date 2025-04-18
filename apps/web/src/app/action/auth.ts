@@ -25,6 +25,12 @@ export const googleLogin = async () => {
   });
 };
 
+export const facebookLogin = async () => {
+  await signIn('facebook', {
+    redirectTo: '/',
+  });
+};
+
 export const logout = async () => {
   await signOut();
 };

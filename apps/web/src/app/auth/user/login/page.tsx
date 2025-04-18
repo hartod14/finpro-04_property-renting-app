@@ -7,8 +7,9 @@ import React, { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Snackbar from '@mui/material/Snackbar';
 import { Alert } from '@mui/material';
-import { googleLogin, login } from '@/app/action/auth';
+import { facebookLogin, googleLogin, login } from '@/app/action/auth';
 import GoogleImage from '@/../public/google.png';
+import FacebookImage from '@/../public/facebook.png';
 
 export default function LoginPage() {
   const { push } = useRouter();
@@ -113,8 +114,13 @@ export default function LoginPage() {
           </h5>
 
           <div className="flex items-center justify-center gap-4">
-            {/* <div>
-              <div className="border p-6 w-full mx-[5] my-[10] rounded-md cursor-pointer">
+            <div>
+              <div
+                className="border py-4 px-5 w-full mx-[5] my-[10] rounded-md cursor-pointer"
+                onClick={() => {
+                  facebookLogin();
+                }}
+              >
                 <Image
                   alt=""
                   src={FacebookImage}
@@ -123,7 +129,7 @@ export default function LoginPage() {
                   className="h-4 w-2"
                 />
               </div>
-            </div> */}
+            </div>
 
             <div>
               <div

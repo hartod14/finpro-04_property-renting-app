@@ -7,7 +7,7 @@ import { jwtDecode } from 'jwt-decode';
 import { InvalidAuthError } from '../interfaces/auth.error';
 import { login, refreshToken, googleAuth } from '@/handlers/auth';
 import Google from 'next-auth/providers/google';
-import { log, profile } from 'console';
+import Facebook from 'next-auth/providers/facebook';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: {
@@ -52,6 +52,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           response_type: 'code',
         },
       },
+    }),
+    Facebook({
+      clientId: process.env.FACEBOOK_CLIENT_ID as string,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
     }),
   ],
   callbacks: {
