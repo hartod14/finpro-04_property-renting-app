@@ -20,6 +20,7 @@ export default function LoginPage() {
     initialValues: {
       email: '',
       password: '',
+      role: 'TENANT',
     },
     onSubmit: async (values) => {
       setErrMessage('');
@@ -38,14 +39,14 @@ export default function LoginPage() {
 
   return (
     <div>
-      <div className="w-full max-w-md bg-white p-8 shadow-lg rounded-lg">
+      <div className="w-full max-w-md bg-white p-8 shadow-lg border-2 border-gray-200 rounded-lg">
         <div className="mb-6 text-center">
           <h4 className="text-2xl font-bold mb-2">Login</h4>
           <p className="text-gray-600">
             Don't have an account?{' '}
             <Link
-              href="/auth/user/register"
-              className="text-primary font-semibold"
+              href="/auth/tenant/register"
+              className="text-primaryOrange font-semibold"
             >
               Sign up here
             </Link>
@@ -55,7 +56,7 @@ export default function LoginPage() {
           <input
             type="email"
             required
-            className="w-full p-3 border  rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full p-3 border  rounded-md focus:outline-none focus:ring-2 focus:ring-primaryOrange"
             placeholder="Email Address"
             name="email"
             value={formik.values.email}
@@ -64,7 +65,7 @@ export default function LoginPage() {
           <input
             type="password"
             required
-            className="w-full p-3 border  rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full p-3 border  rounded-md focus:outline-none focus:ring-2 focus:ring-primaryOrange"
             placeholder="Password"
             name="password"
             value={formik.values.password}
@@ -76,7 +77,7 @@ export default function LoginPage() {
             className={`w-full p-3 rounded-md text-white font-semibold transition-all duration-200 ease-in-out ${
               formik.isSubmitting
                 ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-primary hover:bg-primary/80'
+                : 'bg-primaryOrange hover:bg-primaryOrange/80'
             }`}
             disabled={formik.isSubmitting}
           >
@@ -86,13 +87,13 @@ export default function LoginPage() {
         <div className="mt-4 text-center">
           <Link
             href={'/auth/forget-password'}
-            className="text-primary font-semibold"
+            className="text-primaryOrange font-semibold"
           >
             Forgot password?
           </Link>
         </div>
         <Snackbar
-          className="!bg-primary"
+          className="!bg-primaryOrange"
           open={open.current}
           autoHideDuration={1500}
           onClose={() => {
@@ -104,52 +105,7 @@ export default function LoginPage() {
             Login Success
           </Alert>
         </Snackbar>
-        <center>
-          <h5 className="mt-6 mb-2 text-gray-500 flex items-center justify-center gap-2">
-            <hr className="w-full border-gray-300" />
-            <p className="text-gray-500 w-[900px]">
-              or use one of these options
-            </p>
-            <hr className="w-full border-gray-300" />
-          </h5>
-
-          <div className="flex items-center justify-center gap-4">
-            <div>
-              <div
-                className="border py-4 px-5 w-full mx-[5] my-[10] rounded-md cursor-pointer"
-                onClick={() => {
-                  facebookLogin();
-                }}
-              >
-                <Image
-                  alt=""
-                  src={FacebookImage}
-                  width={16}
-                  height={8}
-                  className="h-4 w-2"
-                />
-              </div>
-            </div>
-
-            <div>
-              <div
-                className="border p-4 w-full mx-[5] my-[10] rounded-md cursor-pointer"
-                onClick={() => {
-                  googleLogin();
-                }}
-              >
-                <Image
-                  alt="Google"
-                  src={GoogleImage}
-                  width={15}
-                  height={15}
-                  className="h-[15] w-[15]"
-                />
-              </div>
-            </div>
-          </div>
-        </center>
       </div>
-    </div>
+    </div>  
   );
 }

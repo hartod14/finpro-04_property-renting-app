@@ -20,7 +20,7 @@ export const registerValidator = Yup.object({
 
 export const updateProfileValidator = Yup.object({
   name: Yup.string().min(4).required("Name is required"),
-  email: Yup.string().min(4).required("Email is required"),
+  phone: Yup.string().min(4).required("Phone is required"),
 });
 
 export const changePasswordValidator = Yup.object({

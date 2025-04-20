@@ -6,17 +6,15 @@ import { compare } from 'bcrypt';
 import { getUserByEmail } from '../helpers/user.prisma';
 import { ErrorHandler } from '../helpers/response.handler';
 import { IUserLogin } from '../interfaces/user.interface';
-import { sign } from 'jsonwebtoken';
 import { generateReferralCode } from '../helpers/referral-code-generator';
 import { generateAuthToken } from '../helpers/token';
 import { transporter } from '../helpers/nodemailer';
 import { hbs } from '../helpers/handlebars';
-import { generateRandomString } from '@/helpers/random-string';
-import { log } from 'console';
 import {
   decodeVerificationJwt,
   verificationJwt,
 } from '@/helpers/verification.jwt';
+import { log } from 'handlebars';
 
 interface AuthenticatedRequest extends Request {
   user?: IUserLogin;
@@ -24,7 +22,7 @@ interface AuthenticatedRequest extends Request {
 
 class AuthService {
   async signIn(req: Request) {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
 
     const user = (await getUserByEmail(email)) as IUserLogin;
 
@@ -37,6 +35,12 @@ class AuthService {
 
     if (!(await compare(password, user.password as string)))
       throw new ErrorHandler('wrong password', 401);
+
+    if (role == 'USER' && user.role == 'TENANT')
+      throw new ErrorHandler('wrong email', 401);
+
+    if (role == 'TENANT' && user.role == 'USER')
+      throw new ErrorHandler('wrong email', 401);
 
     return await generateAuthToken(user);
   }
@@ -97,19 +101,75 @@ class AuthService {
     return authTokens;
   }
 
+  async facebookAuth(req: Request) {
+    const { email, name, facebook_id, profile_picture, role } = req.body;
+    let user = await getUserByEmail(email);
+
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          email,
+          name: name || 'User',
+          facebook_id,
+          profile_picture,
+          role: role || 'USER',
+          is_verified: true,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          password: true,
+          profile_picture: true,
+          is_verified: true,
+          role: true,
+        },
+      });
+    } else {
+      // Update existing user with Google info
+      user = await prisma.user.update({
+        where: { email },
+        data: {
+          facebook_id,
+          name: user.name || name || 'User',
+          profile_picture: user.profile_picture || profile_picture,
+          is_verified: true,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          password: true,
+          profile_picture: true,
+          is_verified: true,
+          role: true,
+        },
+      });
+    }
+
+    const authTokens = await generateAuthToken(user as IUserLogin);
+
+    return authTokens;
+  }
+
   async signUp(req: Request) {
     const { email, role } = req.body;
-
+    let name = '';
     const result = await prisma.$transaction(async (tx) => {
       const token = verificationJwt(email);
+      if (role === 'TENANT') name = 'Tenant property';
+
       const newUser = await tx.user.create({
         data: {
           email,
           role,
+          name,
         },
       });
 
-      await this.sendEmailVerifAndSetPass(email, token);
+      await this.sendEmailVerifAndSetPass(email, token, role);
 
       return newUser;
     });
@@ -124,7 +184,7 @@ class AuthService {
     if (profile_picture) data.profile_picture = profile_picture;
     if (password) data.password = password;
     if (name) data.name = name;
-    if (phone) data.phone = phone;
+    if (phone) data.phone = String(phone);
     if (email) data.email = email;
 
     await prisma.user.update({
@@ -149,7 +209,6 @@ class AuthService {
 
   async changePassword(req: Request) {
     const { password, new_password, confirm_new_password } = req.body;
-
     const email = (req as any).user?.email;
     const user = (await getUserByEmail(email)) as IUserLogin;
     if (new_password != confirm_new_password)
@@ -186,62 +245,6 @@ class AuthService {
     return user;
   }
 
-  // async resetPasswordCheck(req: Request) {
-  //   const { token } = req.query
-
-  //   if (!token || typeof token !== "string") {
-  //     throw new Error("Token is required and must be a string.");
-  //   }
-
-  //   return await prisma.user.findFirstOrThrow({
-  //     where: { forget_password_token: token },
-  //     select: {
-  //       id: true
-  //     }
-  //   })
-  // }
-
-  // async resetPassword(req: Request) {
-  //   const { id } = req.params
-  //   const { password, token } = req.body
-
-  //   const userID = Number(id)
-
-  //   // if (!id) {
-  //   //   throw new Error("Token is required and must be a string.");
-  //   // }
-
-  //   return await prisma.user.update({
-  //     where: {
-  //       id: userID,
-  //       forget_password_token: token
-  //     },
-  //     data: {
-  //       password: await hashedPassword(password)
-  //     }
-  //   })
-  // }
-
-  // async sendEmailForgetPassword(email: string, token: string) {
-  //   try {
-  //     const compiledTemplate = hbs("forget-password.hbs");
-  //     const html = compiledTemplate({
-  //       email,
-  //       token,
-  //     });
-
-  //     transporter.sendMail({
-  //       to: email,
-  //       subject: "Forget Password Request",
-  //       html,
-  //     });
-  //     return "Success send email";
-  //   } catch (error) {
-  //     throw new ErrorHandler("Failed send email")
-
-  //   }
-  // }
-
   async sendEmailForgetPassword(email: string, token: string) {
     try {
       const compiledTemplate = hbs('forget-password.hbs');
@@ -263,12 +266,17 @@ class AuthService {
     }
   }
 
-  async sendEmailVerifAndSetPass(email: string, token: string) {
+  async sendEmailVerifAndSetPass(
+    email: string,
+    token: string,
+    role: string = 'USER',
+  ) {
     try {
       const compiledTemplate = hbs('verification-and-set-password.hbs');
       const html = compiledTemplate({
         email,
         token,
+        role,
         FRONTEND_URL: process.env.FRONTEND_URL,
       });
 
@@ -277,6 +285,27 @@ class AuthService {
         subject: 'Verification and Set Password',
         html,
       });
+      return 'Success send email';
+    } catch (error) {
+      throw new ErrorHandler('Failed send email');
+    }
+  }
+
+  async sendEmailVerification(email: string, token: string) {
+    try {
+      const compiledTemplate = hbs('verification.hbs');
+      const html = compiledTemplate({
+        email,
+        token,
+        FRONTEND_URL: process.env.FRONTEND_URL,
+      });
+
+      transporter.sendMail({
+        to: email,
+        subject: 'Verification',
+        html,
+      });
+
       return 'Success send email';
     } catch (error) {
       throw new ErrorHandler('Failed send email');
@@ -337,6 +366,32 @@ class AuthService {
   async resendVerificationEmail(email: string) {
     const token = verificationJwt(email);
     await this.sendEmailVerifAndSetPass(email, token);
+  }
+
+  async sendOnlyVerificationEmail(email: string) {
+    const token = verificationJwt(email);
+    await this.sendEmailVerification(email, token);
+  }
+
+  async updateStatusVerification(token: string) {
+    const user = decodeVerificationJwt(token) as { email: string };
+
+    await prisma.user.update({
+      where: { email: user.email },
+      data: { is_verified: true },
+    });
+  }
+
+  async checkPasswordSet(email: string) {
+    const userDetail = await prisma.user.findUnique({
+      where: { email: email },
+    });
+
+    if (userDetail?.password) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
 

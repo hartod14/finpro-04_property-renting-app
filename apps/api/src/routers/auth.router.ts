@@ -17,6 +17,7 @@ export const authRouter = () => {
   );
   router.post('/', authController.signIn);
   router.post('/google', authController.googleAuth);
+  router.post('/facebook', authController.facebookAuth);
 
   router.post('/token', verifyRefreshToken, authController.refreshToken);
 
@@ -26,16 +27,23 @@ export const authRouter = () => {
     authController.verificationSetPassword,
   );
   router.post('/resend-verification', authController.resendVerificationEmail);
-
-  // router.patch('/:id', verifyUser, authController.updateUser);
+  router.post('/verification-only', authController.sendOnlyVerificationEmail);
+  router.patch(
+    '/update-status-verification',
+    authController.updateStatusVerification,
+  );
 
   router.post('/forget-password', authController.forgetPassword);
   router.patch('/update-password', authController.updatePassword);
-  // router.get("/reset-password", authController.resetPasswordCheck)
-  // router.post("/reset-password/:id", authController.resetPassword)
 
-  // router.patch('/update', verifyUser, authController.updateUser);
-  // router.patch('/password/change', verifyUser, authController.changePassword)
+  router.patch('/update', verifyUser, authController.updateUser);
+  router.patch('/password/change', verifyUser, authController.changePassword);
+
+  router.get(
+    '/check-password-set',
+    verifyUser,
+    authController.checkPasswordSet,
+  );
 
   return router;
 };

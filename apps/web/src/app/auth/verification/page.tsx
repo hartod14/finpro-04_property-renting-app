@@ -5,8 +5,6 @@ import { Alert, Snackbar } from '@mui/material';
 import { useFormik } from 'formik';
 import Link from 'next/link';
 import React, { useEffect, useRef, useState } from 'react';
-import { registerValidator } from '@/validators/auth.validator';
-import { registerInit } from '@/helpers/formiks/formik.init';
 import { useRouter, useSearchParams } from 'next/navigation';
 import * as Yup from 'yup';
 import {
@@ -18,12 +16,12 @@ import { verificationFormik } from '@/helpers/formiks/verification.formik';
 
 export default function Page() {
   const [errMessage, setErrMessage] = React.useState('');
-  const [userId, setUserId] = useState<number>();
   const open = useRef(false);
   const router = useRouter();
 
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
+  const role = searchParams.get('role');
 
   useEffect(() => {
     async function fetchInvalidToken() {
@@ -36,11 +34,12 @@ export default function Page() {
             icon: 'error',
             confirmButtonColor: '#0194f3',
           }).then(() => {
-            router.push('/auth/user/register');
+            if (role == 'TENANT') {
+              router.push('/auth/tenant/register');
+            } else {
+              router.push('/auth/user/register');
+            }
           });
-        } else {
-          const userID = checkValidToken.data.id;
-          setUserId(userID);
         }
       } catch (error) {
         Swal.fire({
@@ -49,7 +48,7 @@ export default function Page() {
           icon: 'error',
           confirmButtonColor: '#0194f3',
         }).then(() => {
-          router.push('/auth/user/register');
+          router.push('/');
         });
       }
     }
@@ -74,7 +73,13 @@ export default function Page() {
             icon: 'success',
             confirmButtonColor: '#0194f3',
           }).then(() => {
-            router.push('/auth/user/login');
+            console.log(role);
+
+            if (role == 'TENANT') {
+              router.push('/auth/tenant/login');
+            } else {
+              router.push('/auth/user/login');
+            }
           });
         }
       });
@@ -85,7 +90,9 @@ export default function Page() {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 bg-white shadow-lg rounded-lg">
         <div className="mb-4">
-          <h4 className="text-2xl font-bold mb-2 text-center">Set Your Password</h4>
+          <h4 className="text-2xl font-bold mb-2 text-center">
+            Set Your Password
+          </h4>
         </div>
         <form className="space-y-4" onSubmit={formik.handleSubmit}>
           <input

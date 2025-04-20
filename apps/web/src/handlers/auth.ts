@@ -5,6 +5,7 @@ import { cookies } from 'next/headers';
 import { decode } from 'next-auth/jwt';
 import { log } from 'console';
 import { auth_secret } from '@/helpers/config';
+import { get } from 'http';
 
 export const login = async (credentials: Partial<Record<string, unknown>>) => {
   const res = await api('/auth', 'POST', {
@@ -43,20 +44,15 @@ export const refreshToken = async () => {
   };
 };
 
-export const updateUser = async (
-  data: {
-    name: string;
-  },
-  token: string,
-) => {
+export const updateUser = async (data: Record<string, unknown>) => {
   await api(
-    '/auth',
+    '/auth/update',
     'PATCH',
     {
       body: data,
       contentType: 'application/json',
     },
-    token,
+    await getAccessToken(),
   );
 };
 
@@ -83,6 +79,14 @@ export const checkVerificationToken = async (token: string) => {
     'GET',
     undefined,
   );
+};
+
+export const updateStatusVerification = async (token: string) => {
+  return await api(
+    `/auth/update-status-verification?token=${encodeURIComponent(token)}`,
+    'PATCH',
+    undefined,
+  ).catch((err) => (err instanceof Error ? { error: err.message } : err));
 };
 
 export const verificationAndSetPassword = async (
@@ -138,9 +142,67 @@ export const googleAuth = async (profileData: {
   }
 };
 
+export const facebookAuth = async (profileData: {
+  email: string;
+  name?: string;
+  facebook_id: string;
+  profile_picture?: string;
+}) => {
+  try {
+    const response = await api('/auth/facebook', 'POST', {
+      body: {
+        ...profileData,
+        role: 'USER',
+      },
+      contentType: 'application/json',
+    });
+
+    return {
+      data: {
+        access_token: response.data.access_token,
+        refresh_token: response.data.refresh_token,
+      },
+    };
+  } catch (err) {
+    throw err;
+  }
+};
+
 export const updatePassword = async (token: string, values: any) => {
-  return await api(`/auth/update-password?token=${encodeURIComponent(token)}`, 'PATCH', {
-    body: { password: values.password },
+  return await api(
+    `/auth/update-password?token=${encodeURIComponent(token)}`,
+    'PATCH',
+    {
+      body: { password: values.password },
+      contentType: 'application/json',
+    },
+  ).catch((err) => (err instanceof Error ? { error: err.message } : err));
+};
+
+export const changePassword = async (data: Record<string, unknown>) => {
+  return await api(
+    '/auth/password/change',
+    'PATCH',
+    {
+      body: data,
+      contentType: 'application/json',
+    },
+    await getAccessToken(),
+  ).catch((err) => (err instanceof Error ? { error: err.message } : err));
+};
+
+export const sendOnlyVerificationEmail = async (email: string) => {
+  return await api('/auth/verification-only', 'POST', {
+    body: { email },
     contentType: 'application/json',
   }).catch((err) => (err instanceof Error ? { error: err.message } : err));
+};
+
+export const checkPasswordSet = async (email: string) => {
+  return await api(
+    `/auth/check-password-set?email=${encodeURIComponent(email)}`,
+    'GET',
+    undefined,
+    await getAccessToken(),
+  ).catch((err) => (err instanceof Error ? { error: err.message } : err));
 };

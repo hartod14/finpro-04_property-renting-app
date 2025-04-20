@@ -4,6 +4,7 @@ import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler, responseHandler } from '../helpers/response.handler';
 import authService from '@/services/auth.service';
 import { decodeVerificationJwt } from '@/helpers/verification.jwt';
+import { log } from 'handlebars';
 
 class AuthController {
   async signIn(req: Request, res: Response, next: NextFunction) {
@@ -51,6 +52,14 @@ class AuthController {
     }
   }
 
+  async facebookAuth(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await authService.facebookAuth(req);
+      responseHandler(res, 'facebook auth success', data);
+    } catch (error) {
+      next(error);
+    }
+  }
   async refreshToken(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await authService.refreshToken(req);
@@ -99,6 +108,19 @@ class AuthController {
     }
   }
 
+  async sendOnlyVerificationEmail(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      await authService.sendOnlyVerificationEmail(req.body.email);
+      responseHandler(res, 'send only verification email success');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async forgetPassword(req: Request, res: Response, next: NextFunction) {
     try {
       await authService.forgetPassword(req.body.email);
@@ -109,7 +131,6 @@ class AuthController {
   }
 
   async updatePassword(req: Request, res: Response, next: NextFunction) {
-    console.log(req.query);
     try {
       const token = req.query.token as string;
       const decoded = decodeVerificationJwt(token) as {
@@ -122,23 +143,29 @@ class AuthController {
     }
   }
 
-  //   async resetPasswordCheck(req: Request, res: Response, next: NextFunction) {
-  //     try {
-  //       const data = await authService.resetPasswordCheck(req);
-  //       responseHandler(res, "credential valid", data)
-  //     } catch (error) {
-  //       next(error)
-  //     }
-  //   }
+  async updateStatusVerification(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      await authService.updateStatusVerification(req.query.token as string);
+      responseHandler(res, 'update status verification success');
+    } catch (error) {
+      next(error);
+    }
+  }
 
-  //   async resetPassword(req: Request, res: Response, next: NextFunction) {
-  //     try {
-  //       const data = await authService.resetPassword(req);
-  //       responseHandler(res, "success reset password", data)
-  //     } catch (error) {
-  //       next(error)
-  //     }
-  //   }
+  async checkPasswordSet(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await authService.checkPasswordSet(
+        req.query.email as string,
+      );
+      responseHandler(res, 'check password set success', data);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new AuthController();

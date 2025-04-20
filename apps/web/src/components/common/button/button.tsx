@@ -1,16 +1,18 @@
 import React from 'react';
 
 interface PanelButtonProps {
-  color: 'primary' | 'secondary' | 'danger' | 'white' | 'transparent' | 'black';
+  color: 'primary' | 'secondary' | 'danger' | 'white' | 'transparent' | 'black' | 'primaryOrange' | 'lightGray';
   name: string;
-  textColor: 'primary' | 'secondary' | 'danger' | 'white' | 'black';
+  textColor: 'primary' | 'secondary' | 'danger' | 'white' | 'black' | 'primaryOrange' | 'lightGray';
   border?:
     | 'primary'
     | 'secondary'
     | 'danger'
     | 'white'
     | 'transparent'
-    | 'black';
+    | 'black'
+    | 'primaryOrange'
+    | 'lightGray';
   icon?: React.ReactNode;
   iconPosition?: 'before' | 'after';
 }
@@ -55,6 +57,18 @@ const classMapping: Record<
     border: '',
     onHover: 'hover:bg-gray-800',
   },
+  primaryOrange: {
+    bg: 'bg-primaryOrange',
+    text: 'text-white',
+    border: 'border-primaryOrange',
+    onHover: 'hover:bg-orange-600',
+  },
+  lightGray: {
+    bg: 'bg-gray-300',
+    text: 'text-gray-500',
+    border: 'border-gray-300',
+    onHover: 'hover:bg-gray-300',
+  },
 };
 
 export default function Button({
@@ -66,8 +80,7 @@ export default function Button({
   iconPosition = 'before',
 }: PanelButtonProps) {
   return (
-    <button
-      type="button"
+    <div
       className={`rounded px-3 py-2 text-sm flex items-center gap-2
         ${border ? `border border-solid ${classMapping[border].border}` : ''} 
         ${classMapping[color].bg} 
@@ -78,6 +91,6 @@ export default function Button({
       {icon && iconPosition == 'before' && <span>{icon}</span>}
       <span>{name}</span>
       {icon && iconPosition == 'after' && <span>{icon}</span>}
-    </button>
+    </div>
   );
 }

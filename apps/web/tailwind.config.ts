@@ -12,6 +12,7 @@ export default {
         primary: '#0194f3', // blue
         primary2: '#05203C', // dark blue
         black: '#181818', // dark blue
+        primaryOrange: '#FF5E1F', // orange
         background: "var(--background)",
         foreground: "var(--foreground)",
       },

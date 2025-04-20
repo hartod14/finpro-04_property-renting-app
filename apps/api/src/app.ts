@@ -6,12 +6,13 @@ import express, {
   Response,
   NextFunction,
   Router,
-  Application
+  Application,
 } from 'express';
 import cors from 'cors';
 import { PORT } from './config';
 import { authRouter } from './routers/auth.router';
 import { ErrorHandler } from './helpers/response.handler';
+import { uploadRouter } from './routers/upload.router';
 // import { SampleRouter } from './routers/sample.router';
 
 export default class App {
@@ -33,7 +34,7 @@ export default class App {
   private handleError() {
     //not found handler
     this.app.use((req: Request, res: Response, next: NextFunction) => {
-      res.status(404).send("Not found !");
+      res.status(404).send('Not found !');
     });
 
     //error handler
@@ -42,18 +43,18 @@ export default class App {
         res.status(err.code || 500).send({
           message: err.message,
         });
-      }
+      },
     );
   }
 
-  private routes(): void {   
-
+  private routes(): void {
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
     });
-      
+
     //global
     this.app.use('/api/auth', authRouter());
+    this.app.use('/api/upload-image', uploadRouter());
 
     // this.app.use('/api/samples', sampleRouter.getRouter());
   }

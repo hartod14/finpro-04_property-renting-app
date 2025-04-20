@@ -93,13 +93,15 @@ export default function Home() {
               </div>
             </div>
             <div className="flex justify-end w-full">
-              <Button
-                color="primary"
-                textColor="white"
-                iconPosition="after"
-                name="Search Hotel"
-                icon={<FaArrowRight />}
-              />
+              <button>
+                <Button
+                  color="primary"
+                  textColor="white"
+                  iconPosition="after"
+                  name="Search Hotel"
+                  icon={<FaArrowRight />}
+                />
+              </button>
             </div>
           </div>
         </div>

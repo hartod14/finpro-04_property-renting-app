@@ -5,7 +5,7 @@ import Credentials from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import { jwtDecode } from 'jwt-decode';
 import { InvalidAuthError } from '../interfaces/auth.error';
-import { login, refreshToken, googleAuth } from '@/handlers/auth';
+import { login, refreshToken, googleAuth, facebookAuth } from '@/handlers/auth';
 import Google from 'next-auth/providers/google';
 import Facebook from 'next-auth/providers/facebook';
 
@@ -56,10 +56,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     Facebook({
       clientId: process.env.FACEBOOK_CLIENT_ID as string,
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
+      authorization: {
+        params: {
+          prompt: 'consent',
+          access_type: 'offline',
+          response_type: 'code',
+        },
+      },
     }),
   ],
   callbacks: {
     async signIn({ account, profile, user }) {
+      // console.log('account', account);
+      // console.log('profile', profile);
+      // console.log('user', user);
       if (account?.provider == 'google' && profile?.email) {
         try {
           const { sub, email, name, picture } = profile;
@@ -68,6 +78,25 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             name: name as string,
             google_id: sub || '',
             profile_picture: picture || '',
+          });
+
+          if (auth?.data?.access_token) {
+            user.access_token = auth.data.access_token;
+            user.refresh_token = auth.data.refresh_token;
+          }
+        } catch (error) {
+          return false;
+        }
+      }
+
+      if (account?.provider == 'facebook' && profile?.email) {
+        try {
+          const { id, email, name, picture } = profile;
+          const auth = await facebookAuth({
+            email: email as string,
+            name: name as string,
+            facebook_id: id || '',
+            profile_picture: picture.data.url || '',
           });
 
           if (auth?.data?.access_token) {
@@ -94,11 +123,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
 
     async session({ session, token }) {
-
       if (token.access_token) {
         const user = jwtDecode(token.access_token!) as User;
         session.user.id = user.id as string;
         session.user.email = user.email as string;
+        session.user.phone = user.phone as string;
         session.user.profile_picture = user.profile_picture as string;
         session.user.is_verified = user.is_verified as boolean;
         session.user.name = user.name as string;

@@ -11,20 +11,21 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import * as Yup from 'yup';
 import {
   checkVerificationToken,
-  updatePassword,
   verificationAndSetPassword,
 } from '@/handlers/auth';
 import Swal from 'sweetalert2';
 import { verificationFormik } from '@/helpers/formiks/verification.formik';
+import { routeModule } from 'next/dist/build/templates/pages';
+import { jwtDecode } from 'jwt-decode';
 
 export default function Page() {
   const [errMessage, setErrMessage] = React.useState('');
-  const [userId, setUserId] = useState<number>();
   const open = useRef(false);
   const router = useRouter();
 
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
+  const role = searchParams.get('role');
 
   useEffect(() => {
     async function fetchInvalidToken() {
@@ -37,11 +38,12 @@ export default function Page() {
             icon: 'error',
             confirmButtonColor: '#0194f3',
           }).then(() => {
-            router.push('/auth/user/login');
+            if (role == 'TENANT') {
+              router.push('/auth/tenant/register');
+            } else {
+              router.push('/auth/user/register');
+            }
           });
-        } else {
-          const userID = checkValidToken.data.id;
-          setUserId(userID);
         }
       } catch (error) {
         Swal.fire({
@@ -50,7 +52,7 @@ export default function Page() {
           icon: 'error',
           confirmButtonColor: '#0194f3',
         }).then(() => {
-          router.push('/auth/user/login');
+          router.push('/');
         });
       }
     }
@@ -65,7 +67,7 @@ export default function Page() {
     },
     onSubmit: async (values) => {
       setErrMessage('');
-      await updatePassword(String(token), values).then((res) => {
+      await verificationAndSetPassword(String(token), values).then((res) => {
         if (res?.error) {
           setErrMessage(res.error);
         } else {
@@ -75,7 +77,13 @@ export default function Page() {
             icon: 'success',
             confirmButtonColor: '#0194f3',
           }).then(() => {
-            router.push('/auth/user/login');
+            console.log(role);
+
+            if (role == 'TENANT') {
+              router.push('/auth/tenant/login');
+            } else {
+              router.push('/auth/user/login');
+            }
           });
         }
       });
