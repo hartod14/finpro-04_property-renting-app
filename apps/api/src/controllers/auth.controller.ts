@@ -101,6 +101,7 @@ class AuthController {
     next: NextFunction,
   ) {
     try {
+
       await authService.resendVerificationEmail(req.body.email);
       responseHandler(res, 'resend verification email success');
     } catch (error) {
@@ -162,6 +163,24 @@ class AuthController {
         req.query.email as string,
       );
       responseHandler(res, 'check password set success', data);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async sendChangeEmail(req: Request, res: Response, next: NextFunction) {
+    try {
+      await authService.sendChangeEmail(req.body.email);
+      responseHandler(res, 'send change email success');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateChangeEmail(req: Request, res: Response, next: NextFunction) {
+    try {
+      await authService.updateChangeEmail(req.query.token as string, req);
+      responseHandler(res, 'update change email success');
     } catch (error) {
       next(error);
     }

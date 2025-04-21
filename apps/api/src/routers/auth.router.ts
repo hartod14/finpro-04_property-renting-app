@@ -39,11 +39,14 @@ export const authRouter = () => {
   router.patch('/update', verifyUser, authController.updateUser);
   router.patch('/password/change', verifyUser, authController.changePassword);
 
+  router.post('/change-email', authController.sendChangeEmail);
   router.get(
     '/check-password-set',
     verifyUser,
     authController.checkPasswordSet,
   );
+
+  router.patch('/change-email', authController.updateChangeEmail);
 
   return router;
 };

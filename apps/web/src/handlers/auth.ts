@@ -103,6 +103,8 @@ export const verificationAndSetPassword = async (
 };
 
 export const resendVerificationEmail = async (email: string) => {
+  // console.log(email);
+
   return await api('/auth/resend-verification', 'POST', {
     body: { email },
     contentType: 'application/json',
@@ -204,5 +206,20 @@ export const checkPasswordSet = async (email: string) => {
     'GET',
     undefined,
     await getAccessToken(),
+  ).catch((err) => (err instanceof Error ? { error: err.message } : err));
+};
+
+export const sendChangeEmail = async (email: string) => {
+  return await api('/auth/change-email', 'POST', {
+    body: { email },
+    contentType: 'application/json',
+  }).catch((err) => (err instanceof Error ? { error: err.message } : err));
+};
+
+export const updateChangeEmail = async (token: string, values: any) => {
+  return await api(
+    `/auth/change-email?token=${encodeURIComponent(token)}`,
+    'PATCH',
+    { body: values, contentType: 'application/json' },
   ).catch((err) => (err instanceof Error ? { error: err.message } : err));
 };

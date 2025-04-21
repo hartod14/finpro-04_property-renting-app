@@ -39,9 +39,9 @@ export default function PurchaseListPage() {
   const { data: session } = useSession();
 
   return (
-    <>
+    <div className='bg-white rounded-lg shadow-md p-6'>
       <h2 className="text-xl font-semibold mb-6">Purchase History</h2>
 
-    </>
+    </div>
   );
 }

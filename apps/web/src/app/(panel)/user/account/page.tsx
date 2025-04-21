@@ -13,8 +13,9 @@ import { update } from 'cypress/types/lodash';
 import { InputField } from '@/components/common/input/InputField';
 import DefaultImage from '@/../public/default_avatar.jpg';
 import { FaArrowUp, FaUpload } from 'react-icons/fa';
-import { updateUser } from '@/handlers/auth';
+import { sendChangeEmail, updateUser } from '@/handlers/auth';
 import Button from '@/components/common/button/button';
+import Link from 'next/link';
 
 export default function UserAccountPage() {
   const { data: session, update } = useSession();
@@ -42,6 +43,45 @@ export default function UserAccountPage() {
       setImage(session.user.profile_picture ?? '');
     }
   }, [session]);
+
+  const handleChangeEmail = async (email: string) => {
+    Swal.fire({
+      title: 'Change Email Confirmation',
+      text: 'A change email verification email will be sent to your registered email address.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0194f3',
+      cancelButtonColor: '#ABABAB',
+      confirmButtonText: 'Yes, send email!',
+      cancelButtonText: 'Cancel',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res: any = await sendChangeEmail(email);
+          if (res?.error) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: res.error,
+            });
+          } else {
+            Swal.fire({
+              title: 'Email Sent!',
+              text: 'Check your email for change email verification instructions.',
+              icon: 'success',
+              confirmButtonColor: '#0194f3',
+            });
+          }
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Something went wrong, please try again later!',
+          });
+        }
+      }
+    });
+  };
 
   return (
     <div>
@@ -92,7 +132,7 @@ export default function UserAccountPage() {
           }}
         >
           {(formik) => (
-            <Form>
+            <Form className='bg-white rounded-lg shadow-md p-6'>
               <h2 className="text-xl font-semibold mb-6">Update Profile</h2>
               <div className="grid gap-6 mb-6 grid-cols-1">
                 <div>
@@ -170,6 +210,25 @@ export default function UserAccountPage() {
           )}
         </Formik>
       )}
+      <div className='bg-white rounded-lg shadow-md p-6 mt-5'>
+        <div className="flex justify-between gap-6 items-center">
+          <div>
+            <h2 className="text-xl font-semibold mb-6">Change Email</h2>
+            <p>
+              You can change your email by clicking the button on the right.
+            </p>
+          </div>
+          <Link
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              handleChangeEmail(String(session?.user?.email));
+            }}
+          >
+            <Button color="primary" textColor="white" name="Change Email" />
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

@@ -312,6 +312,26 @@ class AuthService {
     }
   }
 
+  async sendChangeEmailVerification(email: string, token: string) {
+    try {
+      const compiledTemplate = hbs('change-email.hbs');
+      const html = compiledTemplate({
+        email,
+        token,
+        FRONTEND_URL: process.env.FRONTEND_URL,
+      });
+
+      transporter.sendMail({
+        to: email,
+        subject: 'Change Email Verification',
+        html,
+      });
+
+      return 'Success send email';
+    } catch (error) {
+      throw new ErrorHandler('Failed send email');
+    }
+  }
   async checkVerificationToken(req: Request) {
     const { token } = req.query;
     const decoded = decodeVerificationJwt(token as string);
@@ -392,6 +412,31 @@ class AuthService {
     } else {
       return false;
     }
+  }
+
+  async sendChangeEmail(email: string) {
+    const token = verificationJwt(email);
+    await this.sendChangeEmailVerification(email, token);
+  }
+
+  async updateChangeEmail(token: string, req: Request) {
+    const user = decodeVerificationJwt(token) as { email: string };
+    const { email, password } = req.body;
+    const emailExist = await prisma.user.findUnique({
+      where: { email: email },
+    });
+    if (emailExist) throw new ErrorHandler('Email already exists', 400);
+    
+    await prisma.user.update({
+      where: { email: user.email },
+      data: {
+        email: email,
+        password: await hashedPassword(password),
+        is_verified: false,
+        google_id: null,
+        facebook_id: null,
+      },
+    });
   }
 }
 

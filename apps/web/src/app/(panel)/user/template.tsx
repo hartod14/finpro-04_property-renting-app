@@ -76,7 +76,7 @@ export default function UserPanelTemplate({ children }: Props) {
       <div className="pt-24">
         {/* Email Verification Alert */}
 
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 pt-8 pb-24">
           <div className="flex flex-col md:flex-row gap-6">
             {/* Sidebar */}
             <div className="w-full md:w-1/4">
@@ -133,7 +133,7 @@ export default function UserPanelTemplate({ children }: Props) {
                   </div>
                 </div>
               </div>
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="">
                 {children}
               </div>
             </div>
