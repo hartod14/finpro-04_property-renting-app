@@ -10,6 +10,7 @@ import express, {
 import cors from 'cors';
 import { PORT } from './config';
 // import { SampleRouter } from './routers/sample.router';
+import { UserTransactionRouter } from './routers/user-transactions.routes';
 
 export default class App {
   private app: Express;
@@ -52,12 +53,14 @@ export default class App {
 
   private routes(): void {
     // const sampleRouter = new SampleRouter();
+    const usertransactionRouter = new UserTransactionRouter();
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
     });
 
     // this.app.use('/api/samples', sampleRouter.getRouter());
+    this.app.use('/api', usertransactionRouter.getRouter());
   }
 
   public start(): void {
