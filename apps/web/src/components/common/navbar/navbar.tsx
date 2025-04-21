@@ -134,11 +134,18 @@ export default function Navbar({ forceScrolled = false }: NavbarProps) {
                   My Account
                 </Link>
                 <Link href="/user/password" className="text-black py-2">
-                  Manage Password 
+                  Manage Password
                 </Link>
-                <Link href="/user/panel/booking" className="text-black py-2">
-                  My Bookings
-                </Link>
+                {session?.user?.role === 'USER' && (
+                  <>
+                    <Link
+                      href="/user/panel/booking"
+                      className="text-black py-2"
+                    >
+                      My Bookings
+                    </Link>
+                  </>
+                )}
                 <Link href="/search-property" className="text-black py-2">
                   Search Property
                 </Link>
@@ -184,13 +191,17 @@ export default function Navbar({ forceScrolled = false }: NavbarProps) {
       {session?.user?.id ? (
         <div className="hidden md:block relative" ref={profileRef}>
           <div className="flex items-center">
-            <Link href="/user/panel/booking">
-              <Button
-                name="My Bookings"
-                color={isScrolled ? 'white' : 'transparent'}
-                textColor={isScrolled ? 'black' : 'white'}
-              />
-            </Link>
+            {session?.user?.role === 'USER' && (
+              <>
+                <Link href="/user/panel/booking">
+                  <Button
+                    name="My Bookings"
+                    color={isScrolled ? 'white' : 'transparent'}
+                    textColor={isScrolled ? 'black' : 'white'}
+                  />
+                </Link>
+              </>
+            )}
             <Link href="/search-property">
               <Button
                 name="Search Property"
