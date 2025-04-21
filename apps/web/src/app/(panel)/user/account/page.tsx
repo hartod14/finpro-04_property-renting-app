@@ -132,7 +132,7 @@ export default function UserAccountPage() {
           }}
         >
           {(formik) => (
-            <Form className='bg-white rounded-lg shadow-md p-6'>
+            <Form className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-xl font-semibold mb-6">Update Profile</h2>
               <div className="grid gap-6 mb-6 grid-cols-1">
                 <div>
@@ -210,7 +210,7 @@ export default function UserAccountPage() {
           )}
         </Formik>
       )}
-      <div className='bg-white rounded-lg shadow-md p-6 mt-5'>
+      <div className="bg-white rounded-lg shadow-md p-6 mt-5">
         <div className="flex justify-between gap-6 items-center">
           <div>
             <h2 className="text-xl font-semibold mb-6">Change Email</h2>

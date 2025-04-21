@@ -26,8 +26,7 @@ export default function TenantSidebar({ children }: Props) {
   ];
 
   useEffect(() => {
-    const currentMenu =
-      menus.find((menu) => menu.href == pathname);
+    const currentMenu = menus.find((menu) => menu.href == pathname);
 
     if (currentMenu) {
       setActiveMenu(currentMenu.label);
@@ -129,6 +128,7 @@ export default function TenantSidebar({ children }: Props) {
                 className="cursor-pointer flex items-center p-2 gap-2 bg-gray-800 rounded"
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
               >
+                <p>{session?.user.name || 'User'}</p>
                 <Image
                   width={48}
                   height={48}
@@ -136,8 +136,6 @@ export default function TenantSidebar({ children }: Props) {
                   className="w-8 h-8 rounded-full"
                   alt=""
                 />
-                <p>{session?.user.name}</p>
-                <div className="text-white focus:outline-none text-sm">▼</div>
               </div>
 
               {/* Profile Dropdown */}

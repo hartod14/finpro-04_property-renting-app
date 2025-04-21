@@ -172,7 +172,7 @@ export default function UserPassword() {
                     confirmButtonColor: '#3085d6',
                   }).then(() => {
                     resetForm();
-                    router.push('/user/password');
+                    router.push('/tenant/password');
                   });
                 }
               } catch (error) {

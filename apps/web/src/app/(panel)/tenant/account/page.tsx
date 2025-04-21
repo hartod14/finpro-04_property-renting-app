@@ -119,7 +119,7 @@ export default function UserAccountPage() {
                       icon: 'success',
                       confirmButtonColor: '#0194f3',
                     }).then(() => {
-                      router.push('/user/account');
+                      router.push('/tenant/account');
                     });
                   }
                 } catch (error) {
