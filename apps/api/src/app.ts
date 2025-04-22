@@ -6,14 +6,18 @@ import express, {
   Response,
   NextFunction,
   Router,
+  Application,
 } from 'express';
 import cors from 'cors';
 import { PORT } from './config';
+import { authRouter } from './routers/auth.router';
+import { ErrorHandler } from './helpers/response.handler';
+import { uploadRouter } from './routers/upload.router';
 // import { SampleRouter } from './routers/sample.router';
 import { UserTransactionRouter } from './routers/user-transactions.routes';
 
 export default class App {
-  private app: Express;
+  private app: Application;
 
   constructor() {
     this.app = express();
@@ -23,30 +27,23 @@ export default class App {
   }
 
   private configure(): void {
+    this.app.use(express.json());
     this.app.use(cors());
-    this.app.use(json());
-    this.app.use(urlencoded({ extended: true }));
+    // this.app.use(urlencoded({ extended: true }));
   }
 
-  private handleError(): void {
-    // not found
+  private handleError() {
+    //not found handler
     this.app.use((req: Request, res: Response, next: NextFunction) => {
-      if (req.path.includes('/api/')) {
-        res.status(404).send('Not found !');
-      } else {
-        next();
-      }
+      res.status(404).send('Not found !');
     });
 
-    // error
+    //error handler
     this.app.use(
-      (err: Error, req: Request, res: Response, next: NextFunction) => {
-        if (req.path.includes('/api/')) {
-          console.error('Error : ', err.stack);
-          res.status(500).send('Error !');
-        } else {
-          next();
-        }
+      (err: ErrorHandler, req: Request, res: Response, next: NextFunction) => {
+        res.status(err.code || 500).send({
+          message: err.message,
+        });
       },
     );
   }
@@ -58,6 +55,10 @@ export default class App {
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
     });
+
+    //global
+    this.app.use('/api/auth', authRouter());
+    this.app.use('/api/upload-image', uploadRouter());
 
     // this.app.use('/api/samples', sampleRouter.getRouter());
     this.app.use('/api', usertransactionRouter.getRouter());
