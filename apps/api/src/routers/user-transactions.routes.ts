@@ -27,7 +27,7 @@ export class UserTransactionRouter {
 
     this.router.post(
       '/payments/:bookingId',
-      uploadPaymentProofMiddleware, 
+      uploadPaymentProofMiddleware,
       paymentController.uploadPaymentProof,
     );
 
