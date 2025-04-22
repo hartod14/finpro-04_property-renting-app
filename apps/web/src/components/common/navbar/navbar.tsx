@@ -32,7 +32,6 @@ export default function Navbar({ forceScrolled = false }: NavbarProps) {
       }
     };
 
-    // Set initial state
     handleScroll();
 
     window.addEventListener('scroll', handleScroll);
@@ -160,32 +159,6 @@ export default function Navbar({ forceScrolled = false }: NavbarProps) {
           </div>
         </div>
       )}
-
-      {/* Desktop Navigation - Not Authenticated */}
-      {/* <div className={`${session?.user?.id ?? 'hidden'}`}>
-        <div className="hidden md:flex items-center gap-4">
-          <Link href="/for-tenant">
-            <Button
-              name="For Tenant"
-              color={isScrolled ? 'white' : 'transparent'}
-              textColor={isScrolled ? 'black' : 'white'}
-            />
-          </Link>
-          <Link href="/auth/user/login">
-            <Button
-              name="Login"
-              color={isScrolled ? 'white' : 'transparent'}
-              textColor={isScrolled ? 'black' : 'white'}
-              border={isScrolled ? 'primary' : 'white'}
-              icon={<FaUser />}
-              iconPosition="before"
-            />
-          </Link>
-          <Link href="/auth/user/register">
-            <Button name="Register" color="primary" textColor="white" />
-          </Link>
-        </div>
-      </div> */}
 
       {/* Desktop Navigation - Authenticated User */}
       {session?.user?.id ? (

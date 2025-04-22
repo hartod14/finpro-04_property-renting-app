@@ -67,9 +67,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     async signIn({ account, profile, user }) {
-      // console.log('account', account);
-      // console.log('profile', profile);
-      // console.log('user', user);
       if (account?.provider == 'google' && profile?.email) {
         try {
           const { sub, email, name, picture } = profile;

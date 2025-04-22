@@ -103,8 +103,6 @@ export const verificationAndSetPassword = async (
 };
 
 export const resendVerificationEmail = async (email: string) => {
-  // console.log(email);
-
   return await api('/auth/resend-verification', 'POST', {
     body: { email },
     contentType: 'application/json',

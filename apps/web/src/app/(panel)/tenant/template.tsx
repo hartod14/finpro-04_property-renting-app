@@ -16,7 +16,7 @@ type Props = {
 
 export default function TenantPanelTemplate({ children }: Props) {
   return (
-    <div className="bg-[#F4F7FE]">
+    <div className="bg-[#F4F7FE] px-4 md:px-8 pt-24 md:pt-28 pb-6 md:pb-10">
       <TenantSidebar>{children}</TenantSidebar>
     </div>
   );

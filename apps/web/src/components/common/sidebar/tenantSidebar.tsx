@@ -22,7 +22,6 @@ export default function TenantSidebar({ children }: Props) {
     // { href: '/user/booking', icon: <FaShoppingBag />, label: 'My Booking' },
     { href: '/tenant/account', icon: <FaUser />, label: 'Account' },
     { href: '/tenant/password', icon: <FaLock />, label: 'Password' },
-    // You can add more menu items here in the future
   ];
 
   useEffect(() => {
@@ -170,7 +169,7 @@ export default function TenantSidebar({ children }: Props) {
           </div>
 
           {/* Page Content */}
-          <div className="px-8 pt-28 ">{children}</div>
+          <nav>{children}</nav>
         </div>
       </div>
     </div>

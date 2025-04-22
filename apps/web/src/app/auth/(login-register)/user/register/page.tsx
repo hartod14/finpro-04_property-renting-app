@@ -13,7 +13,7 @@ import Image from 'next/image';
 import FacebookImage from '@/../public/facebook.png';
 import GoogleImage from '@/../public/google.png';
 import Swal from 'sweetalert2';
-import { googleLogin } from '@/app/action/auth';
+import { facebookLogin, googleLogin } from '@/app/action/auth';
 
 export default function RegisterPage() {
   const [errMessage, setErrMessage] = React.useState('');
@@ -144,8 +144,13 @@ export default function RegisterPage() {
           </h5>
 
           <div className="flex items-center justify-center gap-4">
-            {/* <div>
-              <div className="border p-6 w-full mx-[5] my-[10] rounded-md cursor-pointer">
+            <div>
+              <div
+                className="border py-4 px-5 w-full mx-[5] my-[10] rounded-md cursor-pointer"
+                onClick={() => {
+                  facebookLogin();
+                }}
+              >
                 <Image
                   alt=""
                   src={FacebookImage}
@@ -154,7 +159,7 @@ export default function RegisterPage() {
                   className="h-4 w-2"
                 />
               </div>
-            </div> */}
+            </div>
 
             <div>
               <div

@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import UserSidebar from '@/components/common/sidebar/userSidebar';
-import UserAccountModel from '@/models/user-panel/accountModel';
 import { Form } from 'formik';
 import { updateProfileValidator } from '@/validators/auth.validator';
 import { Formik } from 'formik';
@@ -16,73 +15,22 @@ import { FaArrowUp, FaUpload } from 'react-icons/fa';
 import { sendChangeEmail, updateUser } from '@/handlers/auth';
 import Button from '@/components/common/button/button';
 import Link from 'next/link';
+import UserAccountModel from '@/models/user-panel/accountModel';
 
 export default function UserAccountPage() {
-  const { data: session, update } = useSession();
-  const [initialValues, setInitialValues] = useState<any>();
-
   const {
     isLoading,
     setIsLoading,
     router,
     refImage,
     image,
-    setImage,
     upload,
     error,
+    session,
+    initialValues,
+    update,
+    handleChangeEmail,
   } = UserAccountModel();
-
-  useEffect(() => {
-    if (session) {
-      setInitialValues({
-        email: session.user.email ?? '',
-        phone: session.user.phone ?? '',
-        name: session.user.name ?? '',
-        profile_picture: session.user.profile_picture ?? '',
-      });
-      setImage(session.user.profile_picture ?? '');
-    }
-  }, [session]);
-
-  const handleChangeEmail = async (email: string) => {
-    Swal.fire({
-      title: 'Change Email Confirmation',
-      text: 'A change email verification email will be sent to your registered email address.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#0194f3',
-      cancelButtonColor: '#ABABAB',
-      confirmButtonText: 'Yes, send email!',
-      cancelButtonText: 'Cancel',
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const res: any = await sendChangeEmail(email);
-          if (res?.error) {
-            Swal.fire({
-              icon: 'error',
-              title: 'Oops...',
-              text: res.error,
-            });
-          } else {
-            Swal.fire({
-              title: 'Email Sent!',
-              text: 'Check your email for change email verification instructions.',
-              icon: 'success',
-              confirmButtonColor: '#0194f3',
-            });
-          }
-        } catch (error) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'Something went wrong, please try again later!',
-          });
-        }
-      }
-    });
-  };
-
   return (
     <div>
       {initialValues && (

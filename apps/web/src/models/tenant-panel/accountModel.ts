@@ -13,7 +13,7 @@ import React, {
 } from 'react';
 import Swal from 'sweetalert2';
 
-export default function UserAccountModel() {
+export default function TenantAccountModel() {
   const [isLoading, setIsLoading] = useState(false);
   const { data: session, update } = useSession();
   const [initialValues, setInitialValues] = useState<any>();

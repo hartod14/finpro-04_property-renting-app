@@ -8,6 +8,7 @@ import {
   forgetPassword,
   resendVerificationEmail,
 } from '@/handlers/auth';
+import TenantPasswordModel from '@/models/tenant-panel/passwordModel';
 import { changePasswordValidator } from '@/validators/auth.validator';
 import { log } from 'console';
 import { Form, Formik } from 'formik';
@@ -17,122 +18,18 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 
-export default function UserPassword() {
-  const initChangePassword = {
-    password: '',
-    new_password: '',
-    confirm_new_password: '',
-  };
-  const router = useRouter();
-  const { data: session } = useSession();
-  const [checkPassword, setCheckPassword] = useState(false);
-
-  const handleSetPassword = async (email: string) => {
-    Swal.fire({
-      title: 'Set Password Confirmation',
-      text: 'A password verification email will be sent to your registered email address.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#ABABAB',
-      confirmButtonText: 'Yes, send email!',
-      cancelButtonText: 'Cancel',
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const res: any = await resendVerificationEmail(email);
-          if (res?.error) {
-            Swal.fire({
-              icon: 'error',
-              title: 'Oops...',
-              text: res.error,
-            });
-          } else {
-            Swal.fire({
-              title: 'Email Sent!',
-              text: 'Check your email for password verification instructions.',
-              icon: 'success',
-              confirmButtonColor: '#3085d6',
-            });
-          }
-        } catch (error) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Something went wrong, please try again later!',
-          });
-        }
-      }
-    });
-  };
-
-  const handleForgetPassword = async (email: string) => {
-    if (!email) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Email is required to reset the password!',
-      });
-      return;
-    }
-
-    Swal.fire({
-      title: 'Forget Password Confirmation',
-      text: 'A password reset email will be sent to your registered email address.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#ABABAB',
-      confirmButtonText: 'Yes, send email!',
-      cancelButtonText: 'Cancel',
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const res: any = await forgetPassword(email);
-          if (res?.error) {
-            Swal.fire({
-              icon: 'error',
-              title: 'Oops...',
-              text:
-                res.error || 'Something went wrong, please try again later!',
-            });
-          } else {
-            Swal.fire({
-              title: 'Email Sent!',
-              text: 'Check your email for password reset instructions.',
-              icon: 'success',
-              confirmButtonColor: '#3085d6',
-            });
-          }
-        } catch (error) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Something went wrong, please try again later!',
-          });
-        }
-      }
-    });
-  };
-
-  useEffect(() => {
-    async function getUser() {
-      const res: any = await checkPasswordSet(String(session?.user?.email));
-      if (res.error) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: res.error,
-        });
-      } else {
-        setCheckPassword(res.data);
-      }
-    }
-    getUser();
-  }, [session]);
+export default function TenantPassword() {
+  const {
+    router,
+    session,
+    initChangePassword,
+    handleSetPassword,
+    handleForgetPassword,
+    checkPassword,
+  } = TenantPasswordModel();
 
   return checkPassword ? (
-    <div className='bg-white rounded-lg shadow-md p-6'>
+    <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-6">
       <h2 className="text-xl font-semibold mb-6">Change Password</h2>
       <Formik
         initialValues={initChangePassword}
@@ -248,7 +145,7 @@ export default function UserPassword() {
       </Formik>
     </div>
   ) : (
-    <div>
+    <div className='bg-white p-6 rounded-lg shadow-lg border border-gray-100'>
       <div className="flex justify-between gap-6 items-center">
         <div>
           <h2 className="text-xl font-semibold mb-6">Set Password</h2>
