@@ -23,10 +23,10 @@ export default function UserSidebar() {
         setScreenSize('mobile');
       }
     };
-    
+
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
-    
+
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
@@ -45,7 +45,9 @@ export default function UserSidebar() {
   return (
     <>
       {/* Mobile Menu Bar */}
-      <div className={screenSize !== 'desktop' ? 'block w-full mb-4' : 'hidden'}>
+      <div
+        className={screenSize !== 'desktop' ? 'block w-full mb-4' : 'hidden'}
+      >
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <div className="flex w-full">
             {menuItems.slice(0, 3).map((item) => (
@@ -58,12 +60,18 @@ export default function UserSidebar() {
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                <span className={screenSize === 'mobile' ? 'text-lg mb-1' : 'text-base mb-1'}>
+                <span
+                  className={
+                    screenSize === 'mobile' ? 'text-lg mb-1' : 'text-base mb-1'
+                  }
+                >
                   {item.icon}
                 </span>
-                <span className={`text-sm ${screenSize === 'mobile' ? 'text-xs' : ''}`}>
-                  {screenSize === 'mobile' && item.label.length > 8 
-                    ? item.label.split(' ')[0] 
+                <span
+                  className={`text-sm ${screenSize === 'mobile' ? 'text-xs' : ''}`}
+                >
+                  {screenSize === 'mobile' && item.label.length > 8
+                    ? item.label.split(' ')[0]
                     : item.label}
                 </span>
               </Link>
@@ -71,7 +79,7 @@ export default function UserSidebar() {
           </div>
         </div>
       </div>
-      
+
       {/* Desktop Sidebar */}
       <div className={screenSize === 'desktop' ? 'block' : 'hidden'}>
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -91,7 +99,9 @@ export default function UserSidebar() {
                 />
               </div>
               <div>
-                <h2 className="font-semibold">{session?.user?.name}</h2>
+                <h2 className="font-semibold text-black">
+                  {session?.user?.name}
+                </h2>
                 <p className="text-gray-500 text-sm">{session?.user?.email}</p>
               </div>
             </div>

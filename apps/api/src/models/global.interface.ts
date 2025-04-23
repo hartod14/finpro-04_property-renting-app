@@ -1,6 +1,6 @@
 /** @format */
 
-import { IUserLogin } from "@/interfaces/user.interface";
+import { IUserLogin } from '@/interfaces/user.interface';
 
 declare global {
   namespace Express {

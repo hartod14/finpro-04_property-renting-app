@@ -33,7 +33,7 @@ const UploadPaymentForm: React.FC = () => {
     const formData = new FormData();
     formData.append('file', file);
 
-    const bookingId = '19'; // manual bookingId
+    const bookingId = '2'; // manual bookingId
 
     setLoading(true);
     setError(null);

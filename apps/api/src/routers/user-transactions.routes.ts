@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import * as bookingController from '../controllers/booking.controller';
 import * as paymentController from '../controllers/payment.controller';
+import { verifyUser } from '../middalewares/auth.middleware';
 import {
   uploadPaymentProofMiddleware,
   expireUnpaidBookingsMiddleware,
@@ -16,13 +17,14 @@ export class UserTransactionRouter {
   }
 
   private initializeRoutes(): void {
-    this.router.post('/bookings', bookingController.createBooking);
-    this.router.get('/bookings', bookingController.listBookings);
+    this.router.post('/bookings', verifyUser, bookingController.createBooking);
+    this.router.get('/bookings', verifyUser, bookingController.listBookings);
 
     this.router.delete(
       '/bookings/:bookingId',
+      verifyUser,
       checkBookingStatusForCancellation,
-      bookingController.cancelBooking,
+      bookingController.cancelBookingController,
     );
 
     this.router.post(

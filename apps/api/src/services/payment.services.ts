@@ -48,7 +48,7 @@ export const expireUnpaidBookings = async () => {
   return expired
 }
 
-cron.schedule('*0 * * * * *', async () => {
+cron.schedule('0 * * * * *', async () => {
   console.log('Running scheduled job: expireUnpaidBookings');
 
   try {

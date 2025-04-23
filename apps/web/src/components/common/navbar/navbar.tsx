@@ -138,10 +138,7 @@ export default function Navbar({ forceScrolled = false }: NavbarProps) {
                 </Link>
                 {session?.user?.role === 'USER' && (
                   <>
-                    <Link
-                      href="/user/panel/booking"
-                      className="text-black py-2"
-                    >
+                    <Link href="/user/booking" className="text-black py-2">
                       My Bookings
                     </Link>
                   </>

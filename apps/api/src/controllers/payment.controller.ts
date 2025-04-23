@@ -1,16 +1,19 @@
 import { Request, Response } from 'express';
 import * as paymentService from '../services/payment.services';
 
-export const uploadPaymentProof = async (req: Request, res: Response) => {
+export const uploadPaymentProof = async (req: Request, res: Response): Promise<void> => {
   const bookingId = Number(req.params.bookingId);
-  if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+  if (!req.file) {
+    res.status(400).json({ error: 'No file uploaded' });
+    return; // Pastikan keluar setelah mengirimkan respons
+  }
 
   try {
     await paymentService.uploadPaymentProof(bookingId, req.file);
-    return res.status(200).json({ message: 'Proof uploaded successfully' });
+    res.status(200).json({ message: 'Proof uploaded successfully' });
   } catch (error: any) {
-    console.error(error); // Tambahkan ini
-    return res.status(500).json({ error: 'Failed to upload proof', details: error.message });
+    console.error(error); // Tambahkan log error
+    res.status(500).json({ error: 'Failed to upload proof', details: error.message });
   }
 };
 

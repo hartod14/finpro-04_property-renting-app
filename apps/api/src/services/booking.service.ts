@@ -45,7 +45,7 @@ export const listBookings = async (
 ) => {
   return await prisma.booking.findMany({
     where: {
-      user_id: userId,
+      user_id: userId, // Hanya menampilkan booking milik user yang sedang login
       ...(status && { status }),
       ...(date && {
         checkin_date: {
@@ -65,22 +65,30 @@ export const listBookings = async (
 };
 
 export const cancelBooking = async (bookingId: number) => {
+  console.log("Cancel booking service - Booking ID:", bookingId); // Log ID booking yang diterima
+
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
     include: { payment: true },
   });
 
-  if (!booking) throw new Error('Booking not found');
+  if (!booking) {
+    console.log("Booking not found for ID:", bookingId);  // Log jika booking tidak ditemukan
+    throw new Error('Booking not found');
+  }
 
-  if (
-    booking.status !== BookingStatus.WAITING_FOR_PAYMENT ||
-    booking.payment?.proof
-  ) {
+  // Cek apakah status booking valid untuk dibatalkan
+  if (booking.status !== 'WAITING_FOR_PAYMENT' || booking.payment?.proof) {
+    console.log("Booking cannot be cancelled - Status:", booking.status, "Payment proof:", booking.payment?.proof);
     throw new Error('Booking cannot be cancelled');
   }
 
-  return await prisma.booking.update({
+  // Jika valid, lanjutkan untuk mengupdate status booking
+  const updatedBooking = await prisma.booking.update({
     where: { id: bookingId },
-    data: { status: BookingStatus.CANCELLED },
+    data: { status: 'CANCELLED' },
   });
+
+  console.log("Booking cancelled successfully:", updatedBooking);  // Log setelah pembatalan berhasil
+  return updatedBooking;
 };
