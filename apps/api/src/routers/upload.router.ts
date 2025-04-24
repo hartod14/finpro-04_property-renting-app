@@ -7,7 +7,7 @@ import { Router } from 'express';
 export const uploadRouter = () => {
   const router = Router();
 
-  router.post('/', uploader().single("image"), uploadController.uploadImage);
+  router.post('/', uploader().single('image'), uploadController.uploadImage);
 
   return router;
 };

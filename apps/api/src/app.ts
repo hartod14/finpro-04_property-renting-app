@@ -13,7 +13,6 @@ import { PORT } from './config';
 import { authRouter } from './routers/auth.router';
 import { ErrorHandler } from './helpers/response.handler';
 import { uploadRouter } from './routers/upload.router';
-// import { SampleRouter } from './routers/sample.router';
 
 export default class App {
   private app: Application;
@@ -54,7 +53,7 @@ export default class App {
 
     //global
     this.app.use('/api/auth', authRouter());
-    this.app.use('/api/upload-image', uploadRouter());
+    this.app.use('/api/upload-image',uploadRouter()); 
 
     // this.app.use('/api/samples', sampleRouter.getRouter());
   }
