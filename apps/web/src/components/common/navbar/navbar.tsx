@@ -137,10 +137,7 @@ export default function Navbar({ forceScrolled = false }: NavbarProps) {
                 </Link>
                 {session?.user?.role === 'USER' && (
                   <>
-                    <Link
-                      href="/user/panel/booking"
-                      className="text-black py-2"
-                    >
+                    <Link href="/user/booking" className="text-black py-2">
                       My Bookings
                     </Link>
                   </>
@@ -166,7 +163,7 @@ export default function Navbar({ forceScrolled = false }: NavbarProps) {
           <div className="flex items-center">
             {session?.user?.role === 'USER' && (
               <>
-                <Link href="/user/panel/booking">
+                <Link href="/user/booking">
                   <Button
                     name="My Bookings"
                     color={isScrolled ? 'white' : 'transparent'}
