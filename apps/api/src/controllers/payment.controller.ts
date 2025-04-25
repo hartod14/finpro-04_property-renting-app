@@ -1,7 +1,10 @@
 import { Request, Response } from 'express';
 import * as paymentService from '../services/payment.services';
 
-export const uploadPaymentProof = async (req: Request, res: Response): Promise<void> => {
+export const uploadPaymentProof = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   const bookingId = Number(req.params.bookingId);
   if (!req.file) {
     res.status(400).json({ error: 'No file uploaded' });
@@ -13,7 +16,9 @@ export const uploadPaymentProof = async (req: Request, res: Response): Promise<v
     res.status(200).json({ message: 'Proof uploaded successfully' });
   } catch (error: any) {
     console.error(error); // Tambahkan log error
-    res.status(500).json({ error: 'Failed to upload proof', details: error.message });
+    res
+      .status(500)
+      .json({ error: 'Failed to upload proof', details: error.message });
   }
 };
 
@@ -34,9 +39,13 @@ export const createMidtransPayment = async (req: Request, res: Response) => {
   const { bookingId } = req.params;
 
   try {
-    const result = await paymentService.createMidtransPayment(Number(bookingId));
+    const result = await paymentService.createMidtransPayment(
+      Number(bookingId),
+    );
     res.status(200).json(result);
   } catch (error: any) {
-    res.status(500).json({ message: error.message || 'Failed to create Midtrans payment.' });
+    res
+      .status(500)
+      .json({ message: error.message || 'Failed to create Midtrans payment.' });
   }
 };

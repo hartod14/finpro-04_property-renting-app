@@ -1,5 +1,5 @@
-import { PrismaClient, BookingStatus } from '@prisma/client'
-import { validateImage } from '../utils/validation'
+import { PrismaClient, BookingStatus } from '@prisma/client';
+import { validateImage } from '../utils/validation';
 import cron from 'node-cron';
 
 const prisma = new PrismaClient();
@@ -32,7 +32,7 @@ export const uploadPaymentProof = async (
 };
 
 export const expireUnpaidBookings = async () => {
-  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
   const expired = await prisma.booking.updateMany({
     where: {
@@ -43,18 +43,20 @@ export const expireUnpaidBookings = async () => {
       },
     },
     data: { status: BookingStatus.EXPIRED },
-  })
+  });
 
-  return expired
-}
+  return expired;
+};
 
-cron.schedule('0 * * * * *', async () => {
+cron.schedule('0 * * * *', async () => {
   console.log('Running scheduled job: expireUnpaidBookings');
 
   try {
     const result = await expireUnpaidBookings();
     if (result.count > 0) {
-      console.log(`${result.count} unpaid booking(s) have been marked as EXPIRED.`);
+      console.log(
+        `${result.count} unpaid booking(s) have been marked as EXPIRED.`,
+      );
     }
   } catch (error) {
     console.error('Error in scheduled expireUnpaidBookings:', error);

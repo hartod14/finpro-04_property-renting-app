@@ -1,4 +1,5 @@
 import { PrismaClient, BookingStatus, PaymentMethod } from '@prisma/client';
+import { format } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
 
 const prisma = new PrismaClient();
@@ -11,7 +12,10 @@ export const createBooking = async (
   paymentMethod: PaymentMethod,
   amount: number,
 ) => {
-  const orderNumber = `ORD-${uuidv4()}`;
+  // Format tanggal dengan format yyyyMMdd
+  const formattedDate = format(new Date(), 'ddMMyyyy');
+  // Gabungkan tanggal dengan UUID
+  const orderNumber = `ORD-${formattedDate}-${uuidv4()}`;
 
   // Create payment record
   const payment = await prisma.payment.create({

@@ -190,7 +190,7 @@ export default function Navbar({ forceScrolled = false }: NavbarProps) {
           <div className="flex items-center">
             {session?.user?.role === 'USER' && (
               <>
-                <Link href="/user/panel/booking">
+                <Link href="/user/booking">
                   <Button
                     name="My Bookings"
                     color={isScrolled ? 'white' : 'transparent'}

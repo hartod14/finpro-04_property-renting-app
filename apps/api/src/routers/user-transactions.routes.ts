@@ -6,7 +6,7 @@ import {
   uploadPaymentProofMiddleware,
   expireUnpaidBookingsMiddleware,
   checkBookingStatusForCancellation,
-} from '../middleware/booking.middleware';
+} from '../middalewares/booking.middleware';
 
 export class UserTransactionRouter {
   private router: Router;

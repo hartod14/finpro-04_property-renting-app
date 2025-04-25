@@ -40,12 +40,12 @@ export const listBookings = async (req: Request, res: Response): Promise<any> =>
         user_id: Number(userId),
       },
       include: {
-        user: true, // untuk info user
+        user: true, 
         room: {
           include: {
             property: {
               include: {
-                propertyImages: true, // ambil gambar properti
+                propertyImages: true, 
               },
             },
           },
@@ -72,10 +72,11 @@ export const listBookings = async (req: Request, res: Response): Promise<any> =>
       },
       booking: {
         id: booking.id,
+        order_number: booking.order_number,
         checkinDate: booking.checkin_date,
         checkoutDate: booking.checkout_date,
         status: booking.status,
-        paymentMethod: booking.payment.method,
+        paymentMethod: booking.payment?.method ?? null,
       },
     }));
 
