@@ -58,7 +58,8 @@ export default class App {
 
     //global
     this.app.use('/api/auth', authRouter());
-    this.app.use('/api/upload-image',uploadRouter()); 
+    this.app.use('/api/upload-image', uploadRouter());
+    this.app.use('/api/city', cityRouter());
 
     // this.app.use('/api/samples', sampleRouter.getRouter());
     this.app.use('/api', usertransactionRouter.getRouter());

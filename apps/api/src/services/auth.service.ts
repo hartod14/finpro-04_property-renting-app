@@ -14,7 +14,6 @@ import {
   decodeVerificationJwt,
   verificationJwt,
 } from '@/helpers/verification.jwt';
-import { log } from 'handlebars';
 
 interface AuthenticatedRequest extends Request {
   user?: IUserLogin;
