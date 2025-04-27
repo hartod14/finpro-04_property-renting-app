@@ -60,7 +60,7 @@ export const roomSeed: Prisma.RoomCreateManyInput[] = [
     property_id: 3,
     base_price: 585000,
     description:
-      '24 unit Kamar Deluxe yang luas di hotel ini adalah pilihan ideal untuk pelancong bisnis dan liburan. Tamu dapat memilih kamar dengan satu atau dua tempat tidur single. Menampilkan fasilitas dan layanan yang hebat, kamar-kamar ini ditawarkan dalam paket nilai yang terjangkau.',
+      'The 24 spacious Deluxe rooms in this hotel are the ideal choice for business and holiday travelers. Guests can choose rooms with one or two single beds. Featuring great facilities and services, these rooms are offered in affordable value packages.',
     capacity: 2,
     size: 31,
     total_room: 24,
@@ -366,7 +366,7 @@ export const roomSeed: Prisma.RoomCreateManyInput[] = [
     property_id: 18,
     base_price: 707000,
     description:
-      'Terletak di belakang bangunan utama properti, kamar double atau twin ini menawarkan privasi lebih dengan desain yang elegan. Saat ini kami sedang menjalankan proyek di sebelah bangunan. Beberapa kebisingan akan memengaruhi selama jam kerja dan mungkin memengaruhi pengalaman Anda.',
+      'Located at the back of the main building of the property, this double or twin room offers more privacy with an elegant design. We are currently running a project next to the building. Some noise will affect during working hours and may affect your experience.',
     capacity: 2,
     size: 27,
     total_room: 24,
@@ -463,7 +463,7 @@ export const roomSeed: Prisma.RoomCreateManyInput[] = [
     property_id: 22,
     base_price: 647000,
     description:
-      'Kamar Family adalah pilihan terbaik untuk tinggal bersama keluarga tercinta. Dapat memuat sampai dengan 3 orang dewasa.',
+      'The Family room is the best choice for staying with your beloved family. Can accommodate up to 3 adults.',
     capacity: 3,
     size: 24,
     total_room: 6,
@@ -533,7 +533,7 @@ export const roomSeed: Prisma.RoomCreateManyInput[] = [
     name: 'Studio',
     property_id: 26,
     base_price: 294000,
-    description: 'Hadir untuk para tamu yang ingin menginap bersama dua orang',
+    description: 'Available for guests who want to stay with two people',
     capacity: 2,
     size: 24,
     total_room: 16,
@@ -544,7 +544,7 @@ export const roomSeed: Prisma.RoomCreateManyInput[] = [
     property_id: 26,
     base_price: 245000,
     description:
-      'Hadir secara khusus untuk keluarga atau para tamu yang ingin menginap bersama dua orang lebih dengan 2 kamar tidur',
+      'Specially available for families or guests who want to stay with more than two people with 2 bedrooms',
     capacity: 4,
     size: 48,
     total_room: 10,

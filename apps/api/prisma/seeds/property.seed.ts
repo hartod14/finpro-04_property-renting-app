@@ -8,7 +8,7 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
     city_id: 1,
     name: 'Aryaduta Medan',
     description:
-      'Terletak di salah satu kota terbesar di Indonesia, Aryaduta Medan menawarkan lokasi strategis yang dekat dengan pusat perbelanjaan dan tujuan wisata populer. Berlokasi di Jl. Kapten Maulana Lubis No. 8, hotel ini menyediakan kenyamanan premium yang tak tertandingi di 195 kamar dan suite-nya. Fasilitas yang tersedia meliputi ruang pertemuan serbaguna, kolam renang 35 meter, pusat kebugaran, pilihan kuliner yang menggugah selera, dan berbagai fasilitas lainnya. Menghadap pemandangan kota yang menakjubkan, Aryaduta Medan dirancang untuk menjadi ikon art deco yang ideal bagi pelancong regional dan internasional dalam perjalanan bisnis atau liburan.\n\nHotel ini memiliki pusat kebugaran dengan pemandangan kolam renang dan layanan pijat di kamar. Wi-Fi gratis tersedia di seluruh hotel. Aryaduta Medan menawarkan kamar ber-AC yang luas dengan desain berkarpet kontemporer namun berkelas. Setiap kamar dilengkapi dengan TV layar datar, brankas, area tempat duduk, dan fasilitas untuk membuat teh/kopi. Kamar mandi dilengkapi dengan shower dan perlengkapan mandi gratis. Beberapa tipe kamar menawarkan area tempat duduk yang lebih besar dengan sofa.\n\nRestoran The Kitchen Aryaduta Medan menyajikan hidangan Asia dan Barat untuk sarapan, makan siang, dan makan malam, sementara Pool Cafe yang santai menyediakan minuman segar dan makanan ringan.\n\nStaf resepsionis yang ramah dan tersedia 24 jam dapat membantu Anda dengan layanan concierge dan transfer bandara. Pusat bisnis dan layanan binatu/dry cleaning juga tersedia dengan biaya tambahan.\n\nPenginapan Anda di Aryaduta Medan akan semakin lengkap jika dipadukan dengan kunjungan ke tempat-tempat wisata populer dan menarik yang tidak jauh dari hotel. Anda dapat mengunjungi Lippo Plaza Medan, yang hanya berjarak sekitar 400 meter dengan berjalan kaki. Pusat perbelanjaan terdekat lainnya termasuk Medan Mall dan Sun Plaza.\n\nUntuk tujuan wisata, Anda dapat menjelajahi situs-situs keagamaan seperti Candi Borobudur, Kuil Shri Mariaman, Kuil Gunung Timur, Maha Vihara Maitreya Cemara Asri, dan Masjid Agung Al-Mashun. Istana Maimun, Museum Bukit Barisan, dan Galeri Museum Satwa Liar Internasional Rahmat juga merupakan objek wisata menarik yang dapat Anda kunjungi tidak jauh dari hotel.\n\nLokasi strategis, fasilitas lengkap, dan layanan kelas internasional tidak diragukan lagi menjadi alasan mengapa Anda harus memilih Aryaduta Medan sebagai tempat menginap terbaik di ibukota Sumatera Utara.',
+      'Located in one of the largest cities in Indonesia, Aryaduta Medan offers a strategic location close to shopping centers and popular tourist destinations. Located on Jl. Kapten Maulana Lubis No. 8, this hotel provides unparalleled premium comfort in its 195 rooms and suites. Available facilities include multipurpose meeting rooms, a 35-meter swimming pool, fitness center, appetizing culinary options, and various other amenities. Overlooking breathtaking city views, Aryaduta Medan is designed to be an art deco icon ideal for regional and international travelers on business or vacation.\n\nThe hotel has a fitness center with pool views and in-room massage services. Free Wi-Fi is available throughout the hotel. Aryaduta Medan offers spacious air-conditioned rooms with contemporary yet classy carpeted design. Each room is equipped with a flat-screen TV, safe, seating area, and tea/coffee making facilities. Bathrooms come with a shower and free toiletries. Some room types offer larger seating areas with sofas.\n\nThe Kitchen Aryaduta Medan restaurant serves Asian and Western dishes for breakfast, lunch, and dinner, while the relaxed Pool Cafe provides refreshing drinks and light snacks.\n\nThe friendly reception staff available 24 hours can assist you with concierge service and airport transfers. Business center and laundry/dry cleaning services are also available for an additional fee.\n\nYour stay at Aryaduta Medan will be even more complete when combined with visits to popular and interesting tourist attractions not far from the hotel. You can visit Lippo Plaza Medan, which is only about 400 meters away by foot. Other nearby shopping centers include Medan Mall and Sun Plaza.\n\nFor tourist destinations, you can explore religious sites such as Borobudur Temple, Shri Mariaman Temple, Mount Timur Temple, Maha Vihara Maitreya Cemara Asri, and Al-Mashun Grand Mosque. Maimun Palace, Bukit Barisan Museum, and Rahmat International Wildlife Museum Gallery are also interesting attractions you can visit not far from the hotel.\n\nStrategic location, complete facilities, and international-class service are undoubtedly reasons why you should choose Aryaduta Medan as the best place to stay in the capital of North Sumatra.',
     address:
       'Jalan Kapten Maulana Lubis No. 8, Pusat Kota Medan, Medan, Sumatra Utara, Indonesia, 20112',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -21,7 +21,7 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
     city_id: 1,
     name: 'Adimulia Hotel Medan',
     description:
-      'Penginapan yang elegan dan mewah menanti Anda di Adimulia Hotel Medan. Terletak di jantung Medan dan hanya 12 menit berkendara dari Istana Maimun yang bersejarah di kota ini, hotel ini menawarkan dua kolam renang atap terbuka, spa, dan fasilitas pertemuan/pesta. Tamu juga dapat mengakses WiFi gratis di semua area properti.\n\nMenyajikan desain mewah dengan lantai berkarpet atau kayu, kamar di Adimulia Hotel Medan ber-AC dan memiliki jendela besar yang menghadap ke kota. Setiap kamar juga dilengkapi dengan TV kabel layar datar, area tempat duduk, dan fasilitas pembuat teh/kopi. Tersedia juga kamar mandi dalam dengan shower dan perlengkapan mandi gratis. Beberapa kamar menyediakan area tempat duduk yang lebih luas dengan sofa dan bathtub.\n\nNikmati suasana Eropa klasik dan sarapan prasmanan harian di Cafe de Palmo hotel tempat tamu juga dapat menikmati menu a la carte Asia dan Eropa untuk makan siang dan makan malam.Masakan Cina otentik premium disajikan di Jasmine Chinese Restaurant.Untuk nongkrong santai, pergilah ke Lobby Lounge atau Sports Lounge.Oval Lounge tersedia untuk pertemuan pribadi tamu.\n\nDi Adimulia Hotel Medan, tamu juga dapat menemukan meja depan 24 jam dengan layanan concierge dan penyimpanan bagasi serta parkir pribadi gratis di lokasi.Klub anak - anak dan lapangan bulu tangkis indoor tersedia dengan biaya tambahan.\n\nStasiun Kereta Api Medan dapat dicapai dalam waktu 5 menit berkendara sedangkan Bandara Internasional Kualanamu berjarak sekitar 45 menit berkendara.',
+      'Elegant and luxurious accommodation awaits you at Adimulia Hotel Medan. Located in the heart of Medan and only a 12-minute drive from the historic Maimun Palace in the city, this hotel offers two outdoor rooftop swimming pools, spa, and meeting/party facilities. Guests can also access free WiFi in all areas of the property.\n\nFeaturing luxurious design with carpeted or wooden floors, rooms at Adimulia Hotel Medan are air-conditioned and have large windows facing the city. Each room is also equipped with a flat-screen cable TV, seating area, and tea/coffee making facilities. En suite bathrooms come with a shower and free toiletries. Some rooms provide a larger seating area with sofas and bathtubs.\n\nEnjoy a classic European atmosphere and daily buffet breakfast at the hotel\'s Cafe de Palmo where guests can also enjoy Asian and European a la carte menus for lunch and dinner. Premium authentic Chinese cuisine is served at Jasmine Chinese Restaurant. For casual hangouts, head to the Lobby Lounge or Sports Lounge. Oval Lounge is available for guests\' private meetings.\n\nAt Adimulia Hotel Medan, guests can also find a 24-hour front desk with concierge service and luggage storage as well as free private parking on site. Kids club and indoor badminton court are available for an additional fee.\n\nMedan Train Station can be reached within a 5-minute drive while Kualanamu International Airport is about a 45-minute drive away.',
     address:
       'Jl. Pangeran Diponegoro No.8 Medan Kota, Pusat Kota Medan, Medan, Sumatra Utara, Indonesia, 20112',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -30,11 +30,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 3,
     category_id: 1,
-    tenant_id: 2,
+    tenant_id: 4,
     city_id: 1,
     name: 'Swiss-Belinn Medan',
     description:
-      'Swiss Belinn Medan adalah akomodasi bintang 3 yang mengusung konsep modern minimalis.Kamar yang ditawarkan beragam dan telah dilengkapi fasilitas, yakni AC, TV, hingga akses WiFi.Ada pula fasilitas pendukung, seperti ruang serbaguna, restoran, layanan spa.Bolu Meranti, Istana Maimun, dan Masjid Agung Medan adalah atraksi terdekat dari Swiss Belinn Medan.',
+      'Swiss Belinn Medan is a 3-star accommodation that features a modern minimalist concept. The rooms offered are varied and equipped with facilities, including AC, TV, and WiFi access. There are also supporting facilities, such as multipurpose rooms, restaurant, and spa services. Bolu Meranti, Maimun Palace, and Medan Grand Mosque are the closest attractions to Swiss Belinn Medan.',
     address:
       'Jl Surabaya 88, Pusat Kota Medan, Medan, Sumatra Utara, Indonesia, 20212',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -43,11 +43,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 4,
     category_id: 1,
-    tenant_id: 2,
+    tenant_id: 5,
     city_id: 1,
     name: 'favehotel S. Parman Medan',
     description:
-      'favehotel S. Parman Medan sangat direkomendasikan untuk para backpacker yang ingin mendapatkan penginapan yang terjangkau namun nyaman.\n\nPerawatan spa adalah salah satu fitur utama hotel ini. Manjakan diri Anda dengan perawatan yang menenangkan yang meremajakan Anda.\n\nDari acara bisnis hingga pertemuan perusahaan, favehotel S. Parman Medan menyediakan layanan dan fasilitas lengkap yang Anda dan kolega Anda butuhkan.\n\nPelayanan yang luar biasa bersama dengan berbagai fasilitas yang disediakan akan membuat Anda tidak mengeluh selama menginap di favehotel S. Parman Medan.\n\nResepsionis 24 jam tersedia untuk melayani Anda, mulai dari check-in hingga check-out, atau bantuan apa pun yang Anda butuhkan. Jika Anda menginginkan lebih, jangan ragu untuk bertanya kepada resepsionis, kami selalu siap untuk mengakomodasi Anda.\n\nNikmati hidangan favorit Anda dengan masakan khusus dari favehotel S. Parman Medan khusus untuk Anda.\n\nWiFi tersedia di area publik properti untuk membantu Anda tetap terhubung dengan keluarga dan teman.\n\nfavehotel S. Parman Medan adalah hotel dengan kenyamanan yang luar biasa dan layanan yang sangat baik menurut sebagian besar tamu hotel.\n\nDengan semua fasilitas yang ditawarkan, favehotel S. Parman Medan adalah tempat yang tepat untuk menginap.',
+      'favehotel S. Parman Medan is highly recommended for backpackers who want affordable yet comfortable lodging.\n\nSpa treatment is one of the main features of this hotel. Indulge yourself with soothing treatments that rejuvenate you.\n\nFrom business events to corporate meetings, favehotel S. Parman Medan provides complete services and facilities that you and your colleagues need.\n\nExcellent service combined with a wide range of facilities provided will make you not complain during your stay at favehotel S. Parman Medan.\n\nA 24-hour reception is available to serve you, from check-in to check-out, or any assistance you need. If you want more, feel free to ask the receptionist, we are always ready to accommodate you.\n\nEnjoy your favorite dishes with special cuisine from favehotel S. Parman Medan just for you.\n\nWiFi is available in public areas of the property to help you stay connected with family and friends.\n\nfavehotel S. Parman Medan is a hotel with exceptional comfort and very good service according to most hotel guests.\n\nWith all the facilities offered, favehotel S. Parman Medan is the right place to stay.',
     address:
       'Jalan Mayjend Siswondo Parman No. 313A Medan, Medan Baru, Medan, Sumatra Utara, Indonesia, 20153',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -56,11 +56,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 5,
     category_id: 1,
-    tenant_id: 2,
+    tenant_id: 6,
     city_id: 1,
     name: 'JW Marriott Hotel Medan',
     description:
-      'Jika Anda berkesempatan untuk berkunjung ke Kota Medan, menginap di JW Marriott Medan merupakan pilihan yang pas. Penginapan berbintang 5 ini bertempat di jantung Kota Medan, dekat dengan pusat perbelanjaan, balai kota, pusat kuliner, dan stasiun. Jika Anda datang untuk berwisata ataupun keperluan bisnis, hotel ini menawarkan fasilitas dan pelayanan lengkap untuk berbagai kebutuhan.\n\nTempat menginap bergaya modern dengan interior mewah ini menawarkan beberapa pilihan tipe kamar. Anda dapat memilih kamar tipe Deluxe, Executive, atau Executive Deluxe. Semua kamar menawarkan city view, bahkan untuk kamar bertipe Executive Deluxe yang terletak di ujung gedung. Pemandangan matahari terbit, terbenam, dan lampu-lampu kota pada malam hari dapat dinikmati dari dua sisi.\n\nSetibanya di lobi JW Marriott yang nyaman, Anda akan disambut senyuman ramah staf resepsionis yang bertugas selama 24 jam. Portir pun siap membantu membawa barang bawaan menuju kamar hotel. Kamar yang sudah sejuk, kasur empuk, dilengkapi televisi layar datar dan program TV kabel, serta pilihan kudapan di mini bar pasti mengundang untuk beristirahat dan bersantai menikmati kamar sejenak.\n\nSetelah itu, Anda dapat memilih apakah ingin berendam di bathtub, mandi di bawah rainshower, atau keluar untuk beraktivitas. Pilihan yang ditawarkan hotel JW Marriott cukup beragam, di antaranya adalah berenang di kolam renang outdoor, bersantai di kolam infinity, menikmati pijatan di spa, menyegarkan tubuh di sauna, atau berolahraga di pusat kebugaran yang beroperasi selama 24 jam.\n\nJika Anda mengajak anak-anak menginap di hotel ini, mereka pasti akan terhibur dan betah dengan adanya fasilitas kolam renang anak dan area bermain. Untuk anak-anak yang lebih kecil, tersedia pula fasilitas penitipan anak. Para orang tua pun dapat beraktivitas dengan lebih leluasa dan santai.\n\nJika setelah bersantai atau beraktivitas Anda merasa lapar, tetapi malas untuk keluar hotel, Anda dapat menikmati beraneka menu makanan mancanegara di beberapa pilihan restoran. Di restoran ini, terdapat juga menu vegetarian.\n\nBagi Anda yang sedang dalam perjalanan bisnis, ada fasilitas meja kerja dan internet dalam kamar atau jaringan Wi-Fi di beberapa lokasi untuk memudahkan Anda terhubung dengan rekan kerja atau mengirim dokumen. Tersedia pula ruang rapat yang dilengkapi dengan proyektor yang dapat disewa, serta mesin fax dan mesin fotokopi. Jika Anda dan rekan bisnis ingin berbincang santai sambil menikmati makanan ringan dan minum kopi, coffee shop di dalam JW Marriott Medan dapat menjadi pilihan menarik, selain di bar dan restoran.\n\nMenginap di hotel Marriott Medan yang dekat dengan jalan-jalan utama, Anda dapat dengan mudah mencari transportasi umum. Dengan mudah, Anda dapat mengunjungi pusat perbelanjaan, seperti Sun Plaza, Mall Medan, dan Center Point. Kalau Anda tidak keberatan berjalan kaki, ada pusat kuliner Merdeka Walk yang dapat ditempuh dalam waktu kurang lebih 10 menit.\n\nAnda yang mengajak keluarga, bisa mengajak mereka ke Upside Down World, Junglebooked Adventure, atau Wonders Water World untuk bermain. Beberapa tempat bersejarah seperti Istana Maimun, Masjid Raya al Mashun, dan Kuil Shri Mariamman juga pasti memperluas pengetahuan dan memperdalam kecintaan pada budaya Indonesia. Semua tempat tersebut berjarak kurang dari 5 kilometer dari hotel JW Marriott Medan.\n\nAkomodasi yang tepat berperan besar pada kenyamanan selagi bepergian. Memilih JW Marriott Medan dengan lokasi strategis dan fasilitas lengkap akan mendukung suasana liburan menjadi lebih praktis dan menyenangkan.',
+      'If you have the opportunity to visit Medan City, staying at JW Marriott Medan is the right choice. This 5-star accommodation is located in the heart of Medan City, close to shopping centers, city hall, culinary centers, and stations. Whether you come for tourism or business purposes, this hotel offers complete facilities and services for various needs.\n\nThis modern-style accommodation with luxurious interiors offers several room type choices. You can choose Deluxe, Executive, or Executive Deluxe room types. All rooms offer city views, even for Executive Deluxe rooms located at the end of the building. Sunrise, sunset, and city lights at night can be enjoyed from two sides.\n\nUpon arrival at the comfortable lobby of JW Marriott, you will be greeted with a friendly smile from the reception staff who work 24 hours. The porter is also ready to help carry your luggage to the hotel room. The already cool room, soft bed, equipped with a flat-screen television and cable TV programs, as well as snack options in the mini bar will surely invite you to rest and relax enjoying the room for a moment.\n\nAfter that, you can choose whether to soak in the bathtub, shower under the rainshower, or go out for activities. The choices offered by JW Marriott hotel are quite diverse, including swimming in the outdoor pool, relaxing in the infinity pool, enjoying a massage at the spa, refreshing in the sauna, or exercising at the fitness center that operates 24 hours.\n\nIf you bring children to stay at this hotel, they will surely be entertained and comfortable with the children\'s pool and play area facilities. For smaller children, there is also a childcare facility. Parents can then engage in activities more freely and relaxed.\n\nIf after relaxing or activities you feel hungry, but are too lazy to leave the hotel, you can enjoy a variety of international menus at several restaurant choices. In these restaurants, there are also vegetarian menus.\n\nFor those on a business trip, there are desk facilities and internet in the room or Wi-Fi networks in several locations to make it easier for you to connect with colleagues or send documents. There are also meeting rooms equipped with projectors that can be rented, as well as fax machines and photocopiers. If you and business colleagues want to chat casually while enjoying snacks and drinking coffee, the coffee shop at JW Marriott Medan can be an interesting choice, besides the bar and restaurant.\n\nStaying at Marriott Medan hotel which is close to main roads, you can easily find public transportation. You can easily visit shopping centers, such as Sun Plaza, Mall Medan, and Center Point. If you don\'t mind walking, there is a Merdeka Walk culinary center that can be reached in approximately 10 minutes.\n\nFor those bringing family, you can take them to Upside Down World, Junglebooked Adventure, or Wonders Water World to play. Some historical places like Maimun Palace, Al Mashun Grand Mosque, and Shri Mariamman Temple will also surely expand knowledge and deepen love for Indonesian culture. All these places are less than 5 kilometers from JW Marriott Medan hotel.\n\nThe right accommodation plays a big role in comfort while traveling. Choosing JW Marriott Medan with its strategic location and complete facilities will support a vacation atmosphere to be more practical and enjoyable.',
     address:
       'Jalan Putri Hijau No. 10, Pusat Kota Medan, Medan, Sumatra Utara, Indonesia, 20111',
     checkin_time: new Date('2025-04-12T15:00:00Z'),
@@ -69,11 +69,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 6,
     category_id: 1,
-    tenant_id: 2,
+    tenant_id: 7,
     city_id: 1,
     name: 'Grand City Hall Medan',
     description:
-      'Grand City Hall Medan merupakan penginapan yang terletak di pusat Kota Medan.Akomodasi dibagi menjadi beberapa kategori, yaitu hotel, suites, serta apartemen. Penginapan dibalut dengan desain eksterior klasik.Fasilitas pendukung yang tersedia diantaranya ballroom, ruang meeting, kolam renang, pusat kebugaran, hingga area spa.Mall Grand Palladium serta Istana Maimun adalah atraksi terdekat dari Grand City Hall Medan.',
+      'Grand City Hall Medan is an accommodation located in the center of Medan City. The accommodation is divided into several categories: hotel, suites, and apartments. The lodging is wrapped in a classic exterior design. Supporting facilities available include ballroom, meeting rooms, swimming pool, fitness center, and spa area. Grand Palladium Mall and Maimun Palace are the closest attractions to Grand City Hall Medan.',
     address:
       'Jalan Balai Kota No. 1 , Pusat Kota Medan, Medan, Sumatra Utara, Indonesia, 20112',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -82,11 +82,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 7,
     category_id: 1,
-    tenant_id: 2,
+    tenant_id: 8,
     city_id: 1,
     name: 'Grand Mercure Medan Angkasa',
     description:
-      'Grand Mercure Medan Angkasa berada di Pusat Kota Medan. Resepsionis siap 24 jam untuk melayani proses check-in, check-out dan kebutuhan Anda yang lain. Jangan ragu untuk menghubungi resepsionis, kami siap melayani Anda. WiFi tersedia di seluruh area publik properti untuk membantu Anda tetap terhubung dengan keluarga dan teman.',
+      'Grand Mercure Medan Angkasa is located in Medan City Center. The reception is ready 24 hours to serve check-in, check-out processes and your other needs. Don\'t hesitate to contact the reception, we are ready to serve you. WiFi is available in all public areas of the property to help you stay connected with family and friends.',
     address:
       'Jl Sutomo no 1, Pusat Kota Medan, Medan, Sumatra Utara, Indonesia, 20235',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -95,11 +95,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 8,
     category_id: 1,
-    tenant_id: 2,
+    tenant_id: 8,
     city_id: 1,
     name: 'ibis Styles Medan Pattimura',
     description:
-      'ibis Styles Medan Pattimura berada di Medan Baru. Resepsionis siap 24 jam untuk melayani proses check-in, check-out dan kebutuhan Anda yang lain. Jangan ragu untuk menghubungi resepsionis, kami siap melayani Anda. WiFi tersedia di seluruh area publik properti untuk membantu Anda tetap terhubung dengan keluarga dan teman.',
+      'ibis Styles Medan Pattimura is located in Medan Baru. The reception is ready 24 hours to serve check-in, check-out processes and your other needs. Don\'t hesitate to contact the reception, we are ready to serve you. WiFi is available in all public areas of the property to help you stay connected with family and friends.',
     address:
       'Jalan Pattimura No 442, Kelurahan Darat, Kecamatan Medan Baru, Medan Baru, Medan, Sumatra Utara, Indonesia, 20153',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -108,11 +108,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 9,
     category_id: 2,
-    tenant_id: 2,
+    tenant_id: 9,
     city_id: 2,
     name: 'RedDoorz Plus @ TB Simatupang',
     description:
-      'RedDoorz Plus @ TB Simatupang berada di Lebak Bulus. WiFi tersedia di seluruh area publik properti untuk membantu Anda tetap terhubung dengan keluarga dan teman.',
+      'RedDoorz Plus @ TB Simatupang is located in Lebak Bulus. WiFi is available in all public areas of the property to help you stay connected with family and friends.',
     address:
       'Jalan Lebak Bulus Raya 1 No. 31 (Jalan Haji Baun ) Cilandak, Cilandak, Lebak Bulus, Jakarta, Indonesia, 12440',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -121,11 +121,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 10,
     category_id: 2,
-    tenant_id: 2,
+    tenant_id: 10,
     city_id: 2,
     name: 'Harlys Residence',
     description:
-      'Harlys Residence berada di Tomang. Resepsionis siap 24 jam untuk melayani proses check-in, check-out dan kebutuhan Anda yang lain. Jangan ragu untuk menghubungi resepsionis, kami siap melayani Anda. WiFi tersedia di seluruh area publik properti untuk membantu Anda tetap terhubung dengan keluarga dan teman.',
+      'Harlys Residence is located in Tomang. The reception is ready 24 hours to serve check-in, check-out processes and your other needs. Don\'t hesitate to contact the reception, we are ready to serve you. WiFi is available in all public areas of the property to help you stay connected with family and friends.',
     address:
       'Jalan Tomang Tinggi Raya No. 2 , Grogol Petamburan, Tomang, Jakarta, Indonesia, 11440',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -134,11 +134,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 11,
     category_id: 3,
-    tenant_id: 2,
+    tenant_id: 11,
     city_id: 2,
     name: 'Ascott Jakarta',
     description:
-      'Ascott Jakarta merupakan akomodasi berkonsep apartemen yang berada di Jalan Kebon Kacang Raya No.2.Apartemen ini menawarkan fasilitas lengkap, seperti AC, TV, kursi sofa, hingga perlengkapan dapur.Fasilitas pendukung yang tersedia, yaitu pusat kebugaran, kolam renang, hingga layanan spa.Thamrin City dan Grand Indonesia Shopping Town merupakan atraksi terdekat dari Ascott Jakarta.',
+      'Ascott Jakarta is an apartment-concept accommodation located on Jalan Kebon Kacang Raya No.2. This apartment offers complete facilities, such as AC, TV, sofa chairs, and kitchen equipment. Supporting facilities available include fitness center, swimming pool, and spa services. Thamrin City and Grand Indonesia Shopping Town are the closest attractions to Ascott Jakarta.',
     address:
       'Jalan Kebon Kacang Raya No.2, Thamrin, Jakarta Pusat, Jakarta, Indonesia, 10230',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -147,11 +147,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 12,
     category_id: 3,
-    tenant_id: 2,
+    tenant_id: 11,
     city_id: 2,
     name: 'Citadines Sudirman Jakarta',
     description:
-      'Citadines Sudirman Jakarta terletak di dalam Newton Tower, sebuah pengembangan campuran apartemen servis dan apartemen. Apartemen servis ini cocok untuk individu maupun keluarga. 253 unit di apartemen servis Citadines Sudirman Jakarta berkisar dari Studio, Satu Kamar Tidur, suite keluarga hingga apartemen Dua Kamar Tidur. Semua apartemen dilengkapi dengan perabotan modern, termasuk televisi pintar, kamar mandi dalam, sistem penyejuk udara split, menjadikannya rumah yang nyaman. Privasi, keamanan, dan kenyamanan Anda juga terjamin dengan keamanan 24 jam dan layanan tamu. Fasilitas apartemen servis ini meliputi pusat kebugaran lengkap, kolam renang, jogging track, laundry, restoran yang buka sepanjang hari, dan ruang pertemuan. Di Citadines Sudirman Jakarta, Anda selalu dapat dipastikan memiliki masa inap yang menyenangkan dan santai',
+      'Citadines Sudirman Jakarta is located in Newton Tower, a mixed development of serviced apartments and apartments. These serviced apartments are suitable for individuals and families. The 253 units in Citadines Sudirman Jakarta serviced apartments range from Studio, One Bedroom, family suites to Two Bedroom apartments. All apartments are equipped with modern furnishings, including smart TVs, en-suite bathrooms, split air conditioning systems, making it a comfortable home. Your privacy, security, and comfort are also guaranteed with 24-hour security and guest services. This serviced apartment\'s facilities include a fully-equipped fitness center, swimming pool, jogging track, laundry, all-day restaurant, and meeting rooms. At Citadines Sudirman Jakarta, you can always be assured of having a pleasant and relaxing stay.',
     address:
       'The Newton 1 at Ciputra World 2 Jl. Karet Sawah 219, Setiabudi, Karet Semanggi, Jakarta, Indonesia, 12930',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -160,11 +160,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 13,
     category_id: 4,
-    tenant_id: 2,
+    tenant_id: 12,
     city_id: 3,
     name: 'The Catur Villa Seminyak',
     description:
-      'Menginap di The Catur Villa Seminyak saat anda sedang berada di Seminyak adalah sebuah pilihan cerdas. Resepsionis siap 24 jam untuk melayani proses check-in, check-out dan kebutuhan Anda yang lain. Jangan ragu untuk menghubungi resepsionis, kami siap melayani Anda. WiFi tersedia di seluruh area publik properti untuk membantu Anda tetap terhubung dengan keluarga dan teman.',
+      'Staying at The Catur Villa Seminyak when you are in Seminyak is a smart choice. The reception is ready 24 hours to serve check-in, check-out processes and your other needs. Don\'t hesitate to contact the reception, we are ready to serve you. WiFi is available in all public areas of the property to help you stay connected with family and friends.',
     address:
       'Jl. Plawa Gg. Ratna No.13 D, Seminyak, Kuta, Kabupaten Badung, Bali 80361, Seminyak, Kuta, Bali, Indonesia, 80363',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -173,11 +173,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 14,
     category_id: 4,
-    tenant_id: 2,
+    tenant_id: 12,
     city_id: 3,
     name: 'Aishwarya Exclusive Villas',
     description:
-      'Aishwarya Exclusive Villas adalah akomodasi di lokasi yang baik, tepatnya berada di Ketewel. Resepsionis siap 24 jam untuk melayani proses check-in, check-out dan kebutuhan Anda yang lain. Jangan ragu untuk menghubungi resepsionis, kami siap melayani Anda. WiFi tersedia di seluruh area publik properti untuk membantu Anda tetap terhubung dengan keluarga dan teman.',
+      'Aishwarya Exclusive Villas is an accommodation in a good location, specifically located in Ketewel. The reception is ready 24 hours to serve check-in, check-out processes and your other needs. Don\'t hesitate to contact the reception, we are ready to serve you. WiFi is available in all public areas of the property to help you stay connected with family and friends.',
     address:
       'Jl. Raya Gumicik No 26, Ketewel, Keramas, Sukawati, Ketewel, Gianyar, Bali, Indonesia, 50852',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -186,11 +186,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 15,
     category_id: 4,
-    tenant_id: 2,
+    tenant_id: 12,
     city_id: 3,
     name: 'Belle Astina',
     description:
-      'Belle Astina berada di Canggu. Resepsionis siap 24 jam untuk melayani proses check-in, check-out dan kebutuhan Anda yang lain. Jangan ragu untuk menghubungi resepsionis, kami siap melayani Anda. WiFi tersedia di seluruh area publik properti untuk membantu Anda tetap terhubung dengan keluarga dan teman.',
+      'Belle Astina is located in Canggu. The reception is ready 24 hours to serve check-in, check-out processes and your other needs. Don\'t hesitate to contact the reception, we are ready to serve you. WiFi is available in all public areas of the property to help you stay connected with family and friends.',
     address:
       'Gang Semar 1 No.2, Canggu, Bali 80361, Canggu, Badung, Bali, Indonesia, 80361',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -199,11 +199,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 16,
     category_id: 4,
-    tenant_id: 2,
+    tenant_id: 12,
     city_id: 3,
     name: 'Buana Bali Villas \u0026 Spa',
     description:
-      'Buana Bali Villas \u0026 Spa adalah vila di lingkungan yang baik, yang terletak di Jimbaran. Resepsionis 24 jam tersedia untuk melayani Anda, mulai dari check-in hingga check-out, atau bantuan apa pun yang Anda butuhkan. Jika Anda menginginkan lebih, jangan ragu untuk bertanya kepada resepsionis, kami selalu siap untuk mengakomodasi Anda. WiFi tersedia di area publik properti untuk membantu Anda tetap terhubung dengan keluarga dan teman.',
+      'Buana Bali Villas \u0026 Spa is a villa in a good neighborhood, located in Jimbaran. A 24-hour reception is available to serve you, from check-in to check-out, or any assistance you need. If you want more, don\'t hesitate to ask the receptionist, we are always ready to accommodate you. WiFi is available in public areas of the property to help you stay connected with family and friends.',
     address:
       'Jalan Puri Gading Jimbaran Gading, Jimbaran, Badung, Bali, Indonesia, 80361',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -212,11 +212,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 17,
     category_id: 4,
-    tenant_id: 2,
+    tenant_id: 12,
     city_id: 3,
     name: 'Villa Kayu Raja',
     description:
-      'Villa Kayu Raja adalah pilihan tepat bagi Anda yang ingin menghabiskan waktu dengan berbagai fasilitas mewah. Nikmati kualitas layanan terbaik dan pengalaman mengesankan selama menginap di akomodasi ini.\n\nLayanan spa adalah fasilitas nomor wahid di akomodasi ini. Habiskan waktu Anda dengan melakukan relaksasi dan memanjakan diri.\n\nVilla Kayu Raja adalah tempat bermalam yang tepat bagi Anda yang berlibur bersama keluarga. Nikmati segala fasilitas hiburan untuk Anda dan keluarga.\n\nJika Anda berniat menginap dalam jangka waktu yang lama, Villa Kayu Raja adalah pilihan tepat. Berbagai fasilitas yang tersedia dan kualitas pelayanan yang baik akan membuat Anda merasa sedang berada di rumah sendiri.',
+      'Villa Kayu Raja is the right choice for you who want to spend time with various luxury facilities. Enjoy the best quality service and impressive experience while staying at this accommodation.\n\nSpa service is the number one facility at this accommodation. Spend your time relaxing and pampering yourself.\n\nVilla Kayu Raja is the right place to stay for you who are on vacation with family. Enjoy all entertainment facilities for you and your family.\n\nIf you intend to stay for a long period of time, Villa Kayu Raja is the right choice. The various facilities available and good service quality will make you feel like you\'re at your own home.',
     address:
       'Jl. Lebak Sari No. 18 Petitenget, Kerobokan, Seminyak, Kuta, Bali, Indonesia, 80361',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -225,11 +225,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 18,
     category_id: 1,
-    tenant_id: 2,
+    tenant_id: 13,
     city_id: 3,
     name: 'Wyndham Garden Kuta Beach Bali',
     description:
-      'Wyndham Garden Kuta Beach Bali adalah hotel di lingkungan yang baik, yang terletak di Kuta. Resepsionis 24 jam tersedia untuk melayani Anda, mulai dari check-in hingga check-out, atau bantuan apa pun yang Anda butuhkan. Jika Anda menginginkan lebih, jangan ragu untuk bertanya kepada resepsionis, kami selalu siap untuk mengakomodasi Anda. WiFi tersedia di area publik properti untuk membantu Anda tetap terhubung dengan keluarga dan teman.',
+      'Wyndham Garden Kuta Beach Bali is a hotel in a good neighborhood, located in Kuta. A 24-hour reception is available to serve you, from check-in to check-out, or any assistance you need. If you want more, don\'t hesitate to ask the receptionist, we are always ready to accommodate you. WiFi is available in public areas of the property to help you stay connected with family and friends.',
     address: 'Jalan Pantai Kuta, No 99x, Kuta, Badung, Bali, Indonesia, 80361',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
     checkout_time: new Date('2025-04-12T12:00:00Z'),
@@ -237,11 +237,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 19,
     category_id: 1,
-    tenant_id: 2,
+    tenant_id: 14,
     city_id: 3,
     name: 'Quest Hotel Kuta by ASTON',
     description:
-      'Quest Hotel Kuta by ASTON terletak di area / kota Tuban. Resepsionis 24 jam tersedia untuk melayani Anda, mulai dari check-in hingga check-out, atau bantuan apa pun yang Anda butuhkan. Jika Anda menginginkan lebih, jangan ragu untuk bertanya kepada resepsionis, kami selalu siap untuk mengakomodasi Anda. WiFi tersedia di area publik properti untuk membantu Anda tetap terhubung dengan keluarga dan teman.',
+      'Quest Hotel Kuta by ASTON is located in the Tuban area/city. A 24-hour reception is available to serve you, from check-in to check-out, or any assistance you need. If you want more, don\'t hesitate to ask the receptionist, we are always ready to accommodate you. WiFi is available in public areas of the property to help you stay connected with family and friends.',
     address:
       'Jalan Raya Kediri No. 9 , Tuban - Kuta, Bali, Tuban, Kuta, Bali, Indonesia, 80361',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -250,11 +250,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 20,
     category_id: 1,
-    tenant_id: 2,
+    tenant_id: 14,
     city_id: 3,
     name: 'Quest San Hotel Denpasar by ASTON',
     description:
-      'Bagi Anda, para pelancong yang ingin bepergian dengan nyaman dengan anggaran terbatas, Quest San Hotel Denpasar by ASTON adalah tempat yang tepat untuk menginap yang menyediakan fasilitas yang layak serta layanan yang luar biasa.\n\nBaik Anda merencanakan acara atau acara khusus lainnya, Quest San Hotel Denpasar by ASTON adalah pilihan yang tepat untuk Anda dengan ruang fungsi yang luas dan lengkap untuk memenuhi kebutuhan Anda.\n\nDari acara bisnis hingga pertemuan perusahaan, Quest San Hotel Denpasar by ASTON menyediakan layanan dan fasilitas lengkap yang Anda dan kolega Anda butuhkan.',
+      'For you, travelers who want to travel comfortably on a limited budget, Quest San Hotel Denpasar by ASTON is the right place to stay that provides decent facilities and excellent service.\n\nWhether you are planning an event or other special occasion, Quest San Hotel Denpasar by ASTON is the right choice for you with a spacious and complete function room to meet your needs.\n\nFrom business events to corporate meetings, Quest San Hotel Denpasar by ASTON provides complete services and facilities that you and your colleagues need.',
     address:
       'Jalan Mahendradata No.93, Denpasar Barat, Denpasar, Bali, Indonesia, 80117',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -263,11 +263,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 21,
     category_id: 2,
-    tenant_id: 2,
+    tenant_id: 15,
     city_id: 4,
     name: 'Sapadia Guest House Bandung',
     description:
-      'Sapadia Guest House Bandung adalah akomodasi di lokasi yang baik, tepatnya berada di Dago. Resepsionis siap 24 jam untuk melayani proses check-in, check-out dan kebutuhan Anda yang lain. Jangan ragu untuk menghubungi resepsionis, kami siap melayani Anda. WiFi tersedia di seluruh area publik properti untuk membantu Anda tetap terhubung dengan keluarga dan teman.',
+      'Sapadia Guest House Bandung is an accommodation in a good location, specifically located in Dago. The reception is ready 24 hours to serve check-in, check-out processes and your other needs. Don\'t hesitate to contact the reception, we are ready to serve you. WiFi is available in all public areas of the property to help you stay connected with family and friends.',
     address:
       'Jalan Mundinglaya No.2 Sukasari,Cikapayang, Dago, Bandung, Jawa Barat, Indonesia, 40132',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -276,11 +276,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 22,
     category_id: 2,
-    tenant_id: 2,
+    tenant_id: 16,
     city_id: 4,
     name: 'Pension Guest House',
     description:
-      'Pension Guest House adalah akomodasi di lokasi yang baik, tepatnya berada di Jalan Riau. Resepsionis siap 24 jam untuk melayani proses check-in, check-out dan kebutuhan Anda yang lain. Jangan ragu untuk menghubungi resepsionis, kami siap melayani Anda. WiFi tersedia di seluruh area publik properti untuk membantu Anda tetap terhubung dengan keluarga dan teman.',
+      'Pension Guest House is an accommodation in a good location, specifically located on Jalan Riau. The reception is ready 24 hours to serve check-in, check-out processes and your other needs. Don\'t hesitate to contact the reception, we are ready to serve you. WiFi is available in all public areas of the property to help you stay connected with family and friends.',
     address:
       'Jalan Sabang No. 42, Jalan Riau, Bandung, Jawa Barat, Indonesia, 40131',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -289,11 +289,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 23,
     category_id: 4,
-    tenant_id: 2,
+    tenant_id: 17,
     city_id: 4,
     name: 'Villa de Rossa',
     description:
-      'Villa de Rossa adalah akomodasi di lokasi yang baik, tepatnya berada di Lembang. Resepsionis siap 24 jam untuk melayani proses check-in, check-out dan kebutuhan Anda yang lain. Jangan ragu untuk menghubungi resepsionis, kami siap melayani Anda.',
+      'Villa de Rossa is an accommodation in a good location, specifically located in Lembang. The reception is ready 24 hours to serve check-in, check-out processes and your other needs. Don\'t hesitate to contact the reception, we are ready to serve you.',
     address:
       'Jalan  Panorama 1 No. 34-36, Lembang, Kayuambon, Lembang, Kabupaten Bandung Barat, Lembang, Bandung, Jawa Barat, Indonesia, 40391',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -302,11 +302,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 24,
     category_id: 4,
-    tenant_id: 2,
+    tenant_id: 18,
     city_id: 4,
     name: 'Villa Marindu And Glamping',
     description:
-      'Villa Marindu And Glamping merupakan akomodasi rekomendasi untuk Anda, seorang backpacker yang tak hanya mengutamakan bujet, tapi juga kenyamanan saat beristirahat setelah menempuh petualangan seharian penuh.\n\nAkomodasi ini adalah pilihan tepat bagi Anda dan pasangan yang ingin menikmati liburan romantis. Dapatkan pengalaman yang penuh kesan bersama pasangan dengan menginap di Villa Marindu And Glamping.\n\nVilla Marindu And Glamping adalah tempat bermalam yang tepat bagi Anda yang berlibur bersama keluarga. Nikmati segala fasilitas hiburan untuk Anda dan keluarga.',
+      'Villa Marindu And Glamping is a recommended accommodation for you, a backpacker who not only prioritizes budget but also comfort when resting after a full day of adventure.\n\nThis accommodation is the right choice for you and your partner who want to enjoy a romantic holiday. Get a memorable experience with your partner by staying at Villa Marindu And Glamping.\n\nVilla Marindu And Glamping is the right place to stay for you who are on vacation with family. Enjoy all entertainment facilities for you and your family.',
     address:
       'Jalan Sariater No. 29, Lembang, Bandung, Jawa Barat, Indonesia, 41281',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -315,11 +315,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 25,
     category_id: 3,
-    tenant_id: 2,
+    tenant_id: 19,
     city_id: 5,
     name: 'Green Park Jogja Apartment',
     description:
-      'Menginap di Green Park Jogja Apartment tak hanya memberikan kemudahan untuk mengeksplorasi destinasi petualangan Anda, tapi juga menawarkan kenyamanan bagi istirahat Anda.\n\nGreen Park Jogja Apartment merupakan akomodasi rekomendasi untuk Anda, seorang backpacker yang tak hanya mengutamakan bujet, tapi juga kenyamanan saat beristirahat setelah menempuh petualangan seharian penuh.\n\nDesain dan arsitektur menjadi salah satu faktor penentu kenyamanan Anda di akomodasi. Green Park Jogja Apartment menyediakan tempat menginap yang tak hanya nyaman untuk beristirahat, tapi juga desain cantik yang memanjakan mata Anda.\n\nBagi Anda yang menginginkan kualitas pelayanan oke dengan harga yang ramah di kantong, Green Park Jogja Apartment adalah pilihan yang tepat. Karena meski murah, akomodasi ini menyediakan fasilitas memadai dan pelayanan yang tetap terjaga mutunya.',
+      'Staying at Green Park Jogja Apartment not only provides ease to explore your adventure destinations but also offers comfort for your rest.\n\nGreen Park Jogja Apartment is a recommended accommodation for you, a backpacker who not only prioritizes budget but also comfort when resting after a full day of adventure.\n\nDesign and architecture are determining factors for your comfort in accommodation. Green Park Jogja Apartment provides a place to stay that is not only comfortable for resting but also has a beautiful design that pleases your eyes.\n\nFor those who want good quality service at a wallet-friendly price, Green Park Jogja Apartment is the right choice. Because despite being inexpensive, this accommodation provides adequate facilities and service quality that remains well-maintained.',
     address:
       'Jalan Baladewa - Babarsari, Glendongan, Tambakbayan, Caturtunggal, Depok, Depok, Yogyakarta, Daerah Istimewa Yogyakarta, Indonesia, 55281',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -328,11 +328,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 26,
     category_id: 3,
-    tenant_id: 2,
+    tenant_id: 20,
     city_id: 5,
     name: 'Mirta V Apartment Jogja',
     description:
-      'Mirta V Apartment Jogja berada di Seturan. Resepsionis siap 24 jam untuk melayani proses check-in, check-out dan kebutuhan Anda yang lain. Jangan ragu untuk menghubungi resepsionis, kami siap melayani Anda.',
+      'Mirta V Apartment Jogja is located in Seturan. The reception is ready 24 hours to serve check-in, check-out processes and your other needs. Don\'t hesitate to contact the reception, we are ready to serve you.',
     address:
       'Jalan Amarta No.1 Kledokan, Caturtunggal, Depok, Sleman, Depok, Seturan, Yogyakarta, Indonesia, 55281',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -341,11 +341,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 27,
     category_id: 1,
-    tenant_id: 2,
+    tenant_id: 21,
     city_id: 5,
     name: 'Sahid Raya Hotel \u0026 Convention Yogyakarta',
     description:
-      'Sahid Raya Hotel \u0026 Convention Yogyakarta adalah hotel di lokasi yang baik, tepatnya berada di Depok. Resepsionis siap 24 jam untuk melayani proses check-in, check-out dan kebutuhan Anda yang lain. Jangan ragu untuk menghubungi resepsionis, kami siap melayani Anda. WiFi tersedia di seluruh area publik properti untuk membantu Anda tetap terhubung dengan keluarga dan teman.',
+      'Sahid Raya Hotel \u0026 Convention Yogyakarta is a hotel in a good location, specifically located in Depok. The reception is ready 24 hours to serve check-in, check-out processes and your other needs. Don\'t hesitate to contact the reception, we are ready to serve you. WiFi is available in all public areas of the property to help you stay connected with family and friends.',
     address:
       'Jalan Babarsari, Tambakbayan, Caturtunggal Depok, Depok, Yogyakarta, Daerah Istimewa Yogyakarta, Indonesia, 55281',
     checkin_time: new Date('2025-04-12T15:00:00Z'),
@@ -354,11 +354,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 28,
     category_id: 1,
-    tenant_id: 2,
+    tenant_id: 22,
     city_id: 5,
     name: 'The Malioboro Hotel and Conference Center',
     description:
-      'Menginap di The Malioboro Hotel and Conference Center saat anda sedang berada di Jalan Malioboro adalah sebuah pilihan cerdas. Resepsionis siap 24 jam untuk melayani proses check-in, check-out dan kebutuhan Anda yang lain. Jangan ragu untuk menghubungi resepsionis, kami siap melayani Anda. WiFi tersedia di seluruh area publik properti untuk membantu Anda tetap terhubung dengan keluarga dan teman.',
+      'Staying at The Malioboro Hotel and Conference Center when you are in Jalan Malioboro is a smart choice. The reception is ready 24 hours to serve check-in, check-out processes and your other needs. Don\'t hesitate to contact the reception, we are ready to serve you. WiFi is available in all public areas of the property to help you stay connected with family and friends.',
     address:
       'Jl. Gandekan No.21, Pringgokusuman, Gedong Tengen, Jalan Malioboro, Yogyakarta, Daerah Istimewa Yogyakarta, Indonesia, 55272',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -367,11 +367,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 29,
     category_id: 1,
-    tenant_id: 2,
+    tenant_id: 23,
     city_id: 6,
     name: 'Platinum Hotel Tunjungan Surabaya',
     description:
-      'Platinum Hotel Tunjungan Surabaya adalah hotel di lokasi yang baik, tepatnya berada di Genteng. Resepsionis siap 24 jam untuk melayani proses check-in, check-out dan kebutuhan Anda yang lain. Jangan ragu untuk menghubungi resepsionis, kami siap melayani Anda. WiFi tersedia di seluruh area publik properti untuk membantu Anda tetap terhubung dengan keluarga dan teman.',
+      'Platinum Hotel Tunjungan Surabaya is a hotel in a good location, specifically located in Genteng. The reception is ready 24 hours to serve check-in, check-out processes and your other needs. Don\'t hesitate to contact the reception, we are ready to serve you. WiFi is available in all public areas of the property to help you stay connected with family and friends.',
     address:
       'Jl. Tunjungan 11 - 21 Surabaya, Genteng, Surabaya, Jawa Timur, Indonesia, 60275',
     checkin_time: new Date('2025-04-12T14:00:00Z'),
@@ -380,11 +380,11 @@ export const propertySeed: Prisma.PropertyCreateManyInput[] = [
   {
     id: 30,
     category_id: 1,
-    tenant_id: 2,
+    tenant_id: 24,
     city_id: 6,
     name: 'Four Points by Sheraton Surabaya Pakuwon Indah',
     description:
-      'Four Points by Sheraton Surabaya Pakuwon Indah adalah akomodasi dengan fasilitas baik dan kualitas pelayanan memuaskan menurut sebagian besar tamu. Nikmati pelayanan mewah dan pengalaman tak terlupakan ala Four Points by Sheraton Surabaya Pakuwon Indah selama Anda menginap di sini.',
+      'Four Points by Sheraton Surabaya Pakuwon Indah is an accommodation with good facilities and satisfying service quality according to most guests. Enjoy luxurious service and unforgettable experience at Four Points by Sheraton Surabaya Pakuwon Indah during your stay here.',
     address:
       'Pakuwon Mall, Jalan Puncak Indah Lontar No. 2, Wiyung, Surabaya, Jawa Timur, Indonesia, 60216',
     checkin_time: new Date('2025-04-12T15:00:00Z'),

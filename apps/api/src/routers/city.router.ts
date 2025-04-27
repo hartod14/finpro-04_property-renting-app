@@ -5,4 +5,6 @@ export const cityRouter = () => {
     const router = Router()
 
     router.get('/', cityController.getAllCity)
+
+    return router
 }

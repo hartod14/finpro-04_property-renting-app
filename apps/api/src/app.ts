@@ -15,6 +15,11 @@ import { ErrorHandler } from './helpers/response.handler';
 import { uploadRouter } from './routers/upload.router';
 // import { SampleRouter } from './routers/sample.router';
 import { UserTransactionRouter } from './routers/user-transactions.routes';
+import { cityRouter } from './routers/city.router';
+import { facilityRouter } from './routers/facility.router';
+import { categoryRouter } from './routers/category.router';
+import { userRouter } from './routers/user.router';
+import { propertyRouter } from './routers/property.router';
 
 export default class App {
   private app: Application;
@@ -49,7 +54,6 @@ export default class App {
   }
 
   private routes(): void {
-    // const sampleRouter = new SampleRouter();
     const usertransactionRouter = new UserTransactionRouter();
 
     this.app.get('/api', (req: Request, res: Response) => {
@@ -60,8 +64,11 @@ export default class App {
     this.app.use('/api/auth', authRouter());
     this.app.use('/api/upload-image', uploadRouter());
     this.app.use('/api/city', cityRouter());
+    this.app.use('/api/facility', facilityRouter());
+    this.app.use('/api/category', categoryRouter());
+    this.app.use('/api/property', propertyRouter());
 
-    // this.app.use('/api/samples', sampleRouter.getRouter());
+    this.app.use('/api/user', userRouter());
     this.app.use('/api', usertransactionRouter.getRouter());
   }
 
