@@ -34,22 +34,29 @@ export default function PropertyModel() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   
-  // Search state
-  const [searchTerm, setSearchTerm] = useState('');
+  // Pagination states
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  
+  const [searchTerm, setSearchTerm] = useState('Jakarta');
   const [searchLocation, setSearchLocation] = useState('');
   const [searchDate, setSearchDate] = useState('');
-  const [searchAdults, setSearchAdults] = useState('');
+  const [searchAdults, setSearchAdults] = useState('2');
   
-  // Date range state
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  
   const [dateRange, setDateRange] = useState<{
     from: Date | undefined;
     to: Date | undefined;
   }>({
-    from: undefined,
-    to: undefined,
+    from: today,
+    to: tomorrow,
   });
 
-  // Filter states - change to arrays for multiple selections
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [selectedTenants, setSelectedTenants] = useState<number[]>([]);
   const [selectedFacilities, setSelectedFacilities] = useState<number[]>([]);
@@ -61,44 +68,27 @@ export default function PropertyModel() {
   const sortRef = useRef<HTMLDivElement>(null);
   const priceRef = useRef<HTMLDivElement>(null);
 
-  // Function to fetch properties based on current filters
   const fetchProperties = async () => {
     try {
       const filters: PropertyFilterParams = {};
       
-      // Add filters if selected (now use arrays)
       if (selectedCategories.length > 0) filters.categoryID = selectedCategories;
       if (selectedTenants.length > 0) filters.tenantID = selectedTenants;
       if (selectedFacilities.length > 0) filters.facilityID = selectedFacilities;
       if (selectedCities.length > 0) filters.cityID = selectedCities;
       
-      // Debug current sort state
-      console.log('Current sort state:');
-      console.log('sortValue:', sortValue);
-      console.log('priceValue:', priceValue);
-      
-      // Add sorting - ensure we set these correctly
-      // Changed to separate handling of sorting by name and price
       if (priceValue) {
-        // Price sorting
         filters.sortBy = 'price';
         filters.sortOrder = priceValue === 'low-to-high' ? 'asc' : 'desc';
-        console.log('Using PRICE sorting');
       } else {
-        // Name sorting (default)
         filters.sortBy = 'name';
         filters.sortOrder = sortValue;
-        console.log('Using NAME sorting');
       }
-      
-      console.log(`Sorting by: ${filters.sortBy}, order: ${filters.sortOrder}`);
-      
-      // Add search term if provided
+                  
       if (searchTerm) {
         filters.searchTerm = searchTerm;
       }
       
-      // Add date range if provided
       if (dateRange.from) {
         filters.checkInDate = dateRange.from.toISOString();
       }
@@ -107,37 +97,22 @@ export default function PropertyModel() {
         filters.checkOutDate = dateRange.to.toISOString();
       }
       
-      // Add capacity filter if provided - ensure this is properly sent to the API
       if (searchAdults && searchAdults !== '') {
-        console.log(`Setting capacity filter to ${searchAdults}`);
         filters.capacity = parseInt(searchAdults);
       }
       
-      // Log the filters being sent to the API for debugging
-      console.log('Sending filters to API:', filters);
+      // Add pagination parameters
+      filters.page = page;
+      filters.limit = limit;
       
       const data = await getAllProperty(filters);
       
-      // Log the number of properties returned
-      console.log(`API returned ${data.length} properties`);
+      // Update properties and pagination data
+      setProperties(data.properties);
+      setTotalItems(data.pagination.total);
+      setTotalPages(data.pagination.totalPage);
       
-      // We'll rely on the backend filtering for capacity now
-      // as we've fixed the backend implementation
-      let filteredData = data;
-      
-      // Client-side filtering for search if needed
-      if (searchTerm) {
-        const lowerSearchTerm = searchTerm.toLowerCase();
-        filteredData = filteredData.filter((property: IProperty) => 
-          property.name.toLowerCase().includes(lowerSearchTerm) || 
-          property.city.name.toLowerCase().includes(lowerSearchTerm) ||
-          (property.address && property.address.toLowerCase().includes(lowerSearchTerm))
-        );
-      }
-      
-      setProperties(filteredData);
     } catch (err) {
-      console.error('Error fetching properties:', err);
       setError('Failed to load properties. Please try again later.');
     }
   };
@@ -157,7 +132,6 @@ export default function PropertyModel() {
         // Fetch properties after filters are loaded
         await fetchProperties();
       } catch (err) {
-        console.error('Error fetching data:', err);
         setError('Failed to load data. Please try again later.');
       } finally {
         setLoading(false);
@@ -167,12 +141,23 @@ export default function PropertyModel() {
     fetchData();
   }, []);
 
-  // Refetch properties when filters change
+  // Update properties when filters or pagination changes
   useEffect(() => {
     if (!loading) {
       fetchProperties();
     }
-  }, [selectedCategories, selectedTenants, selectedFacilities, selectedCities, sortValue, priceValue]);
+  }, [selectedCategories, selectedTenants, selectedFacilities, selectedCities, sortValue, priceValue, page, limit]);
+
+  useEffect(() => {
+    if (!loading && properties.length === 0) {
+      handleSearch();
+    }
+  }, [loading]);
+
+  // Reset page when search or filters change
+  useEffect(() => {
+    setPage(1);
+  }, [selectedCategories, selectedTenants, selectedFacilities, selectedCities, sortValue, priceValue, searchTerm, searchAdults]);
 
   async function getCityList() {
     const cities = await getAllCity();
@@ -202,16 +187,17 @@ export default function PropertyModel() {
   };
 
   const toggleFilter = (name: FilterName) => {
-    setOpenFilters({
-      ...openFilters,
-      [name]: !openFilters[name],
-    });
+    setOpenFilters(prev => ({
+      category: name === 'category' ? !prev.category : false,
+      propertyName: name === 'propertyName' ? !prev.propertyName : false,
+      facility: name === 'facility' ? !prev.facility : false,
+      city: name === 'city' ? !prev.city : false,
+    }));
   };
 
   const handleSortClick = (direction: SortDirection) => {
     setSortValue(direction);
-    // Reset price sorting when sorting by name
-    setPriceValue(null as any); // Use null to disable price sorting
+    setPriceValue(null as any); 
     setOpenDropdown((prev) => ({ ...prev, sort: false }));
   };
 
@@ -273,13 +259,12 @@ export default function PropertyModel() {
     setSearchAdults(value);
   };
   
-  // Date range handling
   const handleDateRangeChange = (range: { from: Date | undefined; to: Date | undefined }) => {
     setDateRange(range);
   };
   
   const handleSearch = () => {
-    // This will trigger the useEffect to refetch properties with the search term
+    setPage(1);
     fetchProperties();
   };
 
@@ -290,7 +275,6 @@ export default function PropertyModel() {
     tenants,
     facilities,
     cities,
-    properties,
     loading,
     error,
     selectedCategories,
@@ -309,7 +293,7 @@ export default function PropertyModel() {
     handleTenantClick,
     handleFacilityClick,
     handleCityClick,
-    // Search related returns
+    properties,
     searchTerm,
     searchDate,
     searchAdults,
@@ -317,8 +301,15 @@ export default function PropertyModel() {
     handleDateChange,
     handleAdultsChange,
     handleSearch,
-    // Date range
     dateRange,
     handleDateRangeChange,
+    setOpenFilters,
+    // Pagination props
+    page,
+    setPage,
+    limit,
+    setLimit,
+    totalItems,
+    totalPages,
   };
 }

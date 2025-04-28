@@ -13,9 +13,21 @@ export interface PropertyFilterParams {
   checkInDate?: string;
   checkOutDate?: string;
   capacity?: number;
+  page?: number;
+  limit?: number;
 }
 
-export const getAllProperty = async (filters: PropertyFilterParams = {}) => {
+export interface PaginationResponse {
+  properties: any[];
+  pagination: {
+    total: number;
+    totalPage: number;
+    page: number;
+    limit: number;
+  }
+}
+
+export const getAllProperty = async (filters: PropertyFilterParams = {}): Promise<PaginationResponse> => {
   // Build query parameters
   const params = new URLSearchParams();
   

@@ -23,6 +23,9 @@ import PropertyModel from '@/models/property/propertyModel';
 import Image from 'next/image';
 import { DateRangePicker } from '@/components/ui/calendar';
 import { useEffect } from 'react';
+import PropertySkeleton from '@/components/property/propertySkeleton';
+import Footer from '@/components/common/footer/footer';
+import { PaginationTable } from '@/components/common/pagination/propertyPagination';
 
 export default function PropertyPage() {
   const {
@@ -60,6 +63,14 @@ export default function PropertyPage() {
     handleSearch,
     dateRange,
     handleDateRangeChange,
+    setOpenFilters,
+    // Pagination props
+    page,
+    setPage,
+    limit,
+    setLimit,
+    totalItems,
+    totalPages,
   } = PropertyModel();
 
   const handleDateRangePickerChange = (dates: [Date | null, Date | null]) => {
@@ -76,33 +87,59 @@ export default function PropertyPage() {
       // Handle guest dropdown
       const guestDropdown = document.getElementById('guestDropdown');
       const guestButton = document.getElementById('guestButton');
-      
+
       if (
-        guestDropdown && 
+        guestDropdown &&
         !guestDropdown.classList.contains('hidden') &&
         event.target instanceof Node &&
         !guestDropdown.contains(event.target) &&
-        guestButton && 
+        guestButton &&
         !guestButton.contains(event.target)
       ) {
         guestDropdown.classList.add('hidden');
       }
-      
-      // Handle sortRef dropdown
+
       const sortElement = sortRef.current;
-      if (sortElement && openDropdown.sort && event.target instanceof Node && !sortElement.contains(event.target)) {
+      if (
+        sortElement &&
+        openDropdown.sort &&
+        event.target instanceof Node &&
+        !sortElement.contains(event.target)
+      ) {
         toggleDropdown('sort');
       }
-      
-      // Handle priceRef dropdown
+
       const priceElement = priceRef.current;
-      if (priceElement && openDropdown.price && event.target instanceof Node && !priceElement.contains(event.target)) {
+      if (
+        priceElement &&
+        openDropdown.price &&
+        event.target instanceof Node &&
+        !priceElement.contains(event.target)
+      ) {
         toggleDropdown('price');
       }
+
+      if (event.target instanceof Node) {
+        const isFilterButton = (event.target as Element).closest(
+          '[data-filter-button]',
+        );
+        const isFilterSection = (event.target as Element).closest(
+          '[data-filter-section]',
+        );
+
+        if (!isFilterButton && !isFilterSection) {
+          setOpenFilters({
+            category: false,
+            propertyName: false,
+            facility: false,
+            city: false,
+          });
+        }
+      }
     };
-    
+
     document.addEventListener('mousedown', handleClickOutside);
-    
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
@@ -113,8 +150,61 @@ export default function PropertyPage() {
       <>
         <Navbar forceScrolled={true} />
         <div className="lg:mx-24 py-6 px-4 bg-[#FDFDFE] pt-28 min-h-screen">
-          <div className="flex justify-center items-center h-60">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>
+          {/* Search Bar */}
+          <div className="flex flex-col md:flex-row mb-8">
+            <div className="w-full md:w-1/3 p-3 md:rounded-l-lg flex items-center border-2 border-b-0 md:border-b-2 border-primary md:border-r-0 bg-white">
+              <div className="w-8 h-8 bg-gray-100 rounded-full mr-2 flex items-center justify-center text-gray-500">
+                <FaSearch size={14} />
+              </div>
+              <div className="w-full h-6 bg-gray-200 animate-pulse rounded"></div>
+            </div>
+            <div className="w-full md:w-1/3 p-3 flex items-center border-2 border-b-0 md:border-b-2 border-primary md:border-r-0 bg-white">
+              <div className="w-full h-6 bg-gray-200 animate-pulse rounded"></div>
+            </div>
+            <div className="w-full md:w-1/4 p-3 flex items-center border-2 border-primary bg-white relative">
+              <div className="w-8 h-8 bg-gray-100 rounded-full mr-2 flex items-center justify-center text-gray-500">
+                <FaUser size={14} />
+              </div>
+              <div className="w-full h-6 bg-gray-200 animate-pulse rounded"></div>
+            </div>
+            <div className="w-full md:w-1/6 md:rounded-r-lg bg-primary text-white p-3">
+              <div className="flex gap-2 items-center justify-center">
+                <FaSearch size={18} /> <span>Search Hotel</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row">
+            {/* Filters placeholder */}
+            <div className="hidden md:block md:w-1/4 md:pr-6">
+              <div className="border rounded p-4 mb-4 bg-white shadow-sm">
+                <div className="h-8 w-1/2 bg-gray-200 animate-pulse rounded mb-4"></div>
+                <div className="space-y-3">
+                  <div className="h-6 bg-gray-200 animate-pulse rounded"></div>
+                  <div className="h-6 bg-gray-200 animate-pulse rounded"></div>
+                  <div className="h-6 bg-gray-200 animate-pulse rounded"></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Property Listings */}
+            <div className="w-full md:w-3/4">
+              {/* Filter Options */}
+              <div className="flex justify-center md:justify-end mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="text-gray-500">Sort by:</div>
+                  <div className="h-10 w-24 bg-gray-200 animate-pulse rounded-full"></div>
+                  <div className="h-10 w-24 bg-gray-200 animate-pulse rounded-full"></div>
+                </div>
+              </div>
+
+              {/* Property Skeletons */}
+              <div className="w-full flex flex-col space-y-4">
+                {[1, 2, 3, 4].map((index) => (
+                  <PropertySkeleton key={index} />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </>
@@ -152,9 +242,9 @@ export default function PropertyPage() {
             <div className="w-8 h-8 bg-gray-100 rounded-full mr-2 flex items-center justify-center text-gray-500">
               <FaSearch size={14} />
             </div>
-            <input 
-              type="text" 
-              placeholder="Search location, property..." 
+            <input
+              type="text"
+              placeholder="Search location, property..."
               className="w-full outline-none text-gray-700"
               value={searchTerm}
               onChange={(e) => handleSearchTermChange(e.target.value)}
@@ -173,7 +263,7 @@ export default function PropertyPage() {
             <div className="w-8 h-8 bg-gray-100 rounded-full mr-2 flex items-center justify-center text-gray-500">
               <FaUser size={14} />
             </div>
-            <button 
+            <button
               id="guestButton"
               className="w-full flex items-center justify-between text-gray-700 text-sm"
               onClick={() => {
@@ -183,21 +273,41 @@ export default function PropertyPage() {
                 }
               }}
             >
-              <span>{searchAdults ? `${searchAdults} ${Number(searchAdults) === 1 ? 'Person' : 'People'}` : 'Number of people'}</span>
-              <svg className="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4"/>
+              <span>
+                {searchAdults
+                  ? `${searchAdults} ${Number(searchAdults) === 1 ? 'Person' : 'People'}`
+                  : 'Number of people'}
+              </span>
+              <svg
+                className="w-2.5 h-2.5 ms-3"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 10 6"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="m1 1 4 4 4-4"
+                />
               </svg>
             </button>
-            
+
             {/* Dropdown menu */}
-            <div id="guestDropdown" className="hidden absolute top-full left-0 right-0 mt-1 z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-full">
+            <div
+              id="guestDropdown"
+              className="hidden absolute top-full left-0 right-0 mt-1 z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-full"
+            >
               <ul className="py-2 text-sm text-gray-700">
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
                   <li key={num}>
                     <button
                       onClick={() => {
                         handleAdultsChange(num.toString());
-                        const dropdown = document.getElementById('guestDropdown');
+                        const dropdown =
+                          document.getElementById('guestDropdown');
                         if (dropdown) {
                           dropdown.classList.add('hidden');
                         }
@@ -211,10 +321,9 @@ export default function PropertyPage() {
               </ul>
             </div>
           </div>
-          <button 
+          <button
             className="w-full md:w-1/6 md:rounded-r-lg bg-primary text-white p-3 hover:bg-primary/90 transition-colors"
             onClick={() => {
-              console.log(`Searching with ${searchAdults} people`);
               handleSearch();
             }}
           >
@@ -225,100 +334,7 @@ export default function PropertyPage() {
         </div>
 
         {/* Add global styles for datepicker and select dropdown */}
-        <style jsx global>{`
-          .react-datepicker-wrapper {
-            width: 100%;
-          }
-          .react-datepicker-popper {
-            z-index: 9999 !important;
-          }
-          .react-datepicker {
-            font-family: inherit;
-            border-radius: 8px;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-          }
-          .react-datepicker__triangle {
-            display: none;
-          }
-          /* Make months display horizontally */
-          .react-datepicker__month-container {
-            display: inline-block;
-            margin-right: 10px;
-          }
-          .react-datepicker__month {
-            margin: 0.4rem;
-          }
-          /* Improve navigation arrows */
-          .react-datepicker__navigation {
-            top: 12px;
-            border: none;
-            background: rgba(59, 130, 246, 0.1);
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background 0.2s;
-          }
-          .react-datepicker__navigation:hover {
-            background: rgba(59, 130, 246, 0.2);
-          }
-          .react-datepicker__navigation--previous {
-            left: 12px;
-          }
-          .react-datepicker__navigation--next {
-            right: 12px;
-          }
-          .react-datepicker__navigation-icon::before {
-            border-width: 2px 2px 0 0;
-            border-color: #3b82f6;
-            width: 8px;
-            height: 8px;
-            top: 9px;
-          }
-          .react-datepicker__navigation-icon--previous::before {
-            right: -3px;
-          }
-          .react-datepicker__navigation-icon--next::before {
-            left: -3px;
-          }
-          
-          /* Custom select dropdown styling */
-          select {
-            background-image: none;
-          }
-          
-          select:focus {
-            outline: none;
-          }
-          
-          /* Style for the dropdown when open */
-          select option {
-            padding: 10px;
-            background-color: white;
-            color: #4b5563;
-          }
-          
-          select option:hover,
-          select option:focus,
-          select option:active {
-            background-color: #e0f2fe;
-            color: #1e3a8a;
-          }
-          
-          /* Make Firefox dropdowns look similar to Chrome */
-          @-moz-document url-prefix() {
-            select {
-              color: #4b5563;
-              text-indent: 0.01px;
-              text-overflow: '';
-              padding-right: 1rem;
-            }
-          }
-        `}</style>
+        <style jsx global>{``}</style>
 
         {/* Main Content */}
         <div className="flex flex-col md:flex-row">
@@ -327,72 +343,105 @@ export default function PropertyPage() {
             <div className="grid grid-cols-2 gap-2">
               {/* Category Button */}
               <button
+                data-filter-button="category"
                 onClick={() => toggleFilter('category')}
-                className={`flex items-center border rounded p-3 ${openFilters.category ? 'bg-blue-50 border-blue-300' : 'bg-white'} shadow-sm`}
+                className={`flex items-center justify-between border rounded p-3 ${openFilters.category ? 'bg-blue-50 border-blue-300' : 'bg-white'} shadow-sm`}
               >
-                <FaHotel
-                  className={`${openFilters.category ? 'text-blue-500' : 'text-gray-500'} mr-2`}
-                  size={18}
-                />
-                <span
-                  className={`font-medium ${openFilters.category ? 'text-blue-600' : 'text-gray-700'}`}
-                >
-                  Category
-                </span>
+                <div className="flex items-center">
+                  <FaHotel
+                    className={`${openFilters.category ? 'text-blue-500' : 'text-gray-500'} mr-2`}
+                    size={18}
+                  />
+                  <span
+                    className={`font-medium ${openFilters.category ? 'text-blue-600' : 'text-gray-700'}`}
+                  >
+                    Category
+                  </span>
+                </div>
+                {selectedCategories.length > 0 && (
+                  <span className="ml-2 bg-primary text-white text-xs rounded-full px-2 py-0.5">
+                    {selectedCategories.length}
+                  </span>
+                )}
               </button>
 
               {/* Tenant Button */}
               <button
+                data-filter-button="propertyName"
                 onClick={() => toggleFilter('propertyName')}
-                className={`flex items-center border rounded p-3 ${openFilters.propertyName ? 'bg-blue-50 border-blue-300' : 'bg-white'} shadow-sm`}
+                className={`flex items-center justify-between border rounded p-3 ${openFilters.propertyName ? 'bg-blue-50 border-blue-300' : 'bg-white'} shadow-sm`}
               >
-                <FaBuilding
-                  className={`${openFilters.propertyName ? 'text-blue-500' : 'text-gray-500'} mr-2`}
-                  size={18}
-                />
-                <span
-                  className={`font-medium ${openFilters.propertyName ? 'text-blue-600' : 'text-gray-700'}`}
-                >
-                  Tenant
-                </span>
+                <div className="flex items-center">
+                  <FaBuilding
+                    className={`${openFilters.propertyName ? 'text-blue-500' : 'text-gray-500'} mr-2`}
+                    size={18}
+                  />
+                  <span
+                    className={`font-medium ${openFilters.propertyName ? 'text-blue-600' : 'text-gray-700'}`}
+                  >
+                    Tenant
+                  </span>
+                </div>
+                {selectedTenants.length > 0 && (
+                  <span className="ml-2 bg-primary text-white text-xs rounded-full px-2 py-0.5">
+                    {selectedTenants.length}
+                  </span>
+                )}
               </button>
 
               {/* Facility Button */}
               <button
+                data-filter-button="facility"
                 onClick={() => toggleFilter('facility')}
-                className={`flex items-center border rounded p-3 ${openFilters.facility ? 'bg-blue-50 border-blue-300' : 'bg-white'} shadow-sm`}
+                className={`flex items-center justify-between border rounded p-3 ${openFilters.facility ? 'bg-blue-50 border-blue-300' : 'bg-white'} shadow-sm`}
               >
-                <FaSwimmingPool
-                  className={`${openFilters.facility ? 'text-blue-500' : 'text-gray-500'} mr-2`}
-                  size={18}
-                />
-                <span
-                  className={`font-medium ${openFilters.facility ? 'text-blue-600' : 'text-gray-700'}`}
-                >
-                  Facility
-                </span>
+                <div className="flex items-center">
+                  <FaSwimmingPool
+                    className={`${openFilters.facility ? 'text-blue-500' : 'text-gray-500'} mr-2`}
+                    size={18}
+                  />
+                  <span
+                    className={`font-medium ${openFilters.facility ? 'text-blue-600' : 'text-gray-700'}`}
+                  >
+                    Facility
+                  </span>
+                </div>
+                {selectedFacilities.length > 0 && (
+                  <span className="ml-2 bg-primary text-white text-xs rounded-full px-2 py-0.5">
+                    {selectedFacilities.length}
+                  </span>
+                )}
               </button>
 
               {/* City Button */}
               <button
+                data-filter-button="city"
                 onClick={() => toggleFilter('city')}
-                className={`flex items-center border rounded p-3 ${openFilters.city ? 'bg-blue-50 border-blue-300' : 'bg-white'} shadow-sm`}
+                className={`flex items-center justify-between border rounded p-3 ${openFilters.city ? 'bg-blue-50 border-blue-300' : 'bg-white'} shadow-sm`}
               >
-                <FaCity
-                  className={`${openFilters.city ? 'text-blue-500' : 'text-gray-500'} mr-2`}
-                  size={18}
-                />
-                <span
-                  className={`font-medium ${openFilters.city ? 'text-blue-600' : 'text-gray-700'}`}
-                >
-                  City
-                </span>
+                <div className="flex items-center">
+                  <FaCity
+                    className={`${openFilters.city ? 'text-blue-500' : 'text-gray-500'} mr-2`}
+                    size={18}
+                  />
+                  <span
+                    className={`font-medium ${openFilters.city ? 'text-blue-600' : 'text-gray-700'}`}
+                  >
+                    Popular City
+                  </span>
+                </div>
+                {selectedCities.length > 0 && (
+                  <span className="ml-2 bg-primary text-white text-xs rounded-full px-2 py-0.5">
+                    {selectedCities.length}
+                  </span>
+                )}
               </button>
             </div>
 
             {/* Mobile Filter Sections */}
             {/* Category Section - Mobile */}
             <div
+              data-filter-section="category"
               className={`${openFilters.category ? 'block' : 'hidden'} border rounded p-4 mt-2 mb-4 bg-white shadow-sm transition-all duration-300`}
             >
               <ul className="space-y-2">
@@ -425,6 +474,7 @@ export default function PropertyPage() {
 
             {/* Tenant Section - Mobile */}
             <div
+              data-filter-section="propertyName"
               className={`${openFilters.propertyName ? 'block' : 'hidden'} border rounded p-4 mt-2 mb-4 bg-white shadow-sm transition-all duration-300`}
             >
               <ul className="space-y-2">
@@ -455,6 +505,7 @@ export default function PropertyPage() {
 
             {/* Facility Section - Mobile */}
             <div
+              data-filter-section="facility"
               className={`${openFilters.facility ? 'block' : 'hidden'} border rounded p-4 mt-2 mb-4 bg-white shadow-sm transition-all duration-300`}
             >
               <ul className="space-y-2">
@@ -487,6 +538,7 @@ export default function PropertyPage() {
 
             {/* City Section - Mobile */}
             <div
+              data-filter-section="city"
               className={`${openFilters.city ? 'block' : 'hidden'} border rounded p-4 mt-2 mb-4 bg-white shadow-sm transition-all duration-300`}
             >
               <ul className="space-y-2">
@@ -637,7 +689,7 @@ export default function PropertyPage() {
             <div className="border rounded p-4 bg-white shadow-sm">
               <h2 className="font-bold mb-3 flex items-center">
                 <FaCity className="text-gray-500 mr-2" size={18} />
-                City
+                Popular City
                 {selectedCities.length > 0 && (
                   <span className="ml-2 bg-primary text-white text-xs rounded-full px-2 py-0.5">
                     {selectedCities.length}
@@ -824,7 +876,9 @@ export default function PropertyPage() {
                                   {property.category.name}
                                 </p>
                               </span>
-                              <p className="font-semibold text-lg mt-1">{property.name}</p>
+                              <p className="font-semibold text-lg mt-1">
+                                {property.name}
+                              </p>
                               <div className="flex items-center mt-1 gap-1">
                                 <FaMapMarkerAlt className="text-gray-400 text-sm" />
                                 <p className="text-gray-400 text-sm">
@@ -878,9 +932,24 @@ export default function PropertyPage() {
                 </div>
               )}
             </div>
+            
+            {/* Pagination */}
+            {properties.length > 0 && (
+              <div className="mt-8">
+                <PaginationTable 
+                  page={page}
+                  setPage={setPage}
+                  limit={limit}
+                  setLimit={setLimit}
+                  total={totalItems}
+                  totalPage={totalPages}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 }
