@@ -1,3 +1,5 @@
+'use client';
+
 import Button from '@/components/common/button/button';
 import Footer from '@/components/common/footer/footer';
 import Navbar from '@/components/common/navbar/navbar';
@@ -5,9 +7,49 @@ import BestDealsCaraosel from '@/components/homepage/bestDealsCaraosel';
 import HotelRecommendation from '@/components/homepage/hotelRecommendation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FaArrowRight } from 'react-icons/fa';
+import { FaArrowRight, FaSearch, FaUser } from 'react-icons/fa';
+import { DateRangePicker } from '@/components/ui/calendar';
+import HomeModel from '@/models/homepage/homeModel';
+import { useEffect } from 'react';
 
 export default function Home() {
+  const {
+    searchTerm,
+    dateRange,
+    searchAdults,
+    handleSearchTermChange,
+    handleDateRangeChange,
+    handleAdultsChange,
+    handleSearch,
+    handleDateRangePickerChange,
+  } = HomeModel();
+
+  // Setup click outside handler for dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      // Handle guest dropdown
+      const guestDropdown = document.getElementById('homeGuestDropdown');
+      const guestButton = document.getElementById('guestButton');
+
+      if (
+        guestDropdown &&
+        !guestDropdown.classList.contains('hidden') &&
+        event.target instanceof Node &&
+        !guestDropdown.contains(event.target) &&
+        guestButton &&
+        !guestButton.contains(event.target)
+      ) {
+        guestDropdown.classList.add('hidden');
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
     <>
       <Navbar />
@@ -21,79 +63,135 @@ export default function Home() {
             alt="homepage"
           />
         </div>
-        <div className="relative h-full pt-40 sm:px-12 md:px-24 lg:px-32 mx-auto">
-          <h1 className="mb-2 text-white text-3xl font-bold">
+        <div className="relative h-full pt-24 md:pt-32 sm:px-12 md:px-20 lg:px-30">
+          <h1 className="mb-2 text-white text-center sm:text-left text-md sm:text-3xl font-bold">
             <p className="tracking-wide ps-6 sm:ps-0">
               Find the right hotel today
             </p>
           </h1>
-          <div className="bg-primary2 p-8 rounded-lg text-white">
+          <div className="bg-primary2 p-4 sm:p-8 rounded-lg text-white">
             <div className="lg:flex w-full">
-              <div className="mb-5 flex-1">
+              <div className="mb-5 flex-auto lg:w-1/2">
                 <label
-                  htmlFor="name"
+                  htmlFor="search-term"
                   className="block mb-2 text-xs font-medium"
                 >
                   Where do you want to stay?
                 </label>
-                <input
-                  type="name"
-                  id="name"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg lg:rounded-r-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                  placeholder="name@flowbite.com"
-                  required
-                />
+                <div id="search-container" className="flex items-center w-full  bg-gray-50 border border-gray-300 p-[9px] rounded-lg lg:rounded-r-none">
+                  <div className="w-8 h-8 bg-gray-100 rounded-full mr-2 flex items-center justify-center text-gray-500">
+                    <FaSearch size={14} />
+                  </div>
+                  <input
+                    type="text"
+                    id="search-term"
+                    className="border-2 bg-gray-50 text-gray-900 text-xs shadow-none w-full p-2"
+                    placeholder="Search location, property..."
+                    value={searchTerm}
+                    onChange={(e) => handleSearchTermChange(e.target.value)}
+                    style={{ outline: 'none', boxShadow: 'none' }}
+                  />
+                </div>
               </div>
-              <div className="flex">
-                <div className="mb-5 flex-1">
+              <div className="sm:flex grow-8 lg:w-1/2">
+                <div className="mb-5 flex-auto">
                   <label
                     htmlFor="check-in"
                     className="block mb-2 text-xs font-medium"
                   >
-                    Check-in
+                    Check-in & check-out
                   </label>
-                  <input
-                    type="check-in"
-                    id="check-in"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-l-lg lg:rounded-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    placeholder="name@flowbite.com"
-                    required
-                  />
+                  <div className="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-r-lg sm:rounded-r-none rounded-l-lg lg:rounded-none focus:outline-none focus:ring-0 focus:border-gray-300 block w-full p-2.5">
+                    <DateRangePicker
+                      startDate={
+                        dateRange.from ? new Date(dateRange.from) : null
+                      }
+                      endDate={dateRange.to ? new Date(dateRange.to) : null}
+                      onChange={handleDateRangePickerChange}
+                      startDatePlaceholder="Check-in"
+                      endDatePlaceholder="Check-out"
+                      className="focus:outline-none focus:ring-0"
+                    />
+                  </div>
                 </div>
-                <div className="mb-5 flex-1">
-                  <label
-                    htmlFor="check-out"
-                    className="block mb-2 text-xs font-medium"
-                  >
-                    Check-out
-                  </label>
-                  <input
-                    type="check-out"
-                    id="check-out"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-xs  focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    placeholder="name@flowbite.com"
-                    required
-                  />
-                </div>
-                <div className="mb-5 flex-1">
+
+                <div className="mb-5 flex-auto">
                   <label
                     htmlFor="guest-room"
                     className="block mb-2 text-xs font-medium"
                   >
                     Guest & rooms
                   </label>
-                  <input
-                    type="guest-room"
-                    id="guest-room"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-r-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    placeholder="name@flowbite.com"
-                    required
-                  />
+                  <div className="relative bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-l-lg sm:rounded-l-none rounded-r-lg focus:outline-none focus:ring-0 focus:border-gray-300 block w-full p-2.5">
+                    <button
+                      id="guestButton"
+                      className="w-full flex items-center justify-between text-gray-700 text-sm focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
+                      onClick={() => {
+                        const dropdown =
+                          document.getElementById('homeGuestDropdown');
+                        if (dropdown) {
+                          dropdown.classList.toggle('hidden');
+                        }
+                      }}
+                    >
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 bg-gray-100 rounded-full mr-2 flex items-center justify-center text-gray-500">
+                          <FaUser size={14} />
+                        </div>
+                        <span>
+                          {searchAdults
+                            ? `${searchAdults} ${Number(searchAdults) === 1 ? 'Person' : 'People'}`
+                            : 'Number of people'}
+                        </span>
+                      </div>
+                      <svg
+                        className="w-2.5 h-2.5 ms-3"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 10 6"
+                      >
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="m1 1 4 4 4-4"
+                        />
+                      </svg>
+                    </button>
+
+                    {/* Dropdown menu */}
+                    <div
+                      id="homeGuestDropdown"
+                      className="hidden absolute top-full left-0 right-0 mt-1 z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-full"
+                    >
+                      <ul className="py-2 text-sm text-gray-700">
+                        {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                          <li key={num}>
+                            <button
+                              onClick={() => {
+                                handleAdultsChange(num.toString());
+                                const dropdown =
+                                  document.getElementById('homeGuestDropdown');
+                                if (dropdown) {
+                                  dropdown.classList.add('hidden');
+                                }
+                              }}
+                              className={`block w-full text-left px-4 py-2 hover:bg-gray-100 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${searchAdults === num.toString() ? 'bg-blue-50 text-primary' : ''}`}
+                            >
+                              {num} {num === 1 ? 'Person' : 'People'}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
             <div className="flex justify-end w-full">
-              <button>
+              <button onClick={handleSearch} className="focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0">
                 <Button
                   color="primary"
                   textColor="white"
@@ -121,7 +219,7 @@ export default function Home() {
       <section className="px-6 md:px-24">
         <div className="mb-2">
           <h1 className="font-bold text-xl mb-2">
-            Hotels in your home country
+            Hotels based on popular destination
           </h1>
           <h3 className="font-light text-sm">
             Your next adventure may be closer than you think. Discover hotels

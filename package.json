@@ -37,8 +37,10 @@
       "pre-commit": "npx lint-staged"
     }
   },
-  "dependencies": {    
+  "dependencies": {
+    "@shadcn/ui": "^0.0.4",
     "axios": "^1.9.0",
+    "date-fns": "^4.1.0",
     "midtrans-client": "^1.4.2"
   }
 }
