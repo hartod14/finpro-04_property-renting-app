@@ -932,11 +932,11 @@ export default function PropertyPage() {
                 </div>
               )}
             </div>
-            
+
             {/* Pagination */}
             {properties.length > 0 && (
               <div className="mt-8">
-                <PaginationTable 
+                <PaginationTable
                   page={page}
                   setPage={setPage}
                   limit={limit}

@@ -42,4 +42,10 @@ export const getAllProperty = async (filters: PropertyFilterParams = {}): Promis
 
   const res = await api(`/property?${params.toString()}`, 'GET');
   return res.data;
+};
+
+// Get property by ID with full details including rooms
+export const getPropertyById = async (id: string | number) => {
+  const res = await api(`/property/${id}`, 'GET');
+  return res.data;
 }; 

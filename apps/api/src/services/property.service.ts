@@ -84,9 +84,10 @@ class PropertyService {
         tenant: true,
         propertyImages: true,
       },
-      orderBy: sortBy === 'name' 
-        ? { name: sortOrder === 'asc' ? 'asc' : 'desc' }
-        : undefined,
+      orderBy:
+        sortBy === 'name'
+          ? { name: sortOrder === 'asc' ? 'asc' : 'desc' }
+          : undefined,
       ...pagination(pageNumber, limitNumber),
     });
 
@@ -135,9 +136,7 @@ class PropertyService {
             ? Number(b.rooms[0].base_price)
             : Number.MAX_SAFE_INTEGER;
 
-        return sortOrder === 'asc'
-          ? aPrice - bPrice
-          : bPrice - aPrice;
+        return sortOrder === 'asc' ? aPrice - bPrice : bPrice - aPrice;
       });
     }
 
@@ -201,8 +200,82 @@ class PropertyService {
         total: totalProperties,
         totalPage: Math.ceil(totalProperties / limitNumber),
         page: pageNumber,
-        limit: limitNumber
-      }
+        limit: limitNumber,
+      },
+    };
+  }
+
+  async getPropertyById(id: number) {
+    // Get property with all related data
+    const property = await prisma.property.findUnique({
+      where: {
+        id,
+        deleted_at: null,
+      },
+      include: {
+        rooms: {
+          where: {
+            deleted_at: null,
+          },
+          include: {
+            roomHasFacilities: {
+              include: {
+                facility: true,
+              },
+            },
+            RoomImage: true,
+          },
+        },
+        propertyHasFacilities: {
+          include: {
+            facility: true,
+          },
+        },
+        category: true,
+        city: true,
+        tenant: true,
+        propertyImages: true,
+      },
+    });
+
+    if (!property) {
+      throw new Error('Property not found');
+    }
+
+    // Format the data for the frontend
+    return {
+      id: property.id,
+      name: property.name,
+      description: property.description,
+      address: property.address,
+      checkin_time: property.checkin_time,
+      checkout_time: property.checkout_time,
+      category: property.category,
+      city: property.city,
+      tenant: {
+        id: property.tenant.id,
+        name: property.tenant.name,
+        email: property.tenant.email,
+      },
+      facilities: property.propertyHasFacilities.map((pf) => ({
+        ...pf.facility,
+        type: 'PROPERTY',
+      })),
+      images: property.propertyImages,
+      rooms: property.rooms.map((room) => ({
+        id: room.id,
+        name: room.name,
+        base_price: room.base_price,
+        description: room.description,
+        capacity: room.capacity,
+        size: room.size,
+        total_room: room.total_room,
+        facilities: room.roomHasFacilities.map((rf) => ({
+          ...rf.facility,
+          type: 'ROOM',
+        })),
+        images: room.RoomImage,
+      })),
     };
   }
 }

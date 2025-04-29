@@ -23,6 +23,7 @@ export interface IRoom {
   total_room: number;
   facilities: IFacility[];
   images: IRoomImage[];
+  description?: string;
 }
 
 export interface ITenant {
@@ -44,4 +45,5 @@ export interface IProperty {
   facilities: IFacility[];
   images: IPropertyImage[];
   lowestPriceRoom: IRoom | null;
+  rooms?: IRoom[];
 }

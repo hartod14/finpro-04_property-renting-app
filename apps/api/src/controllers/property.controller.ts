@@ -11,6 +11,16 @@ class PropertyController {
             next(error);
         }
     }
+
+    async getPropertyById(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id } = req.params;
+            const data = await propertyService.getPropertyById(Number(id));
+            responseHandler(res, 'get property detail success', data);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 export default new PropertyController();
