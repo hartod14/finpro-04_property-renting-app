@@ -1,20 +1,20 @@
-import { ICategory } from "./category.interface";
-import { ICity } from "./city.interface";
-import { IFacility } from "./facility.interface";
+import { ICategory } from './category.interface';
+import { ICity } from './city.interface';
+import { IFacility } from './facility.interface';
 
-interface IPropertyImage {
+export interface IPropertyImage {
   id: number;
   path: string;
   property_id: number;
 }
 
-interface IRoomImage {
+export interface IRoomImage {
   id: number;
   path: string;
   room_id: number;
 }
 
-interface IRoom {
+export interface IRoom {
   id: number;
   name: string;
   base_price: number;
@@ -25,7 +25,7 @@ interface IRoom {
   images: IRoomImage[];
 }
 
-interface ITenant {
+export interface ITenant {
   id: number;
   name: string;
   email: string;
@@ -44,4 +44,4 @@ export interface IProperty {
   facilities: IFacility[];
   images: IPropertyImage[];
   lowestPriceRoom: IRoom | null;
-} 
+}

@@ -2,6 +2,68 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Remove focus outlines and borders */
+* {
+  outline: none !important;
+}
+
+*:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+/* Target the search input specifically */
+#search-term {
+  outline: none !important;
+  box-shadow: none !important;
+  border: 1px solid transparent !important;
+
+}
+
+input:focus, 
+button:focus,
+div:focus,
+select:focus,
+a:focus,
+*:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+  ring-color: transparent !important;
+  ring-offset-color: transparent !important;
+  ring-width: 0 !important;
+  ring-offset-width: 0 !important;
+}
+
+.react-datepicker__input-container input:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+input, button, div, select, a {
+  outline: none !important;
+}
+
+input:focus-visible,
+button:focus-visible,
+div:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+}
+
+/* Reset Tailwind focus styles */
+*, *::before, *::after {
+  --tw-ring-inset: var(--tw-empty,/*!*/ /*!*/);
+  --tw-ring-offset-width: 0px;
+  --tw-ring-offset-color: transparent;
+  --tw-ring-color: transparent;
+  --tw-ring-offset-shadow: 0 0 transparent;
+  --tw-ring-shadow: 0 0 transparent;
+}
 
 :root {
   --max-width: 1100px;

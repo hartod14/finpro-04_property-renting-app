@@ -8,8 +8,12 @@ import { PropertyFilterParams, getAllProperty } from '@/handlers/property';
 import { ICategory } from '@/interfaces/category.interface';
 import { ICity } from '@/interfaces/city.interface';
 import { IFacility } from '@/interfaces/facility.interface';
+import { useSearchParams } from 'next/navigation';
 
 export default function PropertyModel() {
+  // Get search parameters from URL
+  const searchParams = useSearchParams();
+
   type FilterName = 'category' | 'propertyName' | 'facility' | 'city';
   type SortDirection = 'asc' | 'desc';
   type PriceDirection = 'low-to-high' | 'high-to-low';
@@ -40,21 +44,31 @@ export default function PropertyModel() {
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   
-  const [searchTerm, setSearchTerm] = useState('Jakarta');
+  // Get search term from URL or use default
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('searchTerm') || '');
   const [searchLocation, setSearchLocation] = useState('');
   const [searchDate, setSearchDate] = useState('');
-  const [searchAdults, setSearchAdults] = useState('2');
+  const [searchAdults, setSearchAdults] = useState(searchParams.get('capacity') || '2');
   
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
   
+  // Parse dates from URL params if available
+  const checkInDate = searchParams.get('checkInDate') 
+    ? new Date(searchParams.get('checkInDate') as string) 
+    : today;
+  
+  const checkOutDate = searchParams.get('checkOutDate') 
+    ? new Date(searchParams.get('checkOutDate') as string) 
+    : tomorrow;
+  
   const [dateRange, setDateRange] = useState<{
     from: Date | undefined;
     to: Date | undefined;
   }>({
-    from: today,
-    to: tomorrow,
+    from: checkInDate,
+    to: checkOutDate,
   });
 
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
