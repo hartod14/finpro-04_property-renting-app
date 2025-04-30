@@ -4,6 +4,7 @@ import { IFacility } from '@/interfaces/facility.interface';
 import { getPropertyById } from '@/handlers/property';
 import { enhanceFacilitiesWithIcons } from '@/utils/facilityIcons';
 import React from 'react';
+import { useSearchParams } from 'next/navigation';
 
 // Type for enhanced facility with React icon node
 export interface IFacilityWithIcon extends Omit<IFacility, 'icon'> {
@@ -16,6 +17,8 @@ export interface IFacilityWithIcon extends Omit<IFacility, 'icon'> {
 export default function PropertyDetailModel(
   propertyId: string | number | string[] | undefined,
 ) {
+  const searchParams = useSearchParams();
+
   const [property, setProperty] = useState<IProperty | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -28,6 +31,29 @@ export default function PropertyDetailModel(
   const [showRoomPhotoModal, setShowRoomPhotoModal] = useState(false);
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
   const [activeRoomId, setActiveRoomId] = useState<number | null>(null);
+
+  const [searchDate, setSearchDate] = useState('');
+  const [searchAdults, setSearchAdults] = useState(
+    searchParams.get('capacity') || '2',
+  );
+
+  const fetchProperties = async () => {
+    try {
+      if (dateRange.from) {
+        dateRange.from.toISOString();
+      }
+
+      if (dateRange.to) {
+        dateRange.to.toISOString();
+      }
+
+      if (searchAdults && searchAdults !== '') {
+        parseInt(searchAdults);
+      }
+    } catch (err) {
+      setError('Failed to load properties. Please try again later.');
+    }
+  };
 
   useEffect(() => {
     const fetchPropertyDetail = async () => {
@@ -80,12 +106,80 @@ export default function PropertyDetailModel(
     }
   }, [propertyId]);
 
+  // Handle keyboard navigation for photo modals
+  const handleKeyboardNavigation = () => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!showPhotoModal && !showRoomPhotoModal) return;
+
+      if (e.key === 'ArrowRight') {
+        goToNextPhoto();
+      } else if (e.key === 'ArrowLeft') {
+        goToPreviousPhoto();
+      } else if (e.key === 'Escape') {
+        if (showPhotoModal) closePhotoModal();
+        if (showRoomPhotoModal) closeRoomPhotoModal();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  };
+
   const handleChangeRoomPhoto = (roomId: number, index: number) => {
     setActiveRoomPhoto((prev) => ({
       ...prev,
       [roomId]: index,
     }));
   };
+
+  const handleDateRangeChange = (range: {
+    from: Date | undefined;
+    to: Date | undefined;
+  }) => {
+    setDateRange(range);
+  };
+
+  const handleDateChange = (value: string) => {
+    setSearchDate(value);
+  };
+
+  const handleAdultsChange = (value: string) => {
+    setSearchAdults(value);
+  };
+
+  const handleSearch = () => {
+    fetchProperties();
+  };
+
+  const handleDateRangePickerChange = (dates: [Date | null, Date | null]) => {
+    const [start, end] = dates;
+    handleDateRangeChange({
+      from: start || undefined,
+      to: end || undefined,
+    });
+  };
+
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const checkInDate = searchParams.get('checkInDate')
+    ? new Date(searchParams.get('checkInDate') as string)
+    : today;
+
+  const checkOutDate = searchParams.get('checkOutDate')
+    ? new Date(searchParams.get('checkOutDate') as string)
+    : tomorrow;
+
+  const [dateRange, setDateRange] = useState<{
+    from: Date | undefined;
+    to: Date | undefined;
+  }>({
+    from: checkInDate,
+    to: checkOutDate,
+  });
 
   // Property photo modal controls
   const openPhotoModal = (index: number) => {
@@ -166,6 +260,15 @@ export default function PropertyDetailModel(
     return enhanceFacilitiesWithIcons(facilities) as IFacilityWithIcon[];
   };
 
+  // Set up keyboard navigation effect
+  useEffect(() => {
+    const cleanup = handleKeyboardNavigation();
+    return cleanup;
+  }, [
+    showPhotoModal,
+    showRoomPhotoModal,
+  ]);
+
   return {
     property,
     loading,
@@ -187,5 +290,13 @@ export default function PropertyDetailModel(
     goToNextPhoto,
     goToPreviousPhoto,
     getCurrentRoomPhotos,
+    handleDateChange,
+    handleAdultsChange,
+    searchDate,
+    searchAdults,
+    handleSearch,
+    dateRange,
+    handleDateRangePickerChange,
+    handleKeyboardNavigation,
   };
 }

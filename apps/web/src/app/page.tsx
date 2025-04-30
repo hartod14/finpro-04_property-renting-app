@@ -74,18 +74,18 @@ export default function Home() {
               <div className="mb-5 flex-auto lg:w-1/2">
                 <label
                   htmlFor="search-term"
-                  className="block mb-2 text-xs font-medium"
+                  className="block mb-2 font-medium"
                 >
                   Where do you want to stay?
                 </label>
-                <div id="search-container" className="flex items-center w-full  bg-gray-50 border border-gray-300 p-[9px] rounded-lg lg:rounded-r-none">
-                  <div className="w-8 h-8 bg-gray-100 rounded-full mr-2 flex items-center justify-center text-gray-500">
+                <div id="search-container" className="flex items-center w-full  bg-gray-50 border border-gray-300 px-3 py-[14px] rounded-lg lg:rounded-r-none">
+                  <div className="w-8 h-8 bg-gray-100 rounded-full mr-2 flex items-center justify-center text-primary">
                     <FaSearch size={14} />
                   </div>
                   <input
                     type="text"
                     id="search-term"
-                    className="border-2 bg-gray-50 text-gray-900 text-xs shadow-none w-full p-2"
+                    className="border-2 bg-gray-50 text-gray-900 text shadow-none w-full"
                     placeholder="Search location, property..."
                     value={searchTerm}
                     onChange={(e) => handleSearchTermChange(e.target.value)}
@@ -97,11 +97,11 @@ export default function Home() {
                 <div className="mb-5 flex-auto">
                   <label
                     htmlFor="check-in"
-                    className="block mb-2 text-xs font-medium"
+                    className="block mb-2 font-medium"
                   >
                     Check-in & check-out
                   </label>
-                  <div className="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-r-lg sm:rounded-r-none rounded-l-lg lg:rounded-none focus:outline-none focus:ring-0 focus:border-gray-300 block w-full p-2.5">
+                  <div className="bg-gray-50 border border-gray-300 text-gray-900 rounded-r-lg sm:rounded-r-none rounded-l-lg lg:rounded-none focus:outline-none focus:ring-0 focus:border-gray-300 block w-full p-2.5 cursor-pointer">
                     <DateRangePicker
                       startDate={
                         dateRange.from ? new Date(dateRange.from) : null
@@ -118,14 +118,14 @@ export default function Home() {
                 <div className="mb-5 flex-auto">
                   <label
                     htmlFor="guest-room"
-                    className="block mb-2 text-xs font-medium"
+                    className="block mb-2 font-medium"
                   >
                     Guest & rooms
                   </label>
-                  <div className="relative bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-l-lg sm:rounded-l-none rounded-r-lg focus:outline-none focus:ring-0 focus:border-gray-300 block w-full p-2.5">
+                  <div className="relative bg-gray-50 border border-gray-300 text-gray-900 rounded-l-lg sm:rounded-l-none rounded-r-lg focus:outline-none focus:ring-0 focus:border-gray-300 block w-full px-3 py-[14px]">
                     <button
                       id="guestButton"
-                      className="w-full flex items-center justify-between text-gray-700 text-sm focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
+                      className="w-full flex items-center justify-between text-gray-700 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
                       onClick={() => {
                         const dropdown =
                           document.getElementById('homeGuestDropdown');
@@ -135,30 +135,15 @@ export default function Home() {
                       }}
                     >
                       <div className="flex items-center">
-                        <div className="w-8 h-8 bg-gray-100 rounded-full mr-2 flex items-center justify-center text-gray-500">
+                        <div className="w-8 h-8 bg-gray-100 rounded-full mr-2 flex items-center justify-center text-primary">
                           <FaUser size={14} />
                         </div>
                         <span>
                           {searchAdults
-                            ? `${searchAdults} ${Number(searchAdults) === 1 ? 'Person' : 'People'}`
+                            ? `${searchAdults} ${Number(searchAdults) == 1 ? 'Person' : 'People'}`
                             : 'Number of people'}
                         </span>
                       </div>
-                      <svg
-                        className="w-2.5 h-2.5 ms-3"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 10 6"
-                      >
-                        <path
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="m1 1 4 4 4-4"
-                        />
-                      </svg>
                     </button>
 
                     {/* Dropdown menu */}
@@ -166,7 +151,7 @@ export default function Home() {
                       id="homeGuestDropdown"
                       className="hidden absolute top-full left-0 right-0 mt-1 z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-full"
                     >
-                      <ul className="py-2 text-sm text-gray-700">
+                      <ul className="py-2 text-gray-700">
                         {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
                           <li key={num}>
                             <button
@@ -180,7 +165,7 @@ export default function Home() {
                               }}
                               className={`block w-full text-left px-4 py-2 hover:bg-gray-100 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${searchAdults === num.toString() ? 'bg-blue-50 text-primary' : ''}`}
                             >
-                              {num} {num === 1 ? 'Person' : 'People'}
+                              {num} {num == 1 ? 'Person' : 'People'}
                             </button>
                           </li>
                         ))}

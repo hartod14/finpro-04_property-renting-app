@@ -26,6 +26,8 @@ import { useEffect } from 'react';
 import PropertySkeleton from '@/components/property/propertySkeleton';
 import Footer from '@/components/common/footer/footer';
 import { PaginationTable } from '@/components/common/pagination/propertyPagination';
+import PropertyPageSkeleton from '@/components/property/propertyPageSkeleton';
+import ErrorPage from '@/components/common/error/errorPage';
 
 export default function PropertyPage() {
   const {
@@ -63,6 +65,7 @@ export default function PropertyPage() {
     handleSearch,
     dateRange,
     handleDateRangeChange,
+    handleDateRangePickerChange,
     setOpenFilters,
     // Pagination props
     page,
@@ -73,162 +76,13 @@ export default function PropertyPage() {
     totalPages,
   } = PropertyModel();
 
-  const handleDateRangePickerChange = (dates: [Date | null, Date | null]) => {
-    const [start, end] = dates;
-    handleDateRangeChange({
-      from: start || undefined,
-      to: end || undefined,
-    });
-  };
-
-  // Setup click outside handler for dropdowns
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      // Handle guest dropdown
-      const guestDropdown = document.getElementById('guestDropdown');
-      const guestButton = document.getElementById('guestButton');
-
-      if (
-        guestDropdown &&
-        !guestDropdown.classList.contains('hidden') &&
-        event.target instanceof Node &&
-        !guestDropdown.contains(event.target) &&
-        guestButton &&
-        !guestButton.contains(event.target)
-      ) {
-        guestDropdown.classList.add('hidden');
-      }
-
-      const sortElement = sortRef.current;
-      if (
-        sortElement &&
-        openDropdown.sort &&
-        event.target instanceof Node &&
-        !sortElement.contains(event.target)
-      ) {
-        toggleDropdown('sort');
-      }
-
-      const priceElement = priceRef.current;
-      if (
-        priceElement &&
-        openDropdown.price &&
-        event.target instanceof Node &&
-        !priceElement.contains(event.target)
-      ) {
-        toggleDropdown('price');
-      }
-
-      if (event.target instanceof Node) {
-        const isFilterButton = (event.target as Element).closest(
-          '[data-filter-button]',
-        );
-        const isFilterSection = (event.target as Element).closest(
-          '[data-filter-section]',
-        );
-
-        if (!isFilterButton && !isFilterSection) {
-          setOpenFilters({
-            category: false,
-            propertyName: false,
-            facility: false,
-            city: false,
-          });
-        }
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [openDropdown, toggleDropdown]);
-
   if (loading) {
-    return (
-      <>
-        <Navbar forceScrolled={true} />
-        <div className="lg:mx-24 py-6 px-4 bg-[#FDFDFE] pt-28 min-h-screen">
-          {/* Search Bar */}
-          <div className="flex flex-col md:flex-row mb-8">
-            <div className="w-full md:w-1/3 p-3 md:rounded-l-lg flex items-center border-2 border-b-0 md:border-b-2 border-primary md:border-r-0 bg-white">
-              <div className="w-8 h-8 bg-gray-100 rounded-full mr-2 flex items-center justify-center text-gray-500">
-                <FaSearch size={14} />
-              </div>
-              <div className="w-full h-6 bg-gray-200 animate-pulse rounded"></div>
-            </div>
-            <div className="w-full md:w-1/3 p-3 flex items-center border-2 border-b-0 md:border-b-2 border-primary md:border-r-0 bg-white">
-              <div className="w-full h-6 bg-gray-200 animate-pulse rounded"></div>
-            </div>
-            <div className="w-full md:w-1/4 p-3 flex items-center border-2 border-primary bg-white relative">
-              <div className="w-8 h-8 bg-gray-100 rounded-full mr-2 flex items-center justify-center text-gray-500">
-                <FaUser size={14} />
-              </div>
-              <div className="w-full h-6 bg-gray-200 animate-pulse rounded"></div>
-            </div>
-            <div className="w-full md:w-1/6 md:rounded-r-lg bg-primary text-white p-3">
-              <div className="flex gap-2 items-center justify-center">
-                <FaSearch size={18} /> <span>Search Hotel</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col md:flex-row">
-            {/* Filters placeholder */}
-            <div className="hidden md:block md:w-1/4 md:pr-6">
-              <div className="border rounded p-4 mb-4 bg-white shadow-sm">
-                <div className="h-8 w-1/2 bg-gray-200 animate-pulse rounded mb-4"></div>
-                <div className="space-y-3">
-                  <div className="h-6 bg-gray-200 animate-pulse rounded"></div>
-                  <div className="h-6 bg-gray-200 animate-pulse rounded"></div>
-                  <div className="h-6 bg-gray-200 animate-pulse rounded"></div>
-                </div>
-              </div>
-            </div>
-
-            {/* Property Listings */}
-            <div className="w-full md:w-3/4">
-              {/* Filter Options */}
-              <div className="flex justify-center md:justify-end mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="text-gray-500">Sort by:</div>
-                  <div className="h-10 w-24 bg-gray-200 animate-pulse rounded-full"></div>
-                  <div className="h-10 w-24 bg-gray-200 animate-pulse rounded-full"></div>
-                </div>
-              </div>
-
-              {/* Property Skeletons */}
-              <div className="w-full flex flex-col space-y-4">
-                {[1, 2, 3, 4].map((index) => (
-                  <PropertySkeleton key={index} />
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </>
-    );
+    return <PropertyPageSkeleton />;
   }
 
   if (error) {
     return (
-      <>
-        <Navbar forceScrolled={true} />
-        <div className="lg:mx-24 py-6 px-4 bg-[#FDFDFE] pt-28 min-h-screen">
-          <div className="flex justify-center items-center h-60">
-            <div className="text-red-500 text-center">
-              <p className="text-xl font-semibold">{error}</p>
-              <button
-                className="mt-4 bg-primary text-white px-4 py-2 rounded hover:bg-primary/90"
-                onClick={() => window.location.reload()}
-              >
-                Try Again
-              </button>
-            </div>
-          </div>
-        </div>
-      </>
+      <ErrorPage message={error} onRetry={() => window.location.reload()} />
     );
   }
 
@@ -239,7 +93,7 @@ export default function PropertyPage() {
         {/* Search Bar */}
         <div className="flex flex-col md:flex-row mb-8 pt-24">
           <div className="w-full md:w-1/3 p-3 md:rounded-l-lg flex items-center border-2 border-b-0 md:border-b-2 border-primary md:border-r-0  bg-white">
-            <div className="w-8 h-8 bg-gray-100 rounded-full mr-2 flex items-center justify-center text-gray-500">
+            <div className="w-8 h-8 bg-gray-100 rounded-full mr-2 flex items-center justify-center text-primary">
               <FaSearch size={14} />
             </div>
             <input
@@ -260,7 +114,7 @@ export default function PropertyPage() {
             />
           </div>
           <div className="w-full md:w-1/4 p-3 flex items-center border-2 border-primary bg-white relative">
-            <div className="w-8 h-8 bg-gray-100 rounded-full mr-2 flex items-center justify-center text-gray-500">
+            <div className="w-8 h-8 bg-gray-100 rounded-full mr-2 flex items-center justify-center text-primary">
               <FaUser size={14} />
             </div>
             <button
@@ -278,21 +132,6 @@ export default function PropertyPage() {
                   ? `${searchAdults} ${Number(searchAdults) === 1 ? 'Person' : 'People'}`
                   : 'Number of people'}
               </span>
-              <svg
-                className="w-2.5 h-2.5 ms-3"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 10 6"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="m1 1 4 4 4-4"
-                />
-              </svg>
             </button>
 
             {/* Dropdown menu */}
@@ -836,8 +675,9 @@ export default function PropertyPage() {
             <div className="w-full flex flex-col space-y-4">
               {properties.length > 0 ? (
                 properties.map((property) => (
-                  <div
+                  <Link
                     key={`property-${property.id}`}
+                    href={`/property/${property.id}`}
                     className="bg-white border border-gray-200 shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow"
                   >
                     <div className="flex flex-col sm:flex-row">
@@ -858,10 +698,7 @@ export default function PropertyPage() {
                         </div>
                       </div>
                       <div className="w-full sm:w-3/5">
-                        <Link
-                          href={`/property/${property.id}`}
-                          className="block"
-                        >
+                        <div className="block">
                           <div>
                             {property.lowestPriceRoom && (
                               <p className="text-xs font-semibold text-primary2 bg-blue-50 py-1 px-2">
@@ -917,10 +754,10 @@ export default function PropertyPage() {
                               )}
                             </div>
                           </div>
-                        </Link>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 ))
               ) : (
                 <div className="flex justify-center items-center h-60">

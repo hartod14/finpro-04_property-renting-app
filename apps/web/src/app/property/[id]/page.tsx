@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Navbar from '@/components/common/navbar/navbar';
 import Footer from '@/components/common/footer/footer';
@@ -11,6 +10,7 @@ import {
   FaArrowLeft,
   FaArrowRight,
   FaTimes,
+  FaSearch,
 } from 'react-icons/fa';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -19,6 +19,7 @@ import PropertyDetailSkeleton from '@/components/property/propertyDetailSkeleton
 import React from 'react';
 import { getFacilityIconByName } from '@/utils/facilityIcons';
 import { formatTimeOnly } from '@/utils/formatters';
+import { DateRangePicker } from '@/components/ui/calendar';
 
 export default function PropertyDetailPage() {
   const { id } = useParams();
@@ -41,45 +42,12 @@ export default function PropertyDetailPage() {
     goToNextPhoto,
     goToPreviousPhoto,
     getCurrentRoomPhotos,
+    handleAdultsChange,
+    searchAdults,
+    handleSearch,
+    dateRange,
+    handleDateRangePickerChange,
   } = PropertyDetailModel(id);
-
-  // Handle keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!showPhotoModal && !showRoomPhotoModal) return;
-
-      if (e.key === 'ArrowRight') {
-        goToNextPhoto();
-      } else if (e.key === 'ArrowLeft') {
-        goToPreviousPhoto();
-      } else if (e.key === 'Escape') {
-        if (showPhotoModal) closePhotoModal();
-        if (showRoomPhotoModal) closeRoomPhotoModal();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [
-    showPhotoModal,
-    showRoomPhotoModal,
-    closePhotoModal,
-    closeRoomPhotoModal,
-    goToPreviousPhoto,
-    goToNextPhoto,
-  ]);
-
-  // Debug time values when property loads
-  useEffect(() => {
-    if (property) {
-      console.log('Raw checkin time:', property.checkin_time);
-      console.log('Raw checkout time:', property.checkout_time);
-      console.log('Formatted checkin time:', formatTimeOnly(property.checkin_time));
-      console.log('Formatted checkout time:', formatTimeOnly(property.checkout_time));
-    }
-  }, [property]);
 
   if (loading) {
     return <PropertyDetailSkeleton />;
@@ -112,12 +80,15 @@ export default function PropertyDetailPage() {
       <div className="min-h-screen pt-28 pb-10 bg-[#FDFDFE] px-4 lg:px-24">
         {/* Back to Property Listing Navigation */}
         <div className="mb-4">
-          <Link href="/property" className="inline-flex items-center text-primary hover:text-primary/80 transition-colors">
+          <Link
+            href="/property"
+            className="inline-flex items-center text-primary hover:text-primary/80 transition-colors"
+          >
             <FaArrowLeft className="mr-2" size={14} />
             <span>Back to Property Listing</span>
           </Link>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-8">
           {property.images && property.images.length > 0 ? (
             <>
@@ -424,7 +395,7 @@ export default function PropertyDetailPage() {
         </div>
 
         <div className="bg-white rounded-lg p-6 shadow-md mb-8">
-          <h2 className="text-xl font-semibold mb-4">Property Facilities</h2>
+          <h2 className="text-xl font-semibold mb-4">Facilities</h2>
 
           {propertyFacilities.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -449,6 +420,76 @@ export default function PropertyDetailPage() {
               No facilities available for this property
             </p>
           )}
+        </div>
+
+        <h2 className="text-xl font-semibold mb-4">Search other date or guest</h2>
+        <div className="flex flex-col md:flex-row mb-8 shadow-lg">
+          <div className="w-full md:w-[40%] md:rounded-l-lg p-3 flex items-center border-2 border-b-0 md:border-b-2 border-gray md:border-r-0 bg-white">
+            <DateRangePicker
+              startDate={dateRange.from ? new Date(dateRange.from) : null}
+              endDate={dateRange.to ? new Date(dateRange.to) : null}
+              onChange={handleDateRangePickerChange}
+              startDatePlaceholder="Check-in"
+              endDatePlaceholder="Check-out"
+            />
+          </div>
+          <div className="w-full md:w-[40%] p-3 flex items-center border-2 border-gray bg-white relative">
+            <div className="w-8 h-8 bg-gray-100 rounded-full mr-2 flex items-center justify-center text-primary">
+              <FaUser size={14} />
+            </div>
+            <button
+              id="guestButton"
+              className="w-full flex items-center justify-between text-gray-700 text-sm"
+              onClick={() => {
+                const dropdown = document.getElementById('guestDropdown');
+                if (dropdown) {
+                  dropdown.classList.toggle('hidden');
+                }
+              }}
+            >
+              <span>
+                {searchAdults
+                  ? `${searchAdults} ${Number(searchAdults) === 1 ? 'Person' : 'People'}`
+                  : 'Number of people'}
+              </span>
+            </button>
+
+            {/* Dropdown menu */}
+            <div
+              id="guestDropdown"
+              className="hidden absolute top-full left-0 right-0 mt-1 z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-lg w-full"
+            >
+              <ul className="py-2 text-sm text-gray-700">
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                  <li key={num}>
+                    <button
+                      onClick={() => {
+                        handleAdultsChange(num.toString());
+                        const dropdown =
+                          document.getElementById('guestDropdown');
+                        if (dropdown) {
+                          dropdown.classList.add('hidden');
+                        }
+                      }}
+                      className={`block w-full text-left px-4 py-2 hover:bg-gray-100 ${searchAdults === num.toString() ? 'bg-blue-50 text-primary' : ''}`}
+                    >
+                      {num} {num === 1 ? 'Person' : 'People'}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <button
+            className="w-full md:w-[20%] md:rounded-r-lg bg-primary text-white p-3 hover:bg-primary/90 transition-colors"
+            onClick={() => {
+              handleSearch();
+            }}
+          >
+            <div className="flex gap-2 items-center justify-center">
+              <FaSearch size={18} /> <span>Search Hotel</span>
+            </div>
+          </button>
         </div>
 
         <div className="bg-white rounded-lg p-6 shadow-md">
