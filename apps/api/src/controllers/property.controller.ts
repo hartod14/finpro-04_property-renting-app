@@ -21,6 +21,25 @@ class PropertyController {
             next(error);
         }
     }
+
+    async getPropertyBySlug(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { slug } = req.params;
+            const data = await propertyService.getPropertyBySlug(slug);
+            responseHandler(res, 'get property detail success', data);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getRecommendedProperties(req: Request, res: Response, next: NextFunction) {
+        try {
+            const data = await propertyService.getRecommendedProperties(req);
+            responseHandler(res, `get properties by filter city ${data[0].city.name}`, data);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 export default new PropertyController();

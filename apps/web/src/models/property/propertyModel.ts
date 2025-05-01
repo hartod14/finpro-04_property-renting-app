@@ -73,7 +73,7 @@ export default function PropertyModel() {
     to: checkOutDate,
   });
 
-  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+  const [selectedCategoryNames, setSelectedCategoryNames] = useState<string[]>([]);
   const [selectedTenants, setSelectedTenants] = useState<number[]>([]);
   const [selectedFacilities, setSelectedFacilities] = useState<number[]>([]);
   const [selectedCities, setSelectedCities] = useState<number[]>([]);
@@ -88,8 +88,10 @@ export default function PropertyModel() {
     try {
       const filters: PropertyFilterParams = {};
 
-      if (selectedCategories.length > 0)
-        filters.categoryID = selectedCategories;
+      if (selectedCategoryNames.length > 0) {
+        filters.categoryName = selectedCategoryNames;
+      }
+      
       if (selectedTenants.length > 0) filters.tenantID = selectedTenants;
       if (selectedFacilities.length > 0)
         filters.facilityID = selectedFacilities;
@@ -164,7 +166,7 @@ export default function PropertyModel() {
       fetchProperties();
     }
   }, [
-    selectedCategories,
+    selectedCategoryNames,
     selectedTenants,
     selectedFacilities,
     selectedCities,
@@ -184,7 +186,7 @@ export default function PropertyModel() {
   useEffect(() => {
     setPage(1);
   }, [
-    selectedCategories,
+    selectedCategoryNames,
     selectedTenants,
     selectedFacilities,
     selectedCities,
@@ -308,12 +310,12 @@ export default function PropertyModel() {
     setOpenDropdown((prev) => ({ ...prev, price: false }));
   };
 
-  const handleCategoryClick = (categoryId: number) => {
-    setSelectedCategories((prev) => {
-      if (prev.includes(categoryId)) {
-        return prev.filter((id) => id !== categoryId);
+  const handleCategoryClick = (categoryName: string) => {
+    setSelectedCategoryNames((prev) => {
+      if (prev.includes(categoryName)) {
+        return prev.filter(name => name !== categoryName);
       } else {
-        return [...prev, categoryId];
+        return [...prev, categoryName];
       }
     });
   };
@@ -367,6 +369,45 @@ export default function PropertyModel() {
 
   const handleAdultsChange = (value: string) => {
     setSearchAdults(value);
+    // When capacity changes, we should also update the page to 1
+    setPage(1);
+    // Fetch properties with new capacity immediately to fix filtering issue
+    if (value && value !== '') {
+      const parsedValue = parseInt(value);
+      if (!isNaN(parsedValue)) {
+        const filters: PropertyFilterParams = {
+          capacity: parsedValue,
+          page: 1,
+          limit: limit
+        };
+        
+        // Include any current active filters
+        if (selectedCategoryNames.length > 0) {
+          filters.categoryName = selectedCategoryNames;
+        }
+        
+        if (selectedTenants.length > 0) filters.tenantID = selectedTenants;
+        if (selectedFacilities.length > 0) filters.facilityID = selectedFacilities;
+        if (selectedCities.length > 0) filters.cityID = selectedCities;
+        
+        if (priceValue) {
+          filters.sortBy = 'price';
+          filters.sortOrder = priceValue === 'low-to-high' ? 'asc' : 'desc';
+        } else {
+          filters.sortBy = 'name';
+          filters.sortOrder = sortValue;
+        }
+        
+        if (searchTerm) {
+          filters.searchTerm = searchTerm;
+        }
+        
+        // Call fetchProperties explicitly after updating the state
+        setTimeout(() => {
+          fetchProperties();
+        }, 0);
+      }
+    }
   };
 
   const handleDateRangeChange = (range: {
@@ -390,7 +431,7 @@ export default function PropertyModel() {
     cities,
     loading,
     error,
-    selectedCategories,
+    selectedCategoryNames,
     selectedTenants,
     selectedFacilities,
     selectedCities,

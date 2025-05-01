@@ -39,7 +39,7 @@ export default function PropertyPage() {
     cities,
     loading,
     error,
-    selectedCategories,
+    selectedCategoryNames,
     selectedTenants,
     selectedFacilities,
     selectedCities,
@@ -197,9 +197,9 @@ export default function PropertyPage() {
                     Category
                   </span>
                 </div>
-                {selectedCategories.length > 0 && (
+                {selectedCategoryNames.length > 0 && (
                   <span className="ml-2 bg-primary text-white text-xs rounded-full px-2 py-0.5">
-                    {selectedCategories.length}
+                    {selectedCategoryNames.length}
                   </span>
                 )}
               </button>
@@ -288,18 +288,18 @@ export default function PropertyPage() {
                   <li
                     key={`m-category-${category.id}`}
                     className="flex items-center hover:text-blue-600 cursor-pointer"
-                    onClick={() => handleCategoryClick(category.id)}
+                    onClick={() => handleCategoryClick(category.name)}
                   >
                     <div
-                      className={`w-5 h-5 border rounded flex items-center justify-center mr-2 ${selectedCategories.includes(category.id) ? 'bg-primary border-primary' : 'border-gray-300'}`}
+                      className={`w-5 h-5 border rounded flex items-center justify-center mr-2 ${selectedCategoryNames.includes(category.name) ? 'bg-primary border-primary' : 'border-gray-300'}`}
                     >
-                      {selectedCategories.includes(category.id) && (
+                      {selectedCategoryNames.includes(category.name) && (
                         <FaCheck className="text-white text-xs" />
                       )}
                     </div>
                     <span
                       className={
-                        selectedCategories.includes(category.id)
+                        selectedCategoryNames.includes(category.name)
                           ? 'font-medium'
                           : ''
                       }
@@ -414,9 +414,9 @@ export default function PropertyPage() {
               <h2 className="font-bold mb-3 flex items-center">
                 <FaHotel className="text-gray-500 mr-2" size={18} />
                 Category
-                {selectedCategories.length > 0 && (
+                {selectedCategoryNames.length > 0 && (
                   <span className="ml-2 bg-primary text-white text-xs rounded-full px-2 py-0.5">
-                    {selectedCategories.length}
+                    {selectedCategoryNames.length}
                   </span>
                 )}
               </h2>
@@ -425,18 +425,18 @@ export default function PropertyPage() {
                   <li
                     key={`category-${category.id}`}
                     className="flex items-center hover:text-blue-600 cursor-pointer"
-                    onClick={() => handleCategoryClick(category.id)}
+                    onClick={() => handleCategoryClick(category.name)}
                   >
                     <div
-                      className={`w-5 h-5 border rounded flex items-center justify-center mr-2 ${selectedCategories.includes(category.id) ? 'bg-primary border-primary' : 'border-gray-300'}`}
+                      className={`w-5 h-5 border rounded flex items-center justify-center mr-2 ${selectedCategoryNames.includes(category.name) ? 'bg-primary border-primary' : 'border-gray-300'}`}
                     >
-                      {selectedCategories.includes(category.id) && (
+                      {selectedCategoryNames.includes(category.name) && (
                         <FaCheck className="text-white text-xs" />
                       )}
                     </div>
                     <span
                       className={
-                        selectedCategories.includes(category.id)
+                        selectedCategoryNames.includes(category.name)
                           ? 'font-medium'
                           : ''
                       }
@@ -677,7 +677,7 @@ export default function PropertyPage() {
                 properties.map((property) => (
                   <Link
                     key={`property-${property.id}`}
-                    href={`/property/${property.id}`}
+                    href={`/property/${property.slug}`}
                     className="bg-white border border-gray-200 shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow"
                   >
                     <div className="flex flex-col sm:flex-row">

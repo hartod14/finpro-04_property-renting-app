@@ -12,9 +12,9 @@ import { categorySeed } from './category.seed';
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.category.createMany({ data: categorySeed });
   await prisma.city.createMany({ data: citySeed });
   await prisma.user.createMany({ data: userSeed });
+  await prisma.category.createMany({ data: categorySeed });
   await prisma.property.createMany({ data: propertySeed });
   await prisma.room.createMany({ data: roomSeed });
   await prisma.facility.createMany({ data: facilitySeed });

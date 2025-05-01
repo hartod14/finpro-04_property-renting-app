@@ -30,11 +30,13 @@ export interface ITenant {
   id: number;
   name: string;
   email: string;
+  profile_picture: string;
 }
 
 export interface IProperty {
   id: number;
   name: string;
+  slug: string;
   description: string | null;
   address: string;
   checkin_time: string | null;

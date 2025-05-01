@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { IProperty, IRoom, IRoomImage } from '@/interfaces/property.interface';
 import { IFacility } from '@/interfaces/facility.interface';
-import { getPropertyById } from '@/handlers/property';
+import { getPropertyById, getPropertyBySlug } from '@/handlers/property';
 import { enhanceFacilitiesWithIcons } from '@/utils/facilityIcons';
 import React from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -15,7 +15,7 @@ export interface IFacilityWithIcon extends Omit<IFacility, 'icon'> {
 }
 
 export default function PropertyDetailModel(
-  propertyId: string | number | string[] | undefined,
+  propertySlug: string | string[] | undefined,
 ) {
   const searchParams = useSearchParams();
 
@@ -60,16 +60,16 @@ export default function PropertyDetailModel(
       try {
         setLoading(true);
 
-        let idValue: string | number;
-        if (typeof propertyId == 'string' || typeof propertyId == 'number') {
-          idValue = propertyId;
-        } else if (Array.isArray(propertyId) && propertyId.length > 0) {
-          idValue = propertyId[0];
+        let slugValue: string;
+        if (typeof propertySlug == 'string') {
+          slugValue = propertySlug;
+        } else if (Array.isArray(propertySlug) && propertySlug.length > 0) {
+          slugValue = propertySlug[0];
         } else {
-          throw new Error('Invalid property ID');
+          throw new Error('Invalid property slug');
         }
 
-        const data = await getPropertyById(Number(idValue));
+        const data = await getPropertyBySlug(slugValue);
 
         // Ensure each room has its facilities properly set
         if (data && data.rooms) {
@@ -101,10 +101,10 @@ export default function PropertyDetailModel(
       }
     };
 
-    if (propertyId) {
+    if (propertySlug) {
       fetchPropertyDetail();
     }
-  }, [propertyId]);
+  }, [propertySlug]);
 
   // Handle keyboard navigation for photo modals
   const handleKeyboardNavigation = () => {

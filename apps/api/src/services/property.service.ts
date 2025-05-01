@@ -6,6 +6,7 @@ class PropertyService {
   async getAllData(req: Request) {
     const {
       categoryID,
+      categoryName,
       tenantID,
       facilityID,
       cityID,
@@ -19,7 +20,6 @@ class PropertyService {
       limit = '15',
     } = req.query;
 
-    // Parse pagination parameters
     const pageNumber = parseInt(String(page), 10) || 1;
     const limitNumber = parseInt(String(limit), 10) || 15;
 
@@ -30,6 +30,14 @@ class PropertyService {
     if (categoryID) {
       const categoryIds = String(categoryID).split(',').map(Number);
       filters.category_id = { in: categoryIds };
+    }
+
+    if (categoryName) {
+      filters.category = {
+        name: {
+          in: String(categoryName).split(',')
+        }
+      };
     }
 
     if (tenantID) {
@@ -49,18 +57,17 @@ class PropertyService {
       ];
     }
 
-    // Get the total count for pagination
     const totalProperties = await prisma.property.count({
       where: filters,
     });
 
-    // Get properties with pagination
     const properties = await prisma.property.findMany({
       where: filters,
       include: {
         rooms: {
           where: {
             deleted_at: null,
+            ...(capacity ? { capacity: { gte: Number(capacity) } } : {}),
           },
           orderBy: {
             base_price: 'asc',
@@ -91,8 +98,7 @@ class PropertyService {
       ...pagination(pageNumber, limitNumber),
     });
 
-    // Post-process for filters that can't be done directly in Prisma
-    let filteredProperties = properties;
+    let filteredProperties = properties.filter(property => property.rooms.length > 0);
 
     if (facilityID) {
       const facilityIds = String(facilityID).split(',').map(Number);
@@ -117,30 +123,27 @@ class PropertyService {
       });
     }
 
-    if (capacity) {
-      const requiredCapacity = Number(capacity);
-      filteredProperties = filteredProperties.filter((property) => {
-        return property.rooms.some((room) => room.capacity >= requiredCapacity);
-      });
-    }
-
-    // Sort by price (can't be done directly in Prisma with our model)
     if (sortBy === 'price') {
       filteredProperties.sort((a, b) => {
-        const aPrice =
-          a.rooms.length > 0
-            ? Number(a.rooms[0].base_price)
-            : Number.MAX_SAFE_INTEGER;
-        const bPrice =
-          b.rooms.length > 0
-            ? Number(b.rooms[0].base_price)
-            : Number.MAX_SAFE_INTEGER;
+        const aRooms = capacity 
+          ? a.rooms.filter(room => room.capacity >= Number(capacity))
+          : a.rooms;
+        
+        const bRooms = capacity
+          ? b.rooms.filter(room => room.capacity >= Number(capacity))
+          : b.rooms;
+
+        const aPrice = aRooms.length > 0
+          ? Number(aRooms[0].base_price)
+          : Number.MAX_SAFE_INTEGER;
+        
+        const bPrice = bRooms.length > 0
+          ? Number(bRooms[0].base_price)
+          : Number.MAX_SAFE_INTEGER;
 
         return sortOrder === 'asc' ? aPrice - bPrice : bPrice - aPrice;
       });
     }
-
-    // Format properties for response
     const formattedProperties = filteredProperties.map((property) => {
       let lowestPriceRoom = null;
 
@@ -163,6 +166,7 @@ class PropertyService {
       return {
         id: property.id,
         name: property.name,
+        slug: property.slug,
         description: property.description,
         address: property.address,
         checkin_time: property.checkin_time,
@@ -173,6 +177,7 @@ class PropertyService {
           id: property.tenant.id,
           name: property.tenant.name,
           email: property.tenant.email,
+          profile_picture: property.tenant.profile_picture,
         },
         facilities: property.propertyHasFacilities.map((pf) => pf.facility),
         images: property.propertyImages,
@@ -193,12 +198,14 @@ class PropertyService {
       };
     });
 
-    // Return pagination metadata with the data
+    // Calculate the accurate total count of filteredProperties to fix pagination display
+    const filteredTotalCount = filteredProperties.length > 0 ? filteredProperties.length : 0;
+
     return {
       properties: formattedProperties,
       pagination: {
-        total: totalProperties,
-        totalPage: Math.ceil(totalProperties / limitNumber),
+        total: filteredTotalCount,
+        totalPage: Math.ceil(filteredTotalCount / limitNumber),
         page: pageNumber,
         limit: limitNumber,
       },
@@ -206,7 +213,6 @@ class PropertyService {
   }
 
   async getPropertyById(id: number) {
-    // Get property with all related data
     const property = await prisma.property.findUnique({
       where: {
         id,
@@ -242,10 +248,10 @@ class PropertyService {
       throw new Error('Property not found');
     }
 
-    // Format the data for the frontend
     return {
       id: property.id,
       name: property.name,
+      slug: property.slug,
       description: property.description,
       address: property.address,
       checkin_time: property.checkin_time,
@@ -256,6 +262,7 @@ class PropertyService {
         id: property.tenant.id,
         name: property.tenant.name,
         email: property.tenant.email,
+        profile_picture: property.tenant.profile_picture,
       },
       facilities: property.propertyHasFacilities.map((pf) => ({
         ...pf.facility,
@@ -277,6 +284,145 @@ class PropertyService {
         images: room.RoomImage,
       })),
     };
+  }
+
+  async getPropertyBySlug(slug: string) {
+    const property = await prisma.property.findUnique({
+      where: {
+        slug,
+        deleted_at: null,
+      },
+      include: {
+        rooms: {
+          where: {
+            deleted_at: null,
+          },
+          include: {
+            roomHasFacilities: {
+              include: {
+                facility: true,
+              },
+            },
+            RoomImage: true,
+          },
+        },
+        propertyHasFacilities: {
+          include: {
+            facility: true,
+          },
+        },
+        category: true,
+        city: true,
+        tenant: true,
+        propertyImages: true,
+      },
+    });
+
+    if (!property) {
+      throw new Error('Property not found');
+    }
+
+    return {
+      id: property.id,
+      name: property.name,
+      slug: property.slug,
+      description: property.description,
+      address: property.address,
+      checkin_time: property.checkin_time,
+      checkout_time: property.checkout_time,
+      category: property.category,
+      city: property.city,
+      tenant: {
+        id: property.tenant.id,
+        name: property.tenant.name,
+        email: property.tenant.email,
+        profile_picture: property.tenant.profile_picture,
+      },
+      facilities: property.propertyHasFacilities.map((pf) => ({
+        ...pf.facility,
+        type: 'PROPERTY',
+      })),
+      images: property.propertyImages,
+      rooms: property.rooms.map((room) => ({
+        id: room.id,
+        name: room.name,
+        base_price: room.base_price,
+        description: room.description,
+        capacity: room.capacity,
+        size: room.size,
+        total_room: room.total_room,
+        facilities: room.roomHasFacilities.map((rf) => ({
+          ...rf.facility,
+          type: 'ROOM',
+        })),
+        images: room.RoomImage,
+      })),
+    };
+  }
+
+  async getRecommendedProperties(req: Request) {
+    const { limit = '6', cityID, categoryID } = req.query;
+    const limitNumber = parseInt(String(limit), 10) || 6;
+
+    const filters: any = {
+      deleted_at: null,
+    };
+
+    if (cityID) {
+      const cityIds = String(cityID).split(',').map(Number);
+      filters.city_id = { in: cityIds };
+    }
+
+    if (categoryID) {
+      const categoryIds = String(categoryID).split(',').map(Number);
+      filters.category_id = { in: categoryIds };
+    }
+
+    const properties = await prisma.property.findMany({
+      where: filters,
+      include: {
+        rooms: {
+          where: {
+            deleted_at: null,
+          },
+          orderBy: {
+            base_price: 'asc',
+          },
+          include: {
+            RoomImage: true,
+          },
+          take: 1,
+        },
+        category: true,
+        city: true,
+        propertyImages: {
+          take: 1,
+        },
+      },
+      orderBy: { id: 'desc' }, // Get newest properties
+      take: limitNumber,
+    });
+
+    const formattedProperties = properties.map((property) => {
+      const lowestPriceRoom =
+        property.rooms.length > 0 ? property.rooms[0] : null;
+
+      return {
+        id: property.id,
+        name: property.name,
+        slug: property.slug,
+        address: property.address,
+        category: property.category,
+        city: property.city,
+        image:
+          property.propertyImages.length > 0
+            ? property.propertyImages[0]
+            : null,
+        lowestPrice: lowestPriceRoom ? lowestPriceRoom.base_price : null,
+      };
+    });
+
+    return formattedProperties;
   }
 }
 

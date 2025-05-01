@@ -9,17 +9,15 @@ import 'swiper/css/pagination';
 import { Navigation, Pagination } from 'swiper/modules';
 import Button from '../common/button/button';
 import { useEffect, useState } from 'react';
-import { getAllProperty } from '@/handlers/property';
 import { getAllCity } from '@/handlers/city';
 import { ICity } from '@/interfaces/city.interface';
-import { IProperty } from '@/interfaces/property.interface';
-
+import PropertyRecommendationModel from '@/models/property/propertyRecommendationModel';
+import { FaMapMarkerAlt } from 'react-icons/fa';
 
 export default function HotelRecommendation() {
   const [cities, setCities] = useState<ICity[]>([]);
-  const [properties, setProperties] = useState<IProperty[]>([]);
   const [selectedCityId, setSelectedCityId] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { properties, loading, error, updateParams } = PropertyRecommendationModel({ limit: 8 });
 
   // Fetch cities
   useEffect(() => {
@@ -31,6 +29,7 @@ export default function HotelRecommendation() {
         // Set the first city as default selected
         if (cityData.length > 0) {
           setSelectedCityId(cityData[0].id);
+          updateParams({ cityID: [cityData[0].id] });
         }
       } catch (error) {
         console.error('Error fetching cities:', error);
@@ -40,33 +39,9 @@ export default function HotelRecommendation() {
     fetchCities();
   }, []);
 
-  // Fetch properties when selected city changes
-  useEffect(() => {
-    const fetchProperties = async () => {
-      if (!selectedCityId) return;
-      
-      setLoading(true);
-      try {
-        const filters = {
-          cityID: [selectedCityId],
-          limit: 8
-        };
-        
-        const data = await getAllProperty(filters);
-        setProperties(data.properties);
-        console.log('Fetched properties:', data.properties);
-      } catch (error) {
-        console.error('Error fetching properties:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProperties();
-  }, [selectedCityId]);
-
   const handleCityClick = (cityId: number) => {
     setSelectedCityId(cityId);
+    updateParams({ cityID: [cityId] });
   };
 
   return (
@@ -91,8 +66,10 @@ export default function HotelRecommendation() {
       </div>
       
       {loading ? (
-        <div className="flex justify-center py-10">
-          <p>Loading properties...</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 py-10">
+          {[...Array(4)].map((_, index) => (
+            <div key={index} className="bg-gray-100 animate-pulse h-64 rounded-lg"></div>
+          ))}
         </div>
       ) : (
         <Swiper
@@ -114,11 +91,11 @@ export default function HotelRecommendation() {
                 key={property.id}
                 className="bg-white border border-gray-200 shadow-lg rounded-lg w-[250px]"
               >
-                <Link href={`/property/${property.id}`} className="">
+                <Link href={`/property/${property.slug}`} className="">
                   <figure>
                     <Image
-                      src={property.images && property.images.length > 0 && property.images[0].path
-                        ? property.images[0].path 
+                      src={property.image && property.image.path
+                        ? property.image.path 
                         : '/homepage/kuta-bali.png'}
                       alt={property.name}
                       width={480}
@@ -127,15 +104,15 @@ export default function HotelRecommendation() {
                     />
                   </figure>
                   <div className="">
-                    <p className="text-xs text-black bg-blue-50 py-1 px-2">
-                      {property.lowestPriceRoom 
-                        ? `${property.lowestPriceRoom.total_room} Room • ${property.lowestPriceRoom.capacity} Guests • ${property.lowestPriceRoom.size}m²` 
-                        : '1 Room • 2 Guests'}
-                    </p>
                     <div className="p-2">
-                      <p className="text-gray-400 text-sm ">{property.category.name}</p>
+                      <span className="inline-block bg-primary/10 text-primary text-xs px-2 py-1 rounded-xl mb-1">
+                        {property.category.name}
+                      </span>
                       <p className="font-semibold">{property.name}</p>
-                      <p className="text-gray-400 text-sm">{property.city.name}</p>
+                      <div className="flex items-center text-gray-500 text-sm mt-1">
+                        <FaMapMarkerAlt className="mr-1" />
+                        <span>{property.city.name}</span>
+                      </div>
                       <div className="flex items-center gap-1 text-sm mt-2 text-gray-400">
                         <div>
                           <Image
@@ -151,14 +128,16 @@ export default function HotelRecommendation() {
                         </div>
                         <div className="pt-2">(104 reviews)</div>
                       </div>
-                      <p className="text-primary font-bold text-lg mt-5">
-                        {property.lowestPriceRoom 
-                          ? `IDR ${Number(property.lowestPriceRoom.base_price).toLocaleString('id-ID')}` 
-                          : 'Price unavailable'}
-                      </p>
-                      <p className="text-gray-400 text-xs">
-                        not including tax and fees
-                      </p>
+                      {property.lowestPrice && (
+                        <>
+                          <p className="text-primary font-bold text-lg mt-5">
+                            IDR {Number(property.lowestPrice).toLocaleString('id-ID')}
+                          </p>
+                          <p className="text-gray-400 text-xs">
+                            not including tax and fees
+                          </p>
+                        </>
+                      )}
                     </div>
                   </div>
                 </Link>
