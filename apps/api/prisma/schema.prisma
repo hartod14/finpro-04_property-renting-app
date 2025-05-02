@@ -58,6 +58,7 @@ model User {
   userReviews   Review[]   @relation(name: "UserReviews")
   tenantReplies Review[]   @relation(name: "TenantReplies")
   Booking       Booking[]
+  Category      Category[]
 
   @@map("users")
 }
@@ -73,12 +74,14 @@ model City {
 
 model Category {
   id         Int       @id @default(autoincrement())
+  tenant_id  Int?
   name       String
   created_at DateTime  @default(now())
   updated_at DateTime? @updatedAt
   deleted_at DateTime?
 
   properties Property[]
+  tenant     User?      @relation(fields: [tenant_id], references: [id])
 
   @@map("categories")
 }
@@ -113,6 +116,7 @@ model Property {
   category_id   Int
   city_id       Int
   name          String
+  slug          String?   @unique @db.Text
   description   String?   @db.Text
   address       String    @db.Text
   checkin_time  DateTime? @db.Time()
@@ -260,7 +264,7 @@ model Payment {
   id           Int           @id @default(autoincrement())
   amount       Decimal       @db.Decimal(15, 2)
   method       PaymentMethod
-  proof        Bytes?    
+  proof        Bytes?
   payment_date DateTime?
   created_at   DateTime      @default(now())
   updated_at   DateTime?     @updatedAt

@@ -11,7 +11,6 @@ import { IFacility } from '@/interfaces/facility.interface';
 import { useSearchParams } from 'next/navigation';
 
 export default function PropertyModel() {
-  // Get search parameters from URL
   const searchParams = useSearchParams();
 
   type FilterName = 'category' | 'propertyName' | 'facility' | 'city';
@@ -37,32 +36,35 @@ export default function PropertyModel() {
   const [properties, setProperties] = useState<IProperty[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
+
   // Pagination states
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  
+
   // Get search term from URL or use default
-  const [searchTerm, setSearchTerm] = useState(searchParams.get('searchTerm') || '');
+  const [searchTerm, setSearchTerm] = useState(
+    searchParams.get('searchTerm') || '',
+  );
   const [searchLocation, setSearchLocation] = useState('');
   const [searchDate, setSearchDate] = useState('');
-  const [searchAdults, setSearchAdults] = useState(searchParams.get('capacity') || '2');
-  
+  const [searchAdults, setSearchAdults] = useState(
+    searchParams.get('capacity') || '2',
+  );
+
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
-  
-  // Parse dates from URL params if available
-  const checkInDate = searchParams.get('checkInDate') 
-    ? new Date(searchParams.get('checkInDate') as string) 
+
+  const checkInDate = searchParams.get('checkInDate')
+    ? new Date(searchParams.get('checkInDate') as string)
     : today;
-  
-  const checkOutDate = searchParams.get('checkOutDate') 
-    ? new Date(searchParams.get('checkOutDate') as string) 
+
+  const checkOutDate = searchParams.get('checkOutDate')
+    ? new Date(searchParams.get('checkOutDate') as string)
     : tomorrow;
-  
+
   const [dateRange, setDateRange] = useState<{
     from: Date | undefined;
     to: Date | undefined;
@@ -71,7 +73,7 @@ export default function PropertyModel() {
     to: checkOutDate,
   });
 
-  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+  const [selectedCategoryNames, setSelectedCategoryNames] = useState<string[]>([]);
   const [selectedTenants, setSelectedTenants] = useState<number[]>([]);
   const [selectedFacilities, setSelectedFacilities] = useState<number[]>([]);
   const [selectedCities, setSelectedCities] = useState<number[]>([]);
@@ -85,12 +87,16 @@ export default function PropertyModel() {
   const fetchProperties = async () => {
     try {
       const filters: PropertyFilterParams = {};
+
+      if (selectedCategoryNames.length > 0) {
+        filters.categoryName = selectedCategoryNames;
+      }
       
-      if (selectedCategories.length > 0) filters.categoryID = selectedCategories;
       if (selectedTenants.length > 0) filters.tenantID = selectedTenants;
-      if (selectedFacilities.length > 0) filters.facilityID = selectedFacilities;
+      if (selectedFacilities.length > 0)
+        filters.facilityID = selectedFacilities;
       if (selectedCities.length > 0) filters.cityID = selectedCities;
-      
+
       if (priceValue) {
         filters.sortBy = 'price';
         filters.sortOrder = priceValue === 'low-to-high' ? 'asc' : 'desc';
@@ -98,34 +104,33 @@ export default function PropertyModel() {
         filters.sortBy = 'name';
         filters.sortOrder = sortValue;
       }
-                  
+
       if (searchTerm) {
         filters.searchTerm = searchTerm;
       }
-      
+
       if (dateRange.from) {
         filters.checkInDate = dateRange.from.toISOString();
       }
-      
+
       if (dateRange.to) {
         filters.checkOutDate = dateRange.to.toISOString();
       }
-      
+
       if (searchAdults && searchAdults !== '') {
         filters.capacity = parseInt(searchAdults);
       }
-      
+
       // Add pagination parameters
       filters.page = page;
       filters.limit = limit;
-      
+
       const data = await getAllProperty(filters);
-      
+
       // Update properties and pagination data
       setProperties(data.properties);
       setTotalItems(data.pagination.total);
       setTotalPages(data.pagination.totalPage);
-      
     } catch (err) {
       setError('Failed to load properties. Please try again later.');
     }
@@ -140,9 +145,9 @@ export default function PropertyModel() {
           getCityList(),
           getCategoryList(),
           getTenantList(),
-          getFacilityList()
+          getFacilityList(),
         ]);
-        
+
         // Fetch properties after filters are loaded
         await fetchProperties();
       } catch (err) {
@@ -160,7 +165,16 @@ export default function PropertyModel() {
     if (!loading) {
       fetchProperties();
     }
-  }, [selectedCategories, selectedTenants, selectedFacilities, selectedCities, sortValue, priceValue, page, limit]);
+  }, [
+    selectedCategoryNames,
+    selectedTenants,
+    selectedFacilities,
+    selectedCities,
+    sortValue,
+    priceValue,
+    page,
+    limit,
+  ]);
 
   useEffect(() => {
     if (!loading && properties.length === 0) {
@@ -171,7 +185,16 @@ export default function PropertyModel() {
   // Reset page when search or filters change
   useEffect(() => {
     setPage(1);
-  }, [selectedCategories, selectedTenants, selectedFacilities, selectedCities, sortValue, priceValue, searchTerm, searchAdults]);
+  }, [
+    selectedCategoryNames,
+    selectedTenants,
+    selectedFacilities,
+    selectedCities,
+    sortValue,
+    priceValue,
+    searchTerm,
+    searchAdults,
+  ]);
 
   async function getCityList() {
     const cities = await getAllCity();
@@ -200,8 +223,75 @@ export default function PropertyModel() {
     });
   };
 
+  // Handle click outside for dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      // Handle guest dropdown
+      const guestDropdown = document.getElementById('guestDropdown');
+      const guestButton = document.getElementById('guestButton');
+
+      if (
+        guestDropdown &&
+        !guestDropdown.classList.contains('hidden') &&
+        event.target instanceof Node &&
+        !guestDropdown.contains(event.target) &&
+        guestButton &&
+        !guestButton.contains(event.target)
+      ) {
+        guestDropdown.classList.add('hidden');
+      }
+
+      // Handle sort dropdown
+      const sortElement = sortRef.current;
+      if (
+        sortElement &&
+        openDropdown.sort &&
+        event.target instanceof Node &&
+        !sortElement.contains(event.target)
+      ) {
+        toggleDropdown('sort');
+      }
+
+      // Handle price dropdown
+      const priceElement = priceRef.current;
+      if (
+        priceElement &&
+        openDropdown.price &&
+        event.target instanceof Node &&
+        !priceElement.contains(event.target)
+      ) {
+        toggleDropdown('price');
+      }
+
+      // Handle filter sections
+      if (event.target instanceof Node) {
+        const isFilterButton = (event.target as Element).closest(
+          '[data-filter-button]',
+        );
+        const isFilterSection = (event.target as Element).closest(
+          '[data-filter-section]',
+        );
+
+        if (!isFilterButton && !isFilterSection) {
+          setOpenFilters({
+            category: false,
+            propertyName: false,
+            facility: false,
+            city: false,
+          });
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [openDropdown, toggleDropdown]);
+
   const toggleFilter = (name: FilterName) => {
-    setOpenFilters(prev => ({
+    setOpenFilters((prev) => ({
       category: name === 'category' ? !prev.category : false,
       propertyName: name === 'propertyName' ? !prev.propertyName : false,
       facility: name === 'facility' ? !prev.facility : false,
@@ -211,7 +301,7 @@ export default function PropertyModel() {
 
   const handleSortClick = (direction: SortDirection) => {
     setSortValue(direction);
-    setPriceValue(null as any); 
+    setPriceValue(null as any);
     setOpenDropdown((prev) => ({ ...prev, sort: false }));
   };
 
@@ -220,30 +310,38 @@ export default function PropertyModel() {
     setOpenDropdown((prev) => ({ ...prev, price: false }));
   };
 
-  const handleCategoryClick = (categoryId: number) => {
-    setSelectedCategories(prev => {
-      if (prev.includes(categoryId)) {
-        return prev.filter(id => id !== categoryId);
+  const handleCategoryClick = (categoryName: string) => {
+    setSelectedCategoryNames((prev) => {
+      if (prev.includes(categoryName)) {
+        return prev.filter(name => name !== categoryName);
       } else {
-        return [...prev, categoryId];
+        return [...prev, categoryName];
       }
     });
   };
 
   const handleTenantClick = (tenantId: number) => {
-    setSelectedTenants(prev => {
+    setSelectedTenants((prev) => {
       if (prev.includes(tenantId)) {
-        return prev.filter(id => id !== tenantId);
+        return prev.filter((id) => id !== tenantId);
       } else {
         return [...prev, tenantId];
       }
     });
   };
 
+  const handleDateRangePickerChange = (dates: [Date | null, Date | null]) => {
+    const [start, end] = dates;
+    handleDateRangeChange({
+      from: start || undefined,
+      to: end || undefined,
+    });
+  };
+
   const handleFacilityClick = (facilityId: number) => {
-    setSelectedFacilities(prev => {
+    setSelectedFacilities((prev) => {
       if (prev.includes(facilityId)) {
-        return prev.filter(id => id !== facilityId);
+        return prev.filter((id) => id !== facilityId);
       } else {
         return [...prev, facilityId];
       }
@@ -251,32 +349,74 @@ export default function PropertyModel() {
   };
 
   const handleCityClick = (cityId: number) => {
-    setSelectedCities(prev => {
+    setSelectedCities((prev) => {
       if (prev.includes(cityId)) {
-        return prev.filter(id => id !== cityId);
+        return prev.filter((id) => id !== cityId);
       } else {
         return [...prev, cityId];
       }
     });
   };
-  
+
   // Search handling functions
   const handleSearchTermChange = (value: string) => {
     setSearchTerm(value);
   };
-  
+
   const handleDateChange = (value: string) => {
     setSearchDate(value);
   };
-  
+
   const handleAdultsChange = (value: string) => {
     setSearchAdults(value);
+    // When capacity changes, we should also update the page to 1
+    setPage(1);
+    // Fetch properties with new capacity immediately to fix filtering issue
+    if (value && value !== '') {
+      const parsedValue = parseInt(value);
+      if (!isNaN(parsedValue)) {
+        const filters: PropertyFilterParams = {
+          capacity: parsedValue,
+          page: 1,
+          limit: limit
+        };
+        
+        // Include any current active filters
+        if (selectedCategoryNames.length > 0) {
+          filters.categoryName = selectedCategoryNames;
+        }
+        
+        if (selectedTenants.length > 0) filters.tenantID = selectedTenants;
+        if (selectedFacilities.length > 0) filters.facilityID = selectedFacilities;
+        if (selectedCities.length > 0) filters.cityID = selectedCities;
+        
+        if (priceValue) {
+          filters.sortBy = 'price';
+          filters.sortOrder = priceValue === 'low-to-high' ? 'asc' : 'desc';
+        } else {
+          filters.sortBy = 'name';
+          filters.sortOrder = sortValue;
+        }
+        
+        if (searchTerm) {
+          filters.searchTerm = searchTerm;
+        }
+        
+        // Call fetchProperties explicitly after updating the state
+        setTimeout(() => {
+          fetchProperties();
+        }, 0);
+      }
+    }
   };
-  
-  const handleDateRangeChange = (range: { from: Date | undefined; to: Date | undefined }) => {
+
+  const handleDateRangeChange = (range: {
+    from: Date | undefined;
+    to: Date | undefined;
+  }) => {
     setDateRange(range);
   };
-  
+
   const handleSearch = () => {
     setPage(1);
     fetchProperties();
@@ -291,7 +431,7 @@ export default function PropertyModel() {
     cities,
     loading,
     error,
-    selectedCategories,
+    selectedCategoryNames,
     selectedTenants,
     selectedFacilities,
     selectedCities,
@@ -317,6 +457,7 @@ export default function PropertyModel() {
     handleSearch,
     dateRange,
     handleDateRangeChange,
+    handleDateRangePickerChange,
     setOpenFilters,
     // Pagination props
     page,

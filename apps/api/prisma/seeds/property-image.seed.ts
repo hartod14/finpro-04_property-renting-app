@@ -301,4 +301,154 @@ export const propertyImageSeed: Prisma.PropertyImageCreateManyInput[] = [
     property_id: 30,
     path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1744449939/aac4928f-5ec4-465a-affc-27ae9a8d489a.png',
   },
+  {
+    id: 61,
+    property_id: 1,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 62,
+    property_id: 2,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 63,
+    property_id: 3,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 64,
+    property_id: 4,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 65,
+    property_id: 5,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 66,
+    property_id: 6,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 67,
+    property_id: 7,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 68,
+    property_id: 8,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 69,
+    property_id: 9,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 70,
+    property_id: 10,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 71,
+    property_id: 11,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 72,
+    property_id: 12,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 73,
+    property_id: 13,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 74,
+    property_id: 14,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 75,
+    property_id: 15,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 76,
+    property_id: 16,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 77,
+    property_id: 17,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 78,
+    property_id: 18,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 79,
+    property_id: 19,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 80,
+    property_id: 20,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 81,
+    property_id: 21,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 82,
+    property_id: 22,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 83,
+    property_id: 23,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 84,
+    property_id: 24,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 85,
+    property_id: 25,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 86,
+    property_id: 26,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 87,
+    property_id: 27,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 88,
+    property_id: 28,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 89,
+    property_id: 29,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
+  {
+    id: 90,
+    property_id: 30,
+    path: 'https://res.cloudinary.com/dv1ehfskz/image/upload/v1745979835/afnxfqhyioecyfi3puf8.jpg',
+  },
 ];

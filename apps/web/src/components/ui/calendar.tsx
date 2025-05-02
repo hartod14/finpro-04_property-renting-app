@@ -69,8 +69,8 @@ export function DateRangePicker({
   };
   
   return (
-    <div className={`relative flex items-center w-full ${className}`}>
-      <div className="w-8 h-8 bg-gray-100 rounded-full absolute left-2 flex items-center justify-center text-gray-500 z-10">
+    <div className={`relative flex items-center w-full ${className} ` } >
+      <div className="w-8 h-8 bg-gray-100 rounded-full absolute  flex items-center justify-center text-primary z-10">
         <FaCalendarAlt size={14} />
       </div>
       <DatePicker
