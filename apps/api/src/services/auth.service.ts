@@ -14,6 +14,7 @@ import {
   decodeVerificationJwt,
   verificationJwt,
 } from '@/helpers/verification.jwt';
+import { decode } from 'jsonwebtoken';
 
 interface AuthenticatedRequest extends Request {
   user?: IUserLogin;
@@ -425,7 +426,7 @@ class AuthService {
       where: { email: email },
     });
     if (emailExist) throw new ErrorHandler('Email already exists', 400);
-    
+
     await prisma.user.update({
       where: { email: user.email },
       data: {

@@ -74,14 +74,14 @@ model City {
 
 model Category {
   id         Int       @id @default(autoincrement())
-  tenant_id  Int?
+  tenant_id  Int
   name       String
   created_at DateTime  @default(now())
   updated_at DateTime? @updatedAt
   deleted_at DateTime?
 
   properties Property[]
-  tenant     User?      @relation(fields: [tenant_id], references: [id])
+  tenant     User       @relation(fields: [tenant_id], references: [id])
 
   @@map("categories")
 }

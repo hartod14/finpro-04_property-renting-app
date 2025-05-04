@@ -219,3 +219,17 @@ export const updateChangeEmail = async (token: string, values: any) => {
     { body: values, contentType: 'application/json' },
   ).catch((err) => (err instanceof Error ? { error: err.message } : err));
 };
+
+export const getAuth = async () => {
+  const cookie = cookies();
+  const token = (await cookie).get('next-auth.session-token')?.value;
+  const decoded = await decode({
+    token: String(token),
+    secret: auth_secret,
+    salt: 'next-auth.session-token',
+  });
+
+  return decoded;
+};
+
+

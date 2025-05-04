@@ -2,45 +2,33 @@ import React from 'react'
 
 type props = {
     setPage: React.Dispatch<React.SetStateAction<number>>
-    setLimit?: React.Dispatch<React.SetStateAction<number>>
+    setLimit: React.Dispatch<React.SetStateAction<number>>
     page: number
     max?: any
     total: any
-    limit?: number
+    limit: number
     setLoading?: any
     totalPerPage?: any
     totalPage?: any
 }
 
-export const PaginationTable: React.FC<props> = props => {
+export const PanelPagination: React.FC<props> = props => {
     const { setPage, setLimit, page, totalPerPage, max, total, limit, setLoading, totalPage } = props
 
-    // Helper function to scroll to top of page
-    const scrollToTop = () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    }
+    const safeNumber = (value: any, defaultValue: number = 0): number => {
+        return typeof value === 'number' && !isNaN(value) ? value : defaultValue;
+    };
 
-    // Calculate current page display count
-    const getDisplayedCount = () => {
-        if (!limit) return total;
-        const itemsOnCurrentPage = page === totalPage 
-            ? total - (totalPage - 1) * limit 
-            : limit;
-        return Math.min(itemsOnCurrentPage, total);
-    }
-
+    const safeTotalPage = safeNumber(totalPage, 1);
+    
     const next = () => {
-        if (totalPage > 1 && totalPage > page) {
+        if (safeTotalPage > 1 && safeTotalPage > page) {
             if (setLoading) {
                 setLoading(true)
                 setPage(page + 1)
             } else {
                 setPage(page + 1)
             }
-            scrollToTop();
         }
     }
 
@@ -52,7 +40,6 @@ export const PaginationTable: React.FC<props> = props => {
             } else {
                 setPage(page - 1)
             }
-            scrollToTop();
         } else {
             setPage(page - 1)
         }
@@ -60,41 +47,48 @@ export const PaginationTable: React.FC<props> = props => {
 
     const jumpToPage = (n: number) => {
         setPage(n)
-        scrollToTop();
     }
 
     const generatePages = () => {
         let pages: (number | string)[] = [];
         const range = 2;
 
-        if (totalPage <= 7) {
-            pages = Array.from({ length: totalPage }, (_, i) => i + 1);
+            if (safeTotalPage <= 7) {
+            pages = Array.from({ length: safeTotalPage }, (_, i) => i + 1);
         } else {
             pages.push(1);
             if (page > range + 2) pages.push("...");
 
-            for (let i = Math.max(2, page - range); i <= Math.min(totalPage - 1, page + range); i++) {
+            for (let i = Math.max(2, page - range); i <= Math.min(safeTotalPage - 1, page + range); i++) {
                 pages.push(i);
             }
 
-            if (page < totalPage - range - 1) pages.push("...");
-            pages.push(totalPage);
+            if (page < safeTotalPage - range - 1) pages.push("...");
+            pages.push(safeTotalPage);
         }
 
         return pages;
     };
 
     return (
-        <div className="flex justify-center items-center gap-2">
-            <div className='flex gap-2 items-center'>
-                <div>
-                    <p className="pr-2">Page <span className='font-semibold'>{page}</span> of <span className='font-semibold'>{totalPage}</span> • <span className='font-semibold'>{total}</span> Results</p>
+        <div className="flex justify-between items-center gap-2">
+            <div className='flex items-center gap-2'>
+                <span className='mb-1'>Results per page</span>
+                <select onChange={(e) => setLimit(Number(e.target.value))} defaultValue={"15"} className="px-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                    <option value="5">5</option>
+                    <option value="15">15</option>
+                    <option value="30">30</option>
+                </select>
+            </div>
+            <div className='flex gap-1'>
+                <div className=''>
+                    <p className="pr-2">Showing <span className='font-semibold'>{safeNumber(page, 1)}</span> to <span className='font-semibold'>{safeTotalPage}</span> of <span className='font-semibold'>{safeNumber(total, 0)}</span> Entries</p>
                 </div>
 
                 <button
                     onClick={prev}
                     disabled={page > 1 ? false : true}
-                    className={`focus:outline-none disabled:cursor-not-allowed w-8 h-8 flex justify-center items-center rounded-lg ${page > 1 ? 'bg-primary' : 'bg-[#C8CED5]'
+                    className={`focus:outline-none disabled:cursor-not-allowed w-8 h-8  flex justify-center items-center rounded-lg ${page > 1 ? 'bg-blue-900' : 'bg-[#C8CED5]'
                         }`}
                 >
                     <svg width="11" height="19" viewBox="0 0 13 21" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -109,17 +103,17 @@ export const PaginationTable: React.FC<props> = props => {
                         key={index}
                         onClick={() => typeof p === "number" && jumpToPage(p)}
                         className={`cursor-pointer w-8 h-8 flex justify-center items-center font-semibold rounded-lg border-2 ${p === page
-                            ? "bg-primary text-white border-secondary"
+                            ? "bg-blue-800 text-white border-secondary"
                             : "bg-white border-[#DFE3E8]"
                             }`}
                     >
-                        {p}
+                        {String(p)}
                     </span>
                 ))}
                 <button
-                    disabled={totalPage > 1 && totalPage > page ? false : true}
+                    disabled={safeTotalPage > 1 && safeTotalPage > page ? false : true}
                     onClick={next}
-                    className={`focus:outline-none w-8 h-8 disabled:cursor-not-allowed flex justify-center items-center rounded-lg ${totalPage > 1 && totalPage > page ? 'bg-primary' : 'bg-[#C8CED5]'
+                    className={`focus:outline-none w-8 h-8 disabled:cursor-not-allowed flex justify-center items-center rounded-lg ${safeTotalPage > 1 && safeTotalPage > page ? 'bg-blue-900' : 'bg-[#C8CED5]'
                         }`}
                 >
                     <svg width="11" height="19" viewBox="0 0 13 21" fill="none" xmlns="http://www.w3.org/2000/svg">

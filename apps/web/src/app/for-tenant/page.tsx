@@ -55,15 +55,17 @@ export default function TenantPage() {
                 </li>
               </ul>
 
-              <Link href={'/auth/tenant/register'}>
-                <Button
-                  name="Get Started now"
-                  color="primaryOrange"
-                  textColor="white"
-                  icon={<FaArrowRight />}
-                  iconPosition="after"
-                />
-              </Link>
+              <div className="flex">
+                <Link href={'/auth/tenant/register'}>
+                  <Button
+                    name="Get Started now"
+                    color="primaryOrange"
+                    textColor="white"
+                    icon={<FaArrowRight />}
+                    iconPosition="after"
+                  />
+                </Link>
+              </div>
             </div>
           </div>
         </div>
