@@ -15,6 +15,7 @@ import { ErrorHandler } from './helpers/response.handler';
 import { uploadRouter } from './routers/upload.router';
 // import { SampleRouter } from './routers/sample.router';
 import { UserTransactionRouter } from './routers/user-transactions.routes';
+import { TenantTransactionRouter } from './routers/tenant-transaction-management.routes';
 
 export default class App {
   private app: Application;
@@ -51,6 +52,7 @@ export default class App {
   private routes(): void {
     // const sampleRouter = new SampleRouter();
     const usertransactionRouter = new UserTransactionRouter();
+    const tenantTransactionManagementRouter = new TenantTransactionRouter();
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
@@ -62,6 +64,7 @@ export default class App {
 
     // this.app.use('/api/samples', sampleRouter.getRouter());
     this.app.use('/api', usertransactionRouter.getRouter());
+    this.app.use('/api', tenantTransactionManagementRouter.getRouter());
   }
 
   public start(): void {
