@@ -31,6 +31,7 @@ export default function UserAccountPage() {
     update,
     handleChangeEmail,
   } = UserAccountModel();
+  
   return (
     <div>
       {initialValues && (

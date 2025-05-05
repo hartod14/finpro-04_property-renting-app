@@ -3,9 +3,7 @@
 import { api } from './_api';
 import { cookies } from 'next/headers';
 import { decode } from 'next-auth/jwt';
-import { log } from 'console';
 import { auth_secret } from '@/helpers/config';
-import { get } from 'http';
 
 export const login = async (credentials: Partial<Record<string, unknown>>) => {
   const res = await api('/auth', 'POST', {
