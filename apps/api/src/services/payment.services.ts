@@ -1,6 +1,7 @@
 import { PrismaClient, BookingStatus } from '@prisma/client';
 import { validateImage } from '../utils/validation';
 import cron from 'node-cron';
+import { cloudinaryUpload } from '@/helpers/cloudinary';
 
 const prisma = new PrismaClient();
 
@@ -15,12 +16,16 @@ export const uploadPaymentProof = async (
     include: { payment: true },
   });
 
-  if (!booking || !booking.payment) throw new Error('Invalid booking/payment');
+  if (!booking || !booking.payment) {
+    throw new Error('Invalid booking/payment');
+  }
+
+  const { secure_url } = await cloudinaryUpload(file);
 
   await prisma.payment.update({
     where: { id: booking.payment.id },
     data: {
-      proof: file.buffer, // Simpan file sebagai buffer (Bytes di database)
+      proof: secure_url, 
       payment_date: new Date(),
     },
   });
