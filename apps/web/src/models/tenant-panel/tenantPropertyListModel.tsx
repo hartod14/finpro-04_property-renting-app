@@ -1,13 +1,16 @@
 'use client';
 
 import PanelButtonAction from '@/components/common/button/panelButtonAction';
-import { deleteCategory, getAllCategory } from '@/handlers/tenant-category';
+import { deleteProperty, getAllProperty } from '@/handlers/tenant-property';
+// import { deleteCategory, getAllCategory } from '@/handlers/tenant-category';
 import { ICategory } from '@/interfaces/category.interface';
+import { IProperty } from '@/interfaces/property.interface';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 import React, { useContext, useEffect, useState } from 'react';
 
-export default function TenantCategoryListModel() {
+export default function TenantPropertyListModel() {
   // const loading = useContext(LoadingContext);
   const [page, setPage] = useState<number>(1);
   const [search, setSearch] = useState<string>('');
@@ -15,18 +18,18 @@ export default function TenantCategoryListModel() {
   const [total, setTotal] = useState<number>(0);
   const [totalPage, setTotalPage] = useState<number>(0);
   const [table, setTable] = useState({
-    head: ['No.', 'Name', 'Action'],
+    head: ['No.', 'Image', 'Name', 'Category', 'City', 'Room type', 'Action'],
     body: [],
   });
   const router = useRouter();
 
-  async function getCategoryList() {
+  async function getPropertyList() {
     // loading?.setLoading(true);
 
     const body: any = [];
 
-    const res = await getAllCategory(search, page, limit);
-    const data: ICategory[] = res.data;
+    const res = await getAllProperty(search, page, limit);
+    const data: IProperty[] = res.data;
     console.log(data);
 
     const total_data: number = res.total_data;
@@ -35,15 +38,35 @@ export default function TenantCategoryListModel() {
       data.map((row, index) => {
         body.push([
           index + 1,
-          row.name,
-
+          <div className="w-48 h-28 rounded-md">
+            <Image
+              src={row.propertyImages[0].path}
+              alt={row.name}
+              width={360}
+              height={360}
+              className="w-full h-full object-cover rounded-md"
+            />
+          </div>,
+          <p className="font-semibold">{row.name}</p>,
+          row.category.name,
+          row.city.name,
+          <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
+            {row.rooms?.map((room) => (
+              <li className="" key={room.id}>
+                {room.name}
+              </li>
+            )) || 'No room type'}
+          </ul>,
           <PanelButtonAction
             key={'button'}
+            onList={() => {
+              router.push(`/tenant/property/list-booking/${row.id}`);
+            }}
             onDelete={async () => {
-              await deleteCategoryList(row.id);
+              await deletePropertyList(row.id);
             }}
             onUpdate={() => {
-              router.push(`/tenant/category/edit/${row.id}`);
+              router.push(`/tenant/property/edit/${row.id}`);
             }}
           />,
         ]);
@@ -59,11 +82,11 @@ export default function TenantCategoryListModel() {
     }
   }
 
-  async function deleteCategoryList(id: number) {
+  async function deletePropertyList(id: number) {
     try {
       // loading?.setLoading(true);
-      await deleteCategory(id.toString()).then(() => {
-        getCategoryList();
+      await deleteProperty(id.toString()).then(() => {
+        getPropertyList();
       });
     } catch (error) {
     } finally {
@@ -71,13 +94,13 @@ export default function TenantCategoryListModel() {
     }
   }
   useEffect(() => {
-    getCategoryList();
+    getPropertyList();
   }, [page, limit]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
       setPage(1);
-      getCategoryList();
+      getPropertyList();
     }, 300);
 
     return () => clearTimeout(handler);

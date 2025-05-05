@@ -1,18 +1,23 @@
-import React, { FC, ReactNode } from "react";
+import React, { FC, ReactNode } from 'react';
 interface IBodyProps {
   body: ReactNode[][];
 }
-export default function Tbody (props : IBodyProps)  {
+export default function Tbody(props: IBodyProps) {
   const { body } = props;
   return (
     <tbody>
       {body.map((row, index) => (
-        <tr className=" " key={"body" + index} >
+        <tr className="hover:bg-gray-50 transition" key={'body' + index}>
           {row.map((col, indexCol) => (
-            <td key={"col" + indexCol} className="bg-white border-b-2 border-gray-100 p-4 ">{col}</td>
+            <td
+              key={'col' + indexCol}
+              className="border-b-2  border-gray-100 py-4 px-8 "
+            >
+              {col}
+            </td>
           ))}
         </tr>
       ))}
     </tbody>
   );
-};
+}

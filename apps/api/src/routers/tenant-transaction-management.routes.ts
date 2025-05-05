@@ -38,12 +38,12 @@ export class TenantTransactionRouter {
       tenantTransactionController.cancelUserOrder,
     );
 
-    this.router.get(
-      '/tenant/:tenantId/properties',
-      verifyUser,
-      authorizeTenantAction,  
-      tenantTransactionController.getPropertyList,
-    );
+    // this.router.get(
+    //   '/tenant/:tenantId/properties',
+    //   verifyUser,
+    //   authorizeTenantAction,  
+    //   tenantTransactionController.getPropertyList,
+    // );
   }
 
   getRouter(): Router {

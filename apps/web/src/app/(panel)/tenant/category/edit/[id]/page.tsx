@@ -2,42 +2,19 @@
 
 import Button from '@/components/common/button/button';
 import { InputField } from '@/components/common/input/InputField';
-import { getCategoryById, updateCategory } from '@/handlers/category';
-import { ICreateCategory } from '@/interfaces/category.interface';
-import { storeCategoryValidator } from '@/validators/faq.validator';
+import { storeCategoryValidator } from '@/validators/category.validator';
 import { Form, Formik } from 'formik';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
-import Swal from 'sweetalert2';
-import { useRouter } from 'next/navigation';
+import React, { use, useEffect, useState } from 'react';
+import TenantCategoryEditModel from '@/models/tenant-panel/tenantCategoryEditModel';
+
 type Props = {
-  params: Promise<{ id: number }>;
+  params: Promise<{ id: string }>;
 };
-export default function PanelEditFaq({ params }: Props) {
-  const router = useRouter();
-  // const { isLoading, loading, router, setIsLoading } = PanelCategoryEditViewModel();
-  const [initialValues, setInitialValues] = useState<ICreateCategory>();
-  useEffect(() => {
-    async function fetchCategory() {
-      try {
-        const { id } = await params;
-        const category: ICreateCategory = (await getCategoryById(id.toString()))
-          .data;
 
-        if (category) {
-          setInitialValues((prev) => {
-            return {
-              name: category.name,
-            };
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching Category:', error);
-      }
-    }
-
-    fetchCategory();
-  }, [params]);
+export default function TenantCategoryEditPage({ params }: Props) {
+  const resolvedParams = use(params);
+  const { isLoading, router, initialValues, handleUpdateCategory } = TenantCategoryEditModel(resolvedParams.id);
 
   return (
     <div className="bg-white rounded-md p-4 border border-gray-100 shadow-md">
@@ -46,44 +23,7 @@ export default function PanelEditFaq({ params }: Props) {
           initialValues={initialValues}
           validationSchema={storeCategoryValidator}
           onSubmit={async (values) => {
-            Swal.fire({
-              title: 'Edit this category?',
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#ABABAB',
-              confirmButtonText: 'Yes, save it!',
-              cancelButtonText: 'Back',
-            }).then(async (result) => {
-              if (result.isConfirmed) {
-                const { id } = await params;
-                try {
-                  // loading?.setLoading(true);
-                  const res = await updateCategory(id.toString(), values);
-
-                  if (res?.error) {
-                    Swal.fire({
-                      icon: 'error',
-                      title: 'Oops...',
-                      text: 'Something went wrong, please try again later!',
-                    });
-                  } else {
-                    Swal.fire({
-                      title: 'Saved!',
-                      text: 'Category has been updated.',
-                      icon: 'success',
-                      confirmButtonColor: '#3085d6',
-                    }).then(() => {
-                      router.push('/tenant/category');
-                    });
-                  }
-                } catch (error) {
-                  alert('something error');
-                } finally {
-                  // loading?.setLoading(false);
-                }
-              }
-            });
+            await handleUpdateCategory(values);
           }}
         >
           {(formik) => (

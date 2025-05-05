@@ -1,27 +1,26 @@
 /** @format */
 
-import { api_url } from "../helpers/config";
-import { jwtDecode } from "jwt-decode";
-import { refreshToken } from "./auth";
+import { api_url } from '../helpers/config';
+import { jwtDecode } from 'jwt-decode';
+import { refreshToken } from './auth';
 
 export const api = async (
-
   path: string,
-  method: "POST" | "GET" | "DELETE" | "PATCH" | "PUT",
+  method: 'POST' | 'GET' | 'DELETE' | 'PATCH' | 'PUT',
   data?: {
     body?: Record<string, unknown> | FormData | String;
-    contentType?: "application/json" | "application/x-www-form-urlencoded";
+    contentType?: 'application/json' | 'application/x-www-form-urlencoded';
   },
-  token?: string
+  token?: string,
 ) => {
   const headers: HeadersInit = {};
-  if (data?.contentType) headers["Content-Type"] = data.contentType;
+  if (data?.contentType) headers['Content-Type'] = data.contentType;
   if (token) {
     const expiresIn = jwtDecode(token).exp! * 1000;
     if (new Date().valueOf() >= expiresIn) {
       const { access_token } = await refreshToken();
-      headers["Authorization"] = "Bearer " + access_token;
-    } else headers["Authorization"] = "Bearer " + token;
+      headers['Authorization'] = 'Bearer ' + access_token;
+    } else headers['Authorization'] = 'Bearer ' + token;
   }
 
   const res = await fetch(api_url + path, {
@@ -32,7 +31,7 @@ export const api = async (
   });
 
   if (res.status == 403) {
-    throw new Error("forbidden");
+    throw new Error('forbidden');
   }
 
   const json = await res.json();

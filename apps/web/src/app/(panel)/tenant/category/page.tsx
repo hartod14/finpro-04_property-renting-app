@@ -7,7 +7,7 @@ import { PanelPagination } from '@/components/common/pagination/panelPagination'
 import { FaArrowRight, FaPlus, FaSearch } from 'react-icons/fa';
 import Link from 'next/link';
 
-export default function TenantCategoryPage() {
+export default function TenantCategoryListPage() {
   const {
     router,
     table,
@@ -24,8 +24,8 @@ export default function TenantCategoryPage() {
   return (
     <div className="flex flex-col gap-4 pb-2">
       <div className="flex justify-between">
-        <div className="flex bg-[#f0f0f0] rounded-md w-1/4 px-3">
-          <div className="flex justify-center items-center w-[31px mr-1">
+        <div className="flex bg-white border border-gray-200 rounded-md w-1/4 px-3 py-2">
+          <div className="flex justify-center items-center mr-3">
             <FaSearch width={20} height={20} />
           </div>
 
@@ -33,7 +33,7 @@ export default function TenantCategoryPage() {
             type="text"
             value={search}
             placeholder="Search"
-            className=" bg-[#f0f0f0] w-full focus:outline-none"
+            className=" w-full focus:outline-none"
             name="search"
             onChange={(e) => setSearch(e.target.value)}
           />

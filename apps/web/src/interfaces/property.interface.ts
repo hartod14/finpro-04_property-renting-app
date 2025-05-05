@@ -48,4 +48,5 @@ export interface IProperty {
   images: IPropertyImage[];
   lowestPriceRoom: IRoom | null;
   rooms?: IRoom[];
+  propertyImages: IPropertyImage[];
 }
