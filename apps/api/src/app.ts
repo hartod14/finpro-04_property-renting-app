@@ -15,11 +15,13 @@ import { ErrorHandler } from './helpers/response.handler';
 import { uploadRouter } from './routers/upload.router';
 // import { SampleRouter } from './routers/sample.router';
 import { UserTransactionRouter } from './routers/user-transactions.routes';
+import { TenantTransactionRouter } from './routers/tenant-transaction-management.routes';
 import { cityRouter } from './routers/city.router';
 import { facilityRouter } from './routers/facility.router';
 import { categoryRouter } from './routers/category.router';
 import { userRouter } from './routers/user.router';
 import { propertyRouter } from './routers/property.router';
+
 
 export default class App {
   private app: Application;
@@ -55,6 +57,7 @@ export default class App {
 
   private routes(): void {
     const usertransactionRouter = new UserTransactionRouter();
+    const tenantTransactionManagementRouter = new TenantTransactionRouter();
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
@@ -70,6 +73,7 @@ export default class App {
 
     this.app.use('/api/user', userRouter());
     this.app.use('/api', usertransactionRouter.getRouter());
+    this.app.use('/api', tenantTransactionManagementRouter.getRouter());
   }
 
   public start(): void {
