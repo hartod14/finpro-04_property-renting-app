@@ -55,6 +55,7 @@ export default function PropertyDetailPage() {
     const today = new Date();
     return new Date(today.getFullYear(), today.getMonth(), 1);
   };
+  
 
   const getNextMonth = (date: Date): Date => {
     return new Date(date.getFullYear(), date.getMonth() + 1, 1);
@@ -106,6 +107,8 @@ export default function PropertyDetailPage() {
     );
     return date >= maxDate;
   };
+
+  
 
   const formatDate = (date: Date): string => {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
@@ -970,7 +973,7 @@ export default function PropertyDetailPage() {
                         </p>
                       </div>
 
-                      <Link href={`/booking/${property.id}?roomId=${room.id}`}>
+                      <Link href={`/booking/${property.slug}?roomId=${room.id}`}>
                         <div className="mt-4 bg-primary text-white px-4 py-2 inline-block rounded hover:bg-primary/90 transition-colors">
                           Book Now
                         </div>
