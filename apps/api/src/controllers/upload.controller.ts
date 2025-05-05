@@ -1,7 +1,7 @@
 /** @format */
 
 import { NextFunction, Request, Response } from "express";
-import { ErrorHandler, responseHandler, responsHandlerPagination } from "../helpers/response.handler";
+import { ErrorHandler, responseHandler } from "../helpers/response.handler";
 import uploadService from "@/services/upload.service";
 class UploadImageController {
 

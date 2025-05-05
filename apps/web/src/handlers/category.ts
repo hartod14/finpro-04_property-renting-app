@@ -50,6 +50,7 @@ export const updateCategory = async (id: string, data: any) => {
     'PUT',
     {
       body: data,
+      contentType: 'application/json',
     },
     await getAccessToken(),
   ).catch((err) => (err instanceof Error ? { error: err.message } : err));

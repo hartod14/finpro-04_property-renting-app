@@ -60,6 +60,7 @@ export default function TenantCategoryPage() {
         setLimit={setLimit}
         total={total}
         totalPage={totalPage}
+        totalPerPage={table.body.length}
       />
     </div>
   );

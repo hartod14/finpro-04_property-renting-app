@@ -65,11 +65,23 @@ class CategoryService {
           mode: 'insensitive',
         },
         tenant_id: Number(user.id),
+        deleted_at: null,
       },
       ...pagination(Number(page), Number(limit)),
     });
 
-    return data;
+    const total = await prisma.category.count({
+      where: {
+        name: {
+          contains: String(search || ''),
+          mode: 'insensitive',
+        },
+        tenant_id: Number(user.id),
+        deleted_at: null,
+      },
+    });
+
+    return { data, total };
   }
 
   async getDataById(id: string) {
@@ -86,16 +98,15 @@ class CategoryService {
 
   async createData(req: Request) {
     const { name } = req.body;
-    console.log(name);
     const { authorization } = req.headers;
-    
+
     const token = String(authorization || '').split('Bearer ')[1];
     const user = decodeVerificationJwt(token) as { id: number };
-    
+
     return await prisma.category.create({
       data: {
         name,
-        tenant_id: user.id,
+        tenant_id: Number(user.id),
       },
     });
   }

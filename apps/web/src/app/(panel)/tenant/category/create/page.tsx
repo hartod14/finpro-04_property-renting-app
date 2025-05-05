@@ -10,6 +10,7 @@ import Link from 'next/link';
 import React from 'react';
 import Swal from 'sweetalert2';
 import TenantCategoryCreateModel from '@/models/tenant-panel/tenantCategoryCreateModel';
+import Button from '@/components/common/button/button';
 
 export default function PanelAddFaq() {
   const { isLoading, router, setIsLoading } = TenantCategoryCreateModel();
@@ -71,31 +72,27 @@ export default function PanelAddFaq() {
               />
             </div>
 
-
             <hr className="my-10 text-gray-50/10" />
             <div className="flex justify-end">
               <div className="flex gap-2">
                 <Link
                   href={'/tenant/category'}
                   onClick={() => router.push('/tenant/category')}
-                  className={
-                    'bg-gray-50 border border-gray-300 text-gray-400font-semibold px-5 py-3 rounded mb-6'
-                  }
                 >
-                  Back
+                  <Button color="secondary" textColor="white" name="Back" />
                 </Link>
+
                 <button
                   type="submit"
-                  className={`${
-                    !(formik.isValid && formik.dirty) || formik.isSubmitting
-                      ? 'bg-gray-300 text-gray-400'
-                      : 'bg-blue-900 text-white'
-                  }   font-semibold px-5 py-3 rounded mb-6`}
                   disabled={
                     !(formik.isValid && formik.dirty) || formik.isSubmitting
                   }
                 >
-                  {formik.isSubmitting ? 'Processing...' : 'Submit'}
+                  <Button
+                    color={`${!(formik.isValid && formik.dirty) || formik.isSubmitting ? 'lightGray' : 'primaryOrange'}`}
+                    textColor="white"
+                    name={formik.isSubmitting ? 'Processing...' : 'Save'}
+                  />
                 </button>
               </div>
             </div>

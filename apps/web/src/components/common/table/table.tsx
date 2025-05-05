@@ -8,8 +8,8 @@ interface ITableProps {
 export default function Table(props: ITableProps) {
   const { body, head } = props;
   return (
-    <div className="table-auto w-full bg-white ">
-      <table className="w-full ">
+    <div className="table-auto w-full shadow-md border-2 bg-white border-gray-100 rounded">
+      <table className="w-full">
         <Thead head={head} />
         {body.length > 0 && <Tbody body={body} />}
       </table>

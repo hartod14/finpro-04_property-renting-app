@@ -20,7 +20,7 @@ export const responseHandler = (
   });
 };
 
-export const responsHandlerPagination = (
+export const responseHandlerPagination = (
   res: Response,
   message: String,
   data: any,

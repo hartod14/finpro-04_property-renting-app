@@ -43,7 +43,7 @@ export default function TenantCategoryListModel() {
           <PanelButtonAction
             key={'button'}
             onDelete={async () => {
-              await deleteCategory(row.id.toString());
+              await deleteCategoryList(row.id);
             }}
             onUpdate={() => {
               router.push(`/tenant/category/edit/${row.id}`);

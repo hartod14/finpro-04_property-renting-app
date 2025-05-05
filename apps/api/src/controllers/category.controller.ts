@@ -1,4 +1,7 @@
-import { responseHandler } from '@/helpers/response.handler';
+import {
+  responseHandler,
+  responseHandlerPagination,
+} from '@/helpers/response.handler';
 import categoryService from '@/services/category.service';
 import { NextFunction, Request, Response } from 'express';
 
@@ -15,7 +18,12 @@ class CategoryController {
   async getAllDataByUserId(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await categoryService.getAllDataByUserId(req);
-      responseHandler(res, 'get all category success', data);
+      responseHandlerPagination(
+        res,
+        'get all category success',
+        data.data,
+        data.total,
+      );
     } catch (error) {
       next(error);
     }

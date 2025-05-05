@@ -9,7 +9,7 @@ export default function Tbody (props : IBodyProps)  {
       {body.map((row, index) => (
         <tr className=" " key={"body" + index} >
           {row.map((col, indexCol) => (
-            <td key={"col" + indexCol} className="bg-white border-b-4 p-4 ">{col}</td>
+            <td key={"col" + indexCol} className="bg-white border-b-2 border-gray-100 p-4 ">{col}</td>
           ))}
         </tr>
       ))}

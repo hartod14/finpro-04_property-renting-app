@@ -1,64 +1,53 @@
 'use client';
-import { InputField } from '@/components/common/inputs/InputField';
-import { InputFieldTextarea } from '@/components/common/inputs/InputFieldTextarea';
-import { SwitchField } from '@/components/common/inputs/SwitchField';
-import PanelFaqsAddViewModel from '@/components/Panel/pages/faqs/add/PanelFaqsAddViewModel';
-import { storeFaqInit } from '@/helpers/formiks/faqs.formik';
 
-import {
-  createFaq,
-  panelGetFaqDetail,
-  updateFaq,
-} from '@/helpers/handlers/apis/faq.api';
-import { ICreateFaqInterface, IFaqInterface } from '@/interfaces/fag.interface';
-import { storeEventValidator } from '@/validators/event.validator';
-import { storeFaqValidator } from '@/validators/faq.validator';
+import Button from '@/components/common/button/button';
+import { InputField } from '@/components/common/input/InputField';
+import { getCategoryById, updateCategory } from '@/handlers/category';
+import { ICreateCategory } from '@/interfaces/category.interface';
+import { storeCategoryValidator } from '@/validators/faq.validator';
 import { Form, Formik } from 'formik';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
+import { useRouter } from 'next/navigation';
 type Props = {
   params: Promise<{ id: number }>;
 };
 export default function PanelEditFaq({ params }: Props) {
-  const { isLoading, loading, router, setIsLoading } = PanelFaqsAddViewModel();
-  const [initialValues, setInitialValues] = useState<ICreateFaqInterface>();
+  const router = useRouter();
+  // const { isLoading, loading, router, setIsLoading } = PanelCategoryEditViewModel();
+  const [initialValues, setInitialValues] = useState<ICreateCategory>();
   useEffect(() => {
-    async function fetchFaq() {
+    async function fetchCategory() {
       try {
         const { id } = await params;
-        const faq: IFaqInterface = (await panelGetFaqDetail(id)).data;
+        const category: ICreateCategory = (await getCategoryById(id.toString()))
+          .data;
 
-        // console.log(Faq);
-
-        if (faq) {
-          console.log('test', faq);
+        if (category) {
           setInitialValues((prev) => {
             return {
-              answer: faq.answer,
-              is_active: faq.is_active,
-              question: faq.question,
+              name: category.name,
             };
           });
         }
       } catch (error) {
-        console.error('Error fetching Faq:', error);
+        console.error('Error fetching Category:', error);
       }
     }
 
-    fetchFaq();
+    fetchCategory();
   }, [params]);
 
   return (
-    <div className="">
+    <div className="bg-white rounded-md p-4 border border-gray-100 shadow-md">
       {initialValues && (
         <Formik
           initialValues={initialValues}
-          validationSchema={storeFaqValidator}
-          // onSubmit={(values) => alert(JSON.stringify(values, null, 3))}
+          validationSchema={storeCategoryValidator}
           onSubmit={async (values) => {
             Swal.fire({
-              title: 'Submit this new faq?',
+              title: 'Edit this category?',
               icon: 'warning',
               showCancelButton: true,
               confirmButtonColor: '#3085d6',
@@ -69,8 +58,8 @@ export default function PanelEditFaq({ params }: Props) {
               if (result.isConfirmed) {
                 const { id } = await params;
                 try {
-                  loading?.setLoading(true);
-                  const res = await updateFaq(id, values);
+                  // loading?.setLoading(true);
+                  const res = await updateCategory(id.toString(), values);
 
                   if (res?.error) {
                     Swal.fire({
@@ -81,17 +70,17 @@ export default function PanelEditFaq({ params }: Props) {
                   } else {
                     Swal.fire({
                       title: 'Saved!',
-                      text: 'Faq has been updated.',
+                      text: 'Category has been updated.',
                       icon: 'success',
                       confirmButtonColor: '#3085d6',
                     }).then(() => {
-                      router.push('/panel/faqs');
+                      router.push('/tenant/category');
                     });
                   }
                 } catch (error) {
                   alert('something error');
                 } finally {
-                  loading?.setLoading(false);
+                  // loading?.setLoading(false);
                 }
               }
             });
@@ -102,56 +91,35 @@ export default function PanelEditFaq({ params }: Props) {
               <div className="grid gap-6 mb-6 md:grid-cols-2">
                 <InputField
                   type="text"
-                  id="question"
-                  name="question"
-                  label="Question"
+                  id="name"
+                  name="name"
+                  label="Name"
                   placeholder=""
                   required
                 />
+              </div>
 
-                <InputFieldTextarea
-                  id="answer"
-                  name="answer"
-                  label="Answer"
-                  required
-                />
-                <SwitchField
-                  id="is_active"
-                  label="Status"
-                  name="is_active"
-                  formik={formik}
-                />
-              </div>         
-
-              {/* <p className="mb-4 text-red-400">{errMessage}</p> */}
-
-              {/* <button type="submit">
-            submit
-          </button> */}
               <hr className="my-10 text-gray-50" />
               <div className="flex justify-end">
                 <div className="flex gap-2">
                   <Link
-                    href={'/panel/faqs'}
-                    onClick={() => router.push('/panel/faqs')}
-                    className={
-                      'bg-gray-50 border border-gray-300 text-gray-400font-semibold px-5 py-3 rounded mb-6'
-                    }
+                    href={'/tenant/category'}
+                    onClick={() => router.push('/tenant/category')}
                   >
-                    Back
+                    <Button color="secondary" textColor="white" name="Back" />
                   </Link>
+
                   <button
                     type="submit"
-                    className={`${
-                      !(formik.isValid && formik.dirty) || formik.isSubmitting
-                        ? 'bg-gray-300 text-gray-400'
-                        : 'bg-blue-900 text-white'
-                    }   font-semibold px-5 py-3 rounded mb-6`}
                     disabled={
                       !(formik.isValid && formik.dirty) || formik.isSubmitting
                     }
                   >
-                    {formik.isSubmitting ? 'Processing...' : 'Submit'}
+                    <Button
+                      color={`${!(formik.isValid && formik.dirty) || formik.isSubmitting ? 'lightGray' : 'primaryOrange'}`}
+                      textColor="white"
+                      name={formik.isSubmitting ? 'Processing...' : 'Save'}
+                    />
                   </button>
                 </div>
               </div>

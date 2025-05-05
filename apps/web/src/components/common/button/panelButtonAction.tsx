@@ -12,7 +12,7 @@ interface ButtonActionProps {
 export default function PanelButtonAction(props: ButtonActionProps) {
   const { onDelete, onShow, onUpdate, onList } = props;
   return (
-    <div className="flex gap-2 items-center">
+    <div className="flex gap-5 items-center">
       {onList && (
         <FaList
           width={32}
@@ -35,14 +35,14 @@ export default function PanelButtonAction(props: ButtonActionProps) {
           onClick={() => onUpdate()}
           width={32}
           height={32}
-          className="text-yellow-800 cursor-pointer"
+          className=" text-yellow-500 cursor-pointer"
         />
       )}
       {onDelete && (
         <FaTrash
           width={32}
           height={32}
-          className="text-red-800 cursor-pointer"
+          className="text-red-500 cursor-pointer"
           onClick={() => {
             Swal.fire({
               title: 'Are you sure?',
