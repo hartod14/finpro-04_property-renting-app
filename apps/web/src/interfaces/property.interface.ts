@@ -50,3 +50,24 @@ export interface IProperty {
   rooms?: IRoom[];
   propertyImages: IPropertyImage[];
 }
+export interface IPropertyCreate {
+  name: string;
+  checkin_time: string;
+  checkout_time: string;
+  description: string;
+  address: string;
+  city_id: string;
+  category_id: string;
+  images: string[];
+  facilities: number[];
+  rooms: {
+    name: string;
+    base_price: string;
+    description: string;
+    capacity: string;
+    size: string;
+    total_room: string;
+    images: string[];
+    facilities: number[];
+  }[];
+}

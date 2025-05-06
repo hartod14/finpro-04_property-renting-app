@@ -8,5 +8,16 @@ export const storePropertyInit = {
   category_id: '',
   images: [],
   facilities: [],
-  rooms: [],
+  rooms: [
+    {
+      name: '',
+      base_price: '',
+      description: '',
+      capacity: '',
+      size: '',
+      total_room: '',
+      images: [],
+      facilities: [],
+    },
+  ],
 };

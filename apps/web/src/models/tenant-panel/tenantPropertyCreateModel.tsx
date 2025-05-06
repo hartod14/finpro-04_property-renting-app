@@ -21,7 +21,6 @@ export default function TenantPropertyCreateModel() {
   const refImage = useRef<HTMLInputElement>(null);
   const router = useRouter();
   
-  // Array of refs for room image uploads
   const roomImageRefs = useRef<Array<HTMLInputElement | null>>([]);
 
   async function getCityList() {
@@ -41,8 +40,8 @@ export default function TenantPropertyCreateModel() {
         form.append('image', image);
 
         const resImage = await uploadImage(form);
+        console.log(resImage);
         
-        // Add the new image to the existing images array
         const updatedImages = [...images, resImage.data];
         setImages(updatedImages);
         setFieldValue('images', updatedImages);
@@ -62,7 +61,6 @@ export default function TenantPropertyCreateModel() {
     [images],
   );
 
-  // Handle room image upload
   const uploadRoomImage = async (
     e: React.ChangeEvent<HTMLInputElement>,
     roomIndex: number,
@@ -78,15 +76,12 @@ export default function TenantPropertyCreateModel() {
         setIsLoading(true);
         const resImage = await uploadImage(form);
         
-        // Get current room images
         const updatedRooms = [...currentValues.rooms];
         
-        // Initialize images array if it doesn't exist
         if (!updatedRooms[roomIndex].images) {
           updatedRooms[roomIndex].images = [];
         }
         
-        // Add the new image
         updatedRooms[roomIndex].images = [...updatedRooms[roomIndex].images, resImage.data];
         setFieldValue('rooms', updatedRooms);
       } catch (error) {
@@ -97,7 +92,6 @@ export default function TenantPropertyCreateModel() {
     }
   };
 
-  // Handle room image deletion
   const deleteRoomImage = (
     roomIndex: number,
     imageIndex: number,
@@ -109,9 +103,7 @@ export default function TenantPropertyCreateModel() {
     setFieldValue('rooms', updatedRooms);
   };
 
-  // Ensure we have enough refs for all rooms
   const ensureRoomImageRefs = (roomCount: number) => {
-    // Resize roomImageRefs array if needed
     if (roomImageRefs.current.length < roomCount) {
       roomImageRefs.current = Array(roomCount).fill(null);
     }
@@ -126,13 +118,11 @@ export default function TenantPropertyCreateModel() {
     try {
       const allFacilities = await getAllFacility(undefined);
       
-      // Filter facilities with type PROPERTY
       const propertyFacilities = allFacilities.filter(
         (facility: IFacility) => facility.type === 'PROPERTY'
       );
       setFacilities(propertyFacilities);
       
-      // Filter facilities with type ROOM
       const roomFacilitiesList = allFacilities.filter(
         (facility: IFacility) => facility.type === 'ROOM'
       );
@@ -149,7 +139,6 @@ export default function TenantPropertyCreateModel() {
   }, []);
 
   const handleCreateProperty = async (values: any) => {    
-    // Check if all rooms have at least 1 facility
     if (values.rooms.some((room: any) => !room.facilities || room.facilities.length < 1)) {
       return Swal.fire({
         icon: 'error',
