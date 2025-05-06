@@ -7,7 +7,7 @@ export default function Tbody(props: IBodyProps) {
   return (
     <tbody>
       {body.map((row, index) => (
-        <tr className="hover:bg-gray-50 transition" key={'body' + index}>
+        <tr className="bg-white hover:bg-gray-50 transition" key={'body' + index}>
           {row.map((col, indexCol) => (
             <td
               key={'col' + indexCol}

@@ -2,9 +2,9 @@ import { api } from './_api';
 import { getAccessToken, getAuth } from './auth';
 
 export const getAllCategory = async (
-  name: string,
-  page: number,
-  limit: number,
+  name: string | "",
+  page: number | "",
+  limit: number | "",
 ) => {
   return await api(
     `/tenant-category?search=${name}&page=${page}&limit=${limit}`,
