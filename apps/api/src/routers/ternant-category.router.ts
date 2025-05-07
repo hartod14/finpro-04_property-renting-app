@@ -1,14 +1,15 @@
 import tenantCategoryController from '@/controllers/tenant-category.controller';
 import { Router } from 'express';
+import { authorizeCategoryOwner } from '@/middalewares/authorizeCategoryOwner.middleware';
 
 export const tenantCategoryRouter = () => {
   const router = Router();
 
   router.get('/', tenantCategoryController.getAllData);
-  router.get('/:id', tenantCategoryController.getCategoryById);
+  router.get('/:id', authorizeCategoryOwner, tenantCategoryController.getCategoryById);
   router.post('/', tenantCategoryController.createCategory);
-  router.put('/:id', tenantCategoryController.updateCategory);
-  router.delete('/:id', tenantCategoryController.deleteCategory);
+  router.put('/:id', authorizeCategoryOwner, tenantCategoryController.updateCategory);
+  router.delete('/:id', authorizeCategoryOwner, tenantCategoryController.deleteCategory);
 
   return router;
 };

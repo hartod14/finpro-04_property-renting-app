@@ -32,6 +32,8 @@ export default function CreatePropertyPage() {
     deleteRoomImage,
     roomImageRefs,
     ensureRoomImageRefs,
+    uploadImageError,
+    roomImageErrors,
   } = TenantPropertyCreateModel();
 
   return (
@@ -116,7 +118,7 @@ export default function CreatePropertyPage() {
                     <button
                       type="button"
                       onClick={() => refImage.current?.click()}
-                      className={`${isLoading ? 'bg-blue-200' : 'bg-blue-700'}  px-3 py-2 text-sm font-medium text-center text-white rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800`}
+                      className={`${isLoading ? 'bg-blue-200' : 'bg-blue-600'}  px-3 py-2 text-sm font-medium text-center text-white rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300`}
                       disabled={isLoading}
                     >
                       <div className="flex gap-2 items-center">
@@ -124,9 +126,11 @@ export default function CreatePropertyPage() {
                         {isLoading ? 'Uploading...' : 'Upload image'}
                       </div>
                     </button>
-                    <span className="text-sm text-blue-700">
-                      *minimum 3 photos required
-                    </span>
+                    {images.length < 3 && (
+                      <span className="text-sm text-red-500">
+                        ({images.length}/3) images uploaded
+                      </span>
+                    )}
                   </div>
                   <input
                     type="file"
@@ -181,12 +185,22 @@ export default function CreatePropertyPage() {
                           </div>
                         )}
                   </div>
+                  {uploadImageError && (
+                    <div className="text-red-500 text-sm mt-2">
+                      {uploadImageError}
+                    </div>
+                  )}
                 </div>
               </section>
               <hr className="my-8 text-gray-50/10" />
               <section>
                 <h1 className="text-2xl font-bold mb-8 text-gray-700">
                   Select Property Facilities
+                  {formik.values.facilities.length < 1 && (
+                    <span className="text-sm text-red-500 ml-2 font-normal">
+                      ({formik.values.facilities.length}/1) facility selected
+                    </span>
+                  )}
                 </h1>
                 <FieldArray
                   name="facilities"
@@ -213,6 +227,7 @@ export default function CreatePropertyPage() {
                                     formik.setFieldValue(
                                       'facilities',
                                       newFacilities,
+                                      true
                                     );
                                   }
                                 } else {
@@ -223,6 +238,7 @@ export default function CreatePropertyPage() {
                                   formik.setFieldValue(
                                     'facilities',
                                     newFacilities,
+                                    true
                                   );
                                 }
                               }}
@@ -356,7 +372,7 @@ export default function CreatePropertyPage() {
                                     onClick={() =>
                                       roomImageRefs.current[index]?.click()
                                     }
-                                    className={`${isLoading ? 'bg-blue-200' : 'bg-blue-700'}  px-3 py-2 text-sm font-medium text-center text-white rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800`}
+                                    className={`${isLoading ? 'bg-blue-200' : 'bg-blue-600'}  px-3 py-2 text-sm font-medium text-center text-white rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300`}
                                     disabled={isLoading}
                                   >
                                     <div className="flex gap-2 items-center">
@@ -366,6 +382,11 @@ export default function CreatePropertyPage() {
                                         : 'Upload image'}
                                     </div>
                                   </button>
+                                  {(!formik.values.rooms[index].images || formik.values.rooms[index].images.length < 2) && (
+                                    <span className="text-sm text-red-500">
+                                      ({formik.values.rooms[index].images ? formik.values.rooms[index].images.length : 0}/2) images uploaded
+                                    </span>
+                                  )}
                                 </div>
                                 <input
                                   type="file"
@@ -379,8 +400,8 @@ export default function CreatePropertyPage() {
                                   onChange={(e) =>
                                     uploadRoomImage(
                                       e,
-                                      index,
                                       formik.setFieldValue,
+                                      index,
                                       formik.values,
                                     )
                                   }
@@ -442,6 +463,13 @@ export default function CreatePropertyPage() {
                                       )}
                                 </div>
 
+                                {/* Display room image upload errors */}
+                                {roomImageErrors[index] && (
+                                  <div className="text-red-500 mt-2 text-sm">
+                                    {roomImageErrors[index]}
+                                  </div>
+                                )}
+
                                 {/* Room Images Validation Message */}
                                 {formik.touched.rooms &&
                                   formik.errors.rooms &&
@@ -462,6 +490,11 @@ export default function CreatePropertyPage() {
                                   <h4 className="text-md font-semibold text-gray-700">
                                     Select Room Facilities
                                   </h4>
+                                  {(!formik.values.rooms[index].facilities || formik.values.rooms[index].facilities.length < 1) && (
+                                    <span className="text-sm text-red-500 ml-2 font-normal">
+                                      ({formik.values.rooms[index].facilities ? formik.values.rooms[index].facilities.length : 0}/1) facility selected
+                                    </span>
+                                  )}
                                 </div>
 
                                 <div className="flex flex-wrap gap-2">
@@ -505,6 +538,7 @@ export default function CreatePropertyPage() {
                                           formik.setFieldValue(
                                             'rooms',
                                             currentRooms,
+                                            true
                                           );
                                         }}
                                         className={`
@@ -556,7 +590,7 @@ export default function CreatePropertyPage() {
                             facilities: [],
                           })
                         }
-                        className="mt-4 py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                        className="mt-4 py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
                       >
                         <span>+</span> Add Another Room
                       </button>
@@ -589,6 +623,10 @@ export default function CreatePropertyPage() {
                       !formik.values.rooms?.length ||
                       formik.values.rooms.some(
                         (room) => !room.images || room.images.length < 2,
+                      ) ||
+                      formik.values.facilities.length === 0 ||
+                      formik.values.rooms.some(
+                        (room) => !room.facilities || room.facilities.length === 0,
                       )
                     }
                   >
@@ -600,6 +638,10 @@ export default function CreatePropertyPage() {
                         !formik.values.rooms?.length ||
                         formik.values.rooms.some(
                           (room) => !room.images || room.images.length < 2,
+                        ) ||
+                        formik.values.facilities.length === 0 ||
+                        formik.values.rooms.some(
+                          (room) => !room.facilities || room.facilities.length === 0,
                         )
                           ? 'lightGray'
                           : 'primaryOrange'

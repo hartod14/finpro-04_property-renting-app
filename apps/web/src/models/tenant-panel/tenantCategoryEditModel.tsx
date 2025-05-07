@@ -10,16 +10,16 @@ export default function TenantCategoryEditModel(id: string) {
   const router = useRouter();
 
   const fetchCategory = async () => {
-    try {
-      const category: ICreateCategory = (await getCategoryById(id)).data;
-
+    let category = await getCategoryById(id);
+    if (category.error == 'forbidden') {
+      router.push('/forbidden');
+    } else {
       if (category) {
+        category = category.data;
         setInitialValues({
           name: category.name,
         });
       }
-    } catch (error) {
-      console.error('Error fetching Category:', error);
     }
   };
 
@@ -67,11 +67,11 @@ export default function TenantCategoryEditModel(id: string) {
     fetchCategory();
   }, [id]);
 
-  return { 
-    isLoading, 
-    setIsLoading, 
-    router, 
+  return {
+    isLoading,
+    setIsLoading,
+    router,
     initialValues,
-    handleUpdateCategory 
+    handleUpdateCategory,
   };
 }

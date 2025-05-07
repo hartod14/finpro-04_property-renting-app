@@ -197,7 +197,7 @@ model Room {
   roomHasFacilities    RoomHasFacility[]
   roomUnavailableDates RoomUnavailableDate[]
   bookings             Booking[]
-  RoomImage            RoomImage[]
+  roomImages           RoomImage[]
 
   @@map("rooms")
 }

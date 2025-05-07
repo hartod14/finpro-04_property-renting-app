@@ -4,6 +4,7 @@ import {
   responseHandlerPagination,
 } from '@/helpers/response.handler';
 import tenantCategoryService from '@/services/tenant-category.service';
+import tenantPropertyService from '@/services/tenant-property.service';
 
 class TenantCategoryController {
   async getAllData(req: Request, res: Response, next: NextFunction) {

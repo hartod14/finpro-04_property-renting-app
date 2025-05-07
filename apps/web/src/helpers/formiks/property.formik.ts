@@ -21,3 +21,14 @@ export const storePropertyInit = {
     },
   ],
 };
+export const updatePropertyInit = {
+  name: '',
+  checkin_time: '',
+  checkout_time: '',
+  description: '',
+  address: '',
+  city_id: '',
+  category_id: '',
+  images: [],
+  facilities: [],
+};

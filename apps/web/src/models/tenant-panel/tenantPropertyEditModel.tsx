@@ -1,34 +1,40 @@
-import { createCategory, getAllCategory } from '@/handlers/tenant-category';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import Swal from 'sweetalert2';
-import { useRouter } from 'next/navigation';
-import { createProperty } from '@/handlers/tenant-property';
-import { getAllCity } from '@/handlers/city';
-import { ICity } from '@/interfaces/city.interface';
-import { ICategory } from '@/interfaces/category.interface';
-import { uploadImage } from '@/handlers/upload';
+import { getAllCategory } from '@/handlers/tenant-category';
 import { getAllFacility } from '@/handlers/facility';
+import { updateProperty } from '@/handlers/tenant-property';
+import { uploadImage } from '@/handlers/upload';
+import { ICategory } from '@/interfaces/category.interface';
+import { ICity } from '@/interfaces/city.interface';
 import { IFacility } from '@/interfaces/facility.interface';
+import { useRouter } from 'next/navigation';
+import { use, useCallback, useEffect, useRef, useState } from 'react';
+import Swal from 'sweetalert2';
+import { getAllCity } from '@/handlers/city';
+import { getPropertyById } from '@/handlers/tenant-property';
+import { IPropertyDetail } from '@/interfaces/property.interface';
+import { log } from 'console';
 
-export default function TenantPropertyCreateModel() {
+export default function TenantPropertyEditModel(id: string) {
   const [isLoading, setIsLoading] = useState(false);
   const [cities, setCities] = useState<ICity[]>([]);
+  const [initialValues, setInitialValues] = useState<IPropertyDetail>({
+    id: 0,
+    name: '',
+    checkin_time: '',
+    checkout_time: '',
+    description: '',
+    address: '',
+    city_id: '',
+    category_id: '',
+    images: [],
+    facilities: [],
+  });
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [facilities, setFacilities] = useState<IFacility[]>([]);
-  const [roomFacilities, setRoomFacilities] = useState<IFacility[]>([]);
-  //   const loading = useContext(LoadingContext);
+
   const [images, setImages] = useState<string[]>([]);
   const [uploadImageError, setUploadImageError] = useState<string>('');
-  const [roomImageErrors, setRoomImageErrors] = useState<{[key: number]: string}>({});
   const refImage = useRef<HTMLInputElement>(null);
   const router = useRouter();
-
-  const roomImageRefs = useRef<Array<HTMLInputElement | null>>([]);
-
-  async function getCityList() {
-    const cities = await getAllCity();
-    setCities(cities);
-  }
 
   const upload = useCallback(
     async (
@@ -77,74 +83,39 @@ export default function TenantPropertyCreateModel() {
     [images],
   );
 
-  const uploadRoomImage = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    setFieldValue: (field: string, value: any) => void,
-    roomIndex: number,
-    currentValues: any,
-  ) => {
-    if (e.target.files?.length) {
-      const image: File = e.target.files[0];
-      
-      // Clear previous error for this room
-      setRoomImageErrors(prev => ({...prev, [roomIndex]: ''}));
-      
-      // Validate image size
-      if (image.size > 1048576) {
-        setRoomImageErrors(prev => ({...prev, [roomIndex]: 'Image size should not exceed 1MB'}));
-        return;
-      }
-      
-      // Validate image type
-      const acceptedTypes = ['image/png', 'image/jpg', 'image/jpeg'];
-      if (!acceptedTypes.includes(image.type)) {
-        setRoomImageErrors(prev => ({...prev, [roomIndex]: 'File must be an image (PNG, JPG, JPEG)'}));
-        return;
-      }
-      
-      const form = new FormData();
-      form.append('image', image);
+  async function getPropertyDetail() {
+    let property = await getPropertyById(id);
+    if (property.error == 'forbidden') {
+      router.push('/forbidden');
+    } else {
+      if (property) {
+        property = property.data;
+        setInitialValues({
+          id: property.id,
+          name: property.name,
+          checkin_time: new Date(property.checkin_time)
+            .toTimeString()
+            .slice(0, 5),
+          checkout_time: new Date(property.checkout_time)
+            .toTimeString()
+            .slice(0, 5),
+          description: property.description,
+          address: property.address,
+          city_id: property.city.id,
+          category_id: property.category.id,
+          images: property.images.map((img: any) => img.path),
+          facilities: property.facilities.map((facility: any) => facility.id),
+        });
 
-      try {
-        setIsLoading(true);
-        const resImage = await uploadImage(form);
-
-        const updatedRooms = [...currentValues.rooms];
-
-        if (!updatedRooms[roomIndex].images) {
-          updatedRooms[roomIndex].images = [];
-        }
-
-        updatedRooms[roomIndex].images = [
-          ...updatedRooms[roomIndex].images,
-          resImage.data,
-        ];
-        setFieldValue('rooms', updatedRooms);
-      } catch (error) {
-        setRoomImageErrors(prev => ({...prev, [roomIndex]: 'Failed to upload image'}));
-        console.error('Error uploading image:', error);
-      } finally {
-        setIsLoading(false);
+        setImages(property.images.map((img: any) => img.path));
       }
     }
-  };
+  }
 
-  const deleteRoomImage = (
-    roomIndex: number,
-    imageIndex: number,
-    setFieldValue: (field: string, value: any) => void,
-    values: any,
-  ) => {
-    const updatedRooms = [...values.rooms];
-    updatedRooms[roomIndex].images.splice(imageIndex, 1);
-    setFieldValue('rooms', updatedRooms);
-  };
-
-  const ensureRoomImageRefs = (roomCount: number) => {
-    if (roomImageRefs.current.length < roomCount) {
-      roomImageRefs.current = Array(roomCount).fill(null);
-    }
-  };
+  async function getCityList() {
+    const cities = await getAllCity();
+    setCities(cities);
+  }
 
   async function getCategoryList() {
     const categories = await getAllCategory('', '', '');
@@ -159,11 +130,6 @@ export default function TenantPropertyCreateModel() {
         (facility: IFacility) => facility.type === 'PROPERTY',
       );
       setFacilities(propertyFacilities);
-
-      const roomFacilitiesList = allFacilities.filter(
-        (facility: IFacility) => facility.type === 'ROOM',
-      );
-      setRoomFacilities(roomFacilitiesList);
     } catch (error) {
       console.error('Error fetching facilities:', error);
     }
@@ -173,11 +139,12 @@ export default function TenantPropertyCreateModel() {
     getCityList();
     getCategoryList();
     getFacilityList();
+    getPropertyDetail();
   }, []);
 
-  const handleCreateProperty = async (values: any) => {
+  const handleEditProperty = async (values: any) => {
     return Swal.fire({
-      title: 'Submit this new property?',
+      title: 'Update this property?',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -188,7 +155,7 @@ export default function TenantPropertyCreateModel() {
       if (result.isConfirmed) {
         try {
           setIsLoading(true);
-          const res = await createProperty(values);
+          const res = await updateProperty(id, values);
 
           if (res?.error) {
             Swal.fire({
@@ -199,7 +166,7 @@ export default function TenantPropertyCreateModel() {
           } else {
             Swal.fire({
               title: 'Saved!',
-              text: 'Your new property has been created.',
+              text: 'Your property has been updated.',
               icon: 'success',
               confirmButtonColor: '#3085d6',
             }).then(() => {
@@ -219,20 +186,15 @@ export default function TenantPropertyCreateModel() {
     isLoading,
     setIsLoading,
     router,
-    handleCreateProperty,
+    handleEditProperty,
     cities,
     categories,
     facilities,
-    roomFacilities,
     images,
     refImage,
     upload,
     deleteImage,
-    uploadRoomImage,
-    deleteRoomImage,
-    roomImageRefs,
-    ensureRoomImageRefs,
     uploadImageError,
-    roomImageErrors,
+    initialValues,
   };
 }

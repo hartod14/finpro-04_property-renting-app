@@ -30,7 +30,6 @@ export default function TenantPropertyListModel() {
 
     const res = await getAllProperty(search, page, limit);
     const data: IProperty[] = res.data;
-    console.log(data);
 
     const total_data: number = res.total_data;
 
@@ -59,8 +58,11 @@ export default function TenantPropertyListModel() {
           </ul>,
           <PanelButtonAction
             key={'button'}
-            onList={() => {
+            onListOrder={() => {
               router.push(`/tenant/property/list-booking/${row.id}`);
+            }}
+            onShowRoom={() => {
+              router.push(`/tenant/property/${row.id}/room`);
             }}
             onDelete={async () => {
               await deletePropertyList(row.id);

@@ -55,3 +55,60 @@ export const updateProperty = async (id: string, data: any) => {
     await getAccessToken(),
   ).catch((err) => (err instanceof Error ? { error: err.message } : err));
 };
+
+//room
+export const getRoomByPropertyId = async (id: string, search: string, page: number, limit: number) => {
+  return await api(
+    `/tenant-property/${id}/room?search=${search}&page=${page}&limit=${limit}`,
+    'GET',
+    undefined,
+    await getAccessToken(),
+  ).catch((err) => (err instanceof Error ? { error: err.message } : err));
+};
+
+export const getRoomById = async (id: string, roomId: string) => {
+  return await api(
+    `/tenant-property/${id}/room/${roomId}`,
+    'GET',
+    undefined,
+    await getAccessToken(),
+  ).catch((err) => (err instanceof Error ? { error: err.message } : err));
+};
+
+export const deleteRoom = async (id: string) => {
+  return await api(
+    `/tenant-property/${id}/room`,
+    'DELETE',
+    undefined,
+    await getAccessToken(),
+  ).catch((err) => (err instanceof Error ? { error: err.message } : err));
+};
+
+export const createRoom = async (id: string, data: any) => {
+  return await api(
+    `/tenant-property/${id}/room`,
+    'POST',
+    { body: data, contentType: 'application/json' },
+    await getAccessToken(),
+  ).catch((err) => (err instanceof Error ? { error: err.message } : err));
+};
+
+export const editRoom = async (id: string, data: any) => {
+  return await api(
+    `/tenant-property/${id}/room`,
+    'PUT',
+    { body: data, contentType: 'application/json' },
+    await getAccessToken(),
+  ).catch((err) => (err instanceof Error ? { error: err.message } : err));
+};
+
+export const updateRoom = async (id: string, roomId: string, data: any) => {
+  return await api(
+    `/tenant-property/${id}/room/${roomId}`,
+    'PUT',
+    { body: data, contentType: 'application/json' },
+    await getAccessToken(),
+  ).catch((err) => (err instanceof Error ? { error: err.message } : err));
+};
+
+
