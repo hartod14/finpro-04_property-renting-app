@@ -2,7 +2,12 @@ import { createCategory, getAllCategory } from '@/handlers/tenant-category';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
-import { createProperty, createRoom } from '@/handlers/tenant-property';
+import {
+  createProperty,
+  createRoom,
+  editRoom,
+  getRoomById,
+} from '@/handlers/tenant-property';
 import { getAllCity } from '@/handlers/city';
 import { ICity } from '@/interfaces/city.interface';
 import { ICategory } from '@/interfaces/category.interface';
@@ -11,10 +16,27 @@ import { getAllFacility } from '@/handlers/facility';
 import { IFacility } from '@/interfaces/facility.interface';
 import { IRoomCreate } from '@/interfaces/property.interface';
 
-export default function TenantPropertyRoomCreateModel(propertyId: string) {
+export default function TenantPropertyRoomEditModel(
+  propertyId: string,
+  roomId: string,
+) {
   const [isLoading, setIsLoading] = useState(false);
+
   const [roomFacilities, setRoomFacilities] = useState<IFacility[]>([]);
+  const [roomImages, setRoomImages] = useState<string[]>([]);
+
   //   const loading = useContext(LoadingContext);
+  const [initialValues, setInitialValues] = useState<IRoomCreate>({
+    name: '',
+    base_price: '',
+    description: '',
+    capacity: '',
+    size: '',
+    total_room: '',
+    roomImages: [],
+    facilities: [],
+  });
+
   const [roomImageErrors, setRoomImageErrors] = useState<{
     [key: number]: string;
   }>({});
@@ -25,7 +47,7 @@ export default function TenantPropertyRoomCreateModel(propertyId: string) {
   const uploadRoomImage = async (
     e: React.ChangeEvent<HTMLInputElement>,
     setFieldValue: (field: string, value: any) => void,
-    values?: any
+    values?: any,
   ) => {
     if (e.target.files?.length) {
       const image: File = e.target.files[0];
@@ -105,11 +127,32 @@ export default function TenantPropertyRoomCreateModel(propertyId: string) {
     }
   }
 
-  useEffect(() => {
-    getFacilityList();
-  }, []);
+  async function getRoomDetail() {
+    let room = await getRoomById(propertyId, roomId);
+    console.log(room);
+    if (room.error == 'forbidden') {
+      router.push('/forbidden');
+    } else {
+      if (room) {
+        room = room.data;
+        console.log(room);
+        setInitialValues({
+          name: room.name,
+          base_price: room.base_price,
+          description: room.description,
+          capacity: room.capacity,
+          size: room.size,
+          total_room: room.total_room,
+          roomImages: room.roomImages.map((image: any) => image.path),
+          facilities: room.roomHasFacilities.map((facility: any) => facility.facility_id),
+        });
 
-  const handleCreateRoom = async (values: IRoomCreate) => {
+        setRoomImages(room.roomImages.map((image: any) => image.path));
+      }
+    }
+  }
+
+  const handleEditRoom = async (values: IRoomCreate) => {
     return Swal.fire({
       title: 'Submit this new room?',
       icon: 'warning',
@@ -122,7 +165,7 @@ export default function TenantPropertyRoomCreateModel(propertyId: string) {
       if (result.isConfirmed) {
         try {
           setIsLoading(true);
-          const res = await createRoom(propertyId, values);
+          const res = await editRoom(propertyId, roomId, values);
 
           if (res?.error) {
             Swal.fire({
@@ -133,7 +176,7 @@ export default function TenantPropertyRoomCreateModel(propertyId: string) {
           } else {
             Swal.fire({
               title: 'Saved!',
-              text: 'Your new room has been created.',
+              text: 'Your room has been updated.',
               icon: 'success',
               confirmButtonColor: '#3085d6',
             }).then(() => {
@@ -149,16 +192,23 @@ export default function TenantPropertyRoomCreateModel(propertyId: string) {
     });
   };
 
+  useEffect(() => {
+    getFacilityList();
+    getRoomDetail();
+  }, []);
+
   return {
     isLoading,
     setIsLoading,
     router,
-    handleCreateRoom,
+    handleEditRoom,
     roomFacilities,
     uploadRoomImage,
     deleteRoomImage,
     roomImageRefs,
     ensureRoomImageRefs,
     roomImageErrors,
+    initialValues,
+    roomImages,
   };
 }

@@ -31,6 +31,31 @@ export const tenantPropertyRouter = () => {
     tenantPropertyRoomController.getRoomByPropertyId,
   );
 
+  router.get(
+    '/:id/room/:roomId',
+    authorizePropertyOwner,
+    tenantPropertyRoomController.getRoomById,
+  );
+
+  router.post(
+    '/:id/room',
+    authorizePropertyOwner,
+    tenantPropertyRoomController.createRoom,
+  );
+
+
+  router.put(
+    '/:id/room/:roomId',
+    authorizePropertyOwner,
+    tenantPropertyRoomController.updateRoom,
+  );
+
+  router.delete(
+    '/:id/room/:roomId',
+    authorizePropertyOwner,
+    tenantPropertyRoomController.deleteRoom,
+  );
+
   return router;
 };
 

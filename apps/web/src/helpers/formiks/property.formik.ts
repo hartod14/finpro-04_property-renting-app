@@ -32,3 +32,14 @@ export const updatePropertyInit = {
   images: [],
   facilities: [],
 };
+
+export const storeRoomInit = {
+  name: '',
+  base_price: '',
+  description: '',
+  capacity: '',
+  size: '',
+  total_room: '',
+  roomImages: [],
+  facilities: [],
+};

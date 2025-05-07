@@ -75,9 +75,9 @@ export const getRoomById = async (id: string, roomId: string) => {
   ).catch((err) => (err instanceof Error ? { error: err.message } : err));
 };
 
-export const deleteRoom = async (id: string) => {
+export const deleteRoom = async (id: string, roomId: string) => {
   return await api(
-    `/tenant-property/${id}/room`,
+    `/tenant-property/${id}/room/${roomId}`,
     'DELETE',
     undefined,
     await getAccessToken(),
@@ -93,9 +93,9 @@ export const createRoom = async (id: string, data: any) => {
   ).catch((err) => (err instanceof Error ? { error: err.message } : err));
 };
 
-export const editRoom = async (id: string, data: any) => {
+export const editRoom = async (id: string, roomId: string, data: any) => {
   return await api(
-    `/tenant-property/${id}/room`,
+    `/tenant-property/${id}/room/${roomId}`,
     'PUT',
     { body: data, contentType: 'application/json' },
     await getAccessToken(),

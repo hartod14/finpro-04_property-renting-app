@@ -1,46 +1,48 @@
 'use client';
 
-import Button from '@/components/common/button/button';
 import { InputField } from '@/components/common/input/InputField';
-import { InputFieldTextarea } from '@/components/common/input/InputFieldTextarea';
-import { InputSelect } from '@/components/common/input/InputSelect';
 import { storeRoomInit } from '@/helpers/formiks/property.formik';
 import { IRoomCreate } from '@/interfaces/property.interface';
-import TenantPropertyRoomCreateModel from '@/models/tenant-panel/tenantPropertyRoomCreateModel';
+import { Form } from 'formik';
+import TenantPropertyRoomEditModel from '@/models/tenant-panel/tenantPropertyRoomEditModel';
+import { Formik } from 'formik';
+import { use } from 'react';
 import { storeRoomValidator } from '@/validators/property.validator';
-import { Form, Formik } from 'formik';
+import { InputFieldTextarea } from '@/components/common/input/InputFieldTextarea';
+import { FaUpload, FaTrash, FaCheck } from 'react-icons/fa';
 import Image from 'next/image';
 import Link from 'next/link';
-import { use } from 'react';
-import { FaCheck, FaTrash, FaUpload } from 'react-icons/fa';
+import Button from '@/components/common/button/button';
 
 type Props = {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; roomId: string }>;
 };
 
-export default function TenantPropertyRoomCreatePage({ params }: Props) {
+export default function TenantPropertyRoomEditPage({ params }: Props) {
   const resolvedParams = use(params);
   const {
     isLoading,
     setIsLoading,
     router,
-    handleCreateRoom,
+    handleEditRoom,
     roomFacilities,
     uploadRoomImage,
     deleteRoomImage,
     roomImageRefs,
     roomImageErrors,
+    roomImages,
+    initialValues,
     ensureRoomImageRefs,
-  } = TenantPropertyRoomCreateModel(resolvedParams.id);
+  } = TenantPropertyRoomEditModel(resolvedParams.id, resolvedParams.roomId);
 
   return (
     <div className="bg-white rounded-md p-4 border border-gray-100 shadow-md">
       <Formik<IRoomCreate>
-        initialValues={storeRoomInit}
+        initialValues={initialValues}
         validationSchema={storeRoomValidator}
         enableReinitialize
         onSubmit={async (values) => {
-          await handleCreateRoom(values);
+          await handleEditRoom(values);
         }}
       >
         {(formik) => {
@@ -232,24 +234,37 @@ export default function TenantPropertyRoomCreatePage({ params }: Props) {
 
                   <div className="flex flex-wrap gap-2">
                     {roomFacilities.map((facility) => {
-                      const isChecked = formik.values.facilities.includes(
-                        Number(facility.id),
-                      );
+                      // Convert facilities array to numbers for proper comparison
+                      const facilitiesAsNumbers = Array.isArray(formik.values.facilities) 
+                        ? formik.values.facilities.map((f: any) => {
+                            if (typeof f === 'object') {
+                              // Handle both potential object formats
+                              return f.facility_id || f.id;
+                            }
+                            return Number(f);
+                          })
+                        : [];
+                      
+                      const isChecked = facilitiesAsNumbers.includes(Number(facility.id));
+                      
                       return (
                         <div
                           key={facility.id}
                           onClick={() => {
-                            const currentFacilities = [
-                              ...formik.values.facilities,
-                            ];
-
+                            const currentFacilities = [...formik.values.facilities];
+                            
                             if (isChecked) {
                               // Remove facility if already selected
-                              const facilityIndex = currentFacilities.indexOf(
-                                Number(facility.id),
-                              );
-                              if (facilityIndex >= 0) {
-                                currentFacilities.splice(facilityIndex, 1);
+                              const idx = currentFacilities.findIndex((f: any) => {
+                                if (typeof f === 'object') {
+                                  // Check both potential object formats
+                                  return (f.facility_id || f.id) === Number(facility.id);
+                                }
+                                return Number(f) === Number(facility.id);
+                              });
+                              
+                              if (idx >= 0) {
+                                currentFacilities.splice(idx, 1);
                               }
                             } else {
                               // Add facility if not selected

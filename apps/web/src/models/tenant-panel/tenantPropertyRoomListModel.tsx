@@ -64,7 +64,7 @@ export default function TenantPropertyRoomListModel(propertyId: string) {
           <PanelButtonAction
             key={'button'}
             onDelete={async () => {
-              await deleteRoomList(row.id);
+              await deleteRoomList(propertyId, String(row.id));
             }}
             onUpdate={() => {
               router.push(`/tenant/property/${propertyId}/room/${row.id}/edit`);
@@ -83,10 +83,10 @@ export default function TenantPropertyRoomListModel(propertyId: string) {
     }
   }
 
-  async function deleteRoomList(id: number) {
+  async function deleteRoomList(propertyId: string, roomId: string) {
     try {
       // loading?.setLoading(true);
-      await deleteRoom(id.toString()).then(() => {
+      await deleteRoom(propertyId, roomId).then(() => {
         getRoomList();
       });
     } catch (error) {

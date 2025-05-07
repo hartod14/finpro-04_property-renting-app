@@ -31,7 +31,7 @@ export default function TenantPropertyRoomPage({ params }: Props) {
     <div className="flex flex-col gap-4 pb-2 ">
       <Link
         href={`/tenant/property`}
-        className="flex items-center hover:text-blue-400 gap-2 text-blue-500"
+        className="flex items-center hover:text-blue-400 gap-2 text-blue-500 w-fit"
       >
         <FaArrowLeft />
         <span className="text-sm ">Back to property</span>

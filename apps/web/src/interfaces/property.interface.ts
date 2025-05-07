@@ -26,6 +26,17 @@ export interface IRoom {
   description?: string;
 }
 
+export interface IRoomCreate {
+  name: string;
+  base_price: string;
+  description: string;
+  capacity: string;
+  size: string;
+  total_room: string;
+  roomImages: string[];
+  facilities: number[];
+}
+
 export interface ITenant {
   id: number;
   name: string;
