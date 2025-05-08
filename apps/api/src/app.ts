@@ -25,6 +25,7 @@ import { tenantCategoryRouter } from './routers/ternant-category.router';
 import { tenantPropertyRouter } from './routers/tenant-property.router';
 import { verifyUser } from './middalewares/auth.middleware';
 import { authorizeTenantAction } from './middalewares/authorizeTenantAction';
+import { tenantRoomAvailabilityRouter } from './routers/tenant-room-availability.router';
 
 export default class App {
   private app: Application;
@@ -83,6 +84,8 @@ export default class App {
       // authorizeTenantAction,
       tenantPropertyRouter(),
     );
+
+    this.app.use('/api/tenant-room-availability', verifyUser, tenantRoomAvailabilityRouter());
 
     this.app.use('/api', usertransactionRouter.getRouter());
     this.app.use('/api', tenantTransactionManagementRouter.getRouter());

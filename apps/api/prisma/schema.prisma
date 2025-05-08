@@ -25,6 +25,11 @@ enum ValueType {
   PERCENTAGE
 }
 
+enum RateType {
+  INCREASE
+  DECREASE
+}
+
 enum BookingStatus {
   WAITING_FOR_PAYMENT
   WAITING_FOR_CONFIRMATION
@@ -54,11 +59,13 @@ model User {
   updated_at      DateTime? @updatedAt
   deleted_at      DateTime?
 
-  properties    Property[]
-  userReviews   Review[]   @relation(name: "UserReviews")
-  tenantReplies Review[]   @relation(name: "TenantReplies")
-  Booking       Booking[]
-  Category      Category[]
+  properties          Property[]
+  userReviews         Review[]              @relation(name: "UserReviews")
+  tenantReplies       Review[]              @relation(name: "TenantReplies")
+  Booking             Booking[]
+  Category            Category[]
+  roomUnavailableDate RoomUnavailableDate[]
+  peakSeasonRate      PeakSeasonRate[]
 
   @@map("users")
 }
@@ -130,7 +137,6 @@ model Property {
   city                  City                  @relation(fields: [city_id], references: [id])
   propertyHasFacilities PropertyHasFacility[]
   rooms                 Room[]
-  peakSeasonRates       PeakSeasonRate[]
   reviews               Review[]
   propertyImages        PropertyImage[]
 
@@ -193,11 +199,12 @@ model Room {
   updated_at  DateTime? @updatedAt
   deleted_at  DateTime?
 
-  property             Property              @relation(fields: [property_id], references: [id])
-  roomHasFacilities    RoomHasFacility[]
-  roomUnavailableDates RoomUnavailableDate[]
-  bookings             Booking[]
-  roomImages           RoomImage[]
+  property                Property                 @relation(fields: [property_id], references: [id])
+  roomHasFacilities       RoomHasFacility[]
+  bookings                Booking[]
+  roomImages              RoomImage[]
+  roomHasUnavailableDates RoomHasUnavailableDate[]
+  roomHasPeakSeasonRates  RoomHasPeakSeasonRate[]
 
   @@map("rooms")
 }
@@ -214,33 +221,60 @@ model RoomHasFacility {
 }
 
 model RoomUnavailableDate {
-  id         Int       @id @default(autoincrement())
-  room_id    Int
-  start_date DateTime  @db.Date
-  end_date   DateTime  @db.Date
-  created_at DateTime  @default(now())
-  updated_at DateTime? @updatedAt
-  deleted_at DateTime?
-
-  room Room @relation(fields: [room_id], references: [id])
-
-  @@map("room_unavailable_dates")
-}
-
-model PeakSeasonRate {
   id          Int       @id @default(autoincrement())
-  property_id Int
-  value_type  ValueType
-  value       Decimal   @db.Decimal(15, 2)
+  tenant_id   Int
   start_date  DateTime  @db.Date
   end_date    DateTime  @db.Date
+  description String?   @db.Text
   created_at  DateTime  @default(now())
   updated_at  DateTime? @updatedAt
   deleted_at  DateTime?
 
-  property Property @relation(fields: [property_id], references: [id])
+  roomHasUnavailableDates RoomHasUnavailableDate[]
+  tenant                  User                     @relation(fields: [tenant_id], references: [id])
+
+  @@map("room_unavailable_dates")
+}
+
+model RoomHasUnavailableDate {
+  id                       Int @id @default(autoincrement())
+  room_id                  Int
+  room_unavailable_date_id Int
+
+  room                Room                @relation(fields: [room_id], references: [id])
+  roomUnavailableDate RoomUnavailableDate @relation(fields: [room_unavailable_date_id], references: [id])
+
+  @@map("room_has_unavailable_dates")
+}
+
+model PeakSeasonRate {
+  id          Int       @id @default(autoincrement())
+  tenant_id   Int
+  value_type  ValueType
+  value       Decimal   @db.Decimal(15, 2)
+  start_date  DateTime  @db.Date
+  end_date    DateTime  @db.Date
+  type        RateType
+  description String?   @db.Text
+  created_at  DateTime  @default(now())
+  updated_at  DateTime? @updatedAt
+  deleted_at  DateTime?
+
+  roomHasPeakSeasonRates RoomHasPeakSeasonRate[]
+  tenant                 User                    @relation(fields: [tenant_id], references: [id])
 
   @@map("peak_season_dates")
+}
+
+model RoomHasPeakSeasonRate {
+  id                  Int @id @default(autoincrement())
+  room_id             Int
+  peak_season_rate_id Int
+
+  room           Room           @relation(fields: [room_id], references: [id])
+  peakSeasonRate PeakSeasonRate @relation(fields: [peak_season_rate_id], references: [id])
+
+  @@map("room_has_peak_season_rates")
 }
 
 model Booking {
@@ -264,7 +298,7 @@ model Payment {
   id           Int           @id @default(autoincrement())
   amount       Decimal       @db.Decimal(15, 2)
   method       PaymentMethod
-  proof        String?   
+  proof        String?
   payment_date DateTime?
   created_at   DateTime      @default(now())
   updated_at   DateTime?     @updatedAt

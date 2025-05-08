@@ -24,6 +24,7 @@ export default function TenantSidebar({ children }: Props) {
 
     // { href: '/user/booking', icon: <FaShoppingBag />, label: 'My Booking' },
     { href: '/tenant/property', icon: <FaHotel />, label: 'Property' },
+    { href: '/tenant/room-availability', icon: <FaLock />, label: 'Room Availability' },
     { href: '/tenant/account', icon: <FaUser />, label: 'Account' },
     { href: '/tenant/password', icon: <FaLock />, label: 'Password' },
   ];
