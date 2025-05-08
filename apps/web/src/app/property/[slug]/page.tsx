@@ -403,7 +403,7 @@ export default function PropertyDetailPage() {
   return (
     <>
       <Navbar forceScrolled={true} />
-      <div className="min-h-screen pt-28 pb-10 bg-[#FDFDFE] px-4 lg:px-24">
+      <div className="min-h-screen pt-28 pb-10 bg-[#FDFDFE] px-4 lg:px-24 text-black">
         {/* Back to Property Listing Navigation */}
         <div className="mb-4">
           <Link

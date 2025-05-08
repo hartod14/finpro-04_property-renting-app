@@ -89,7 +89,7 @@ export default function PropertyPage() {
   return (
     <>
       <Navbar forceScrolled={true} />
-      <div className="lg:mx-24 py-6 px-4 bg-[#FDFDFE]">
+      <div className="lg:mx-24 py-6 px-4 bg-[#FDFDFE] text-black">
         {/* Search Bar */}
         <div className="flex flex-col md:flex-row mb-8 pt-24">
           <div className="w-full md:w-1/3 p-3 md:rounded-l-lg flex items-center border-2 border-b-0 md:border-b-2 border-primary md:border-r-0  bg-white">
@@ -99,7 +99,7 @@ export default function PropertyPage() {
             <input
               type="text"
               placeholder="Search location, property..."
-              className="w-full outline-none text-gray-700"
+              className="w-full outline-none text-gray-700 bg-transparent"
               value={searchTerm}
               onChange={(e) => handleSearchTermChange(e.target.value)}
             />

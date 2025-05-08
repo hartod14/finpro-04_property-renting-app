@@ -192,7 +192,6 @@ export const listBookings = async (userId: number) => {
   return formattedBookings;
 };
 
-
 export const cancelBooking = async (bookingId: number) => {
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
