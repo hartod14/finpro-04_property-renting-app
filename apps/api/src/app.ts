@@ -21,7 +21,10 @@ import { facilityRouter } from './routers/facility.router';
 import { categoryRouter } from './routers/category.router';
 import { userRouter } from './routers/user.router';
 import { propertyRouter } from './routers/property.router';
-
+import { tenantCategoryRouter } from './routers/ternant-category.router';
+import { tenantPropertyRouter } from './routers/tenant-property.router';
+import { verifyUser } from './middalewares/auth.middleware';
+import { authorizeTenantAction } from './middalewares/authorizeTenantAction';
 
 export default class App {
   private app: Application;
@@ -68,10 +71,19 @@ export default class App {
     this.app.use('/api/upload-image', uploadRouter());
     this.app.use('/api/city', cityRouter());
     this.app.use('/api/facility', facilityRouter());
+    this.app.use('/api/user', userRouter());
     this.app.use('/api/category', categoryRouter());
     this.app.use('/api/property', propertyRouter());
 
-    this.app.use('/api/user', userRouter());
+    //tenant
+    this.app.use('/api/tenant-category', verifyUser, tenantCategoryRouter());
+    this.app.use(
+      '/api/tenant-property',
+      verifyUser,
+      // authorizeTenantAction,
+      tenantPropertyRouter(),
+    );
+
     this.app.use('/api', usertransactionRouter.getRouter());
     this.app.use('/api', tenantTransactionManagementRouter.getRouter());
   }

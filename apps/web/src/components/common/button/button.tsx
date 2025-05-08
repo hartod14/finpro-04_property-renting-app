@@ -1,11 +1,12 @@
 import React from 'react';
 
 interface PanelButtonProps {
-  color: 'primary' | 'secondary' | 'danger' | 'white' | 'transparent' | 'black' | 'primaryOrange' | 'lightGray';
+  color: 'primary' | 'primary2' | 'secondary' | 'danger' | 'white' | 'transparent' | 'black' | 'primaryOrange' | 'lightGray';
   name: string;
   textColor: 'primary' | 'secondary' | 'danger' | 'white' | 'black' | 'primaryOrange' | 'lightGray';
   border?:
     | 'primary'
+    | 'primary2'
     | 'secondary'
     | 'danger'
     | 'white'
@@ -26,6 +27,12 @@ const classMapping: Record<
     text: 'text-primary',
     border: 'border-primary',
     onHover: 'hover:saturate-150',
+  },
+  primary2: {
+    bg: 'bg-primary2',
+    text: 'text-primary2',
+    border: 'border-primary2',
+    onHover: 'hover:bg-primary2/80',
   },
   black: {
     bg: 'bg-black',

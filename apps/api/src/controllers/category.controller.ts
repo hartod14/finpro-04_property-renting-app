@@ -1,4 +1,7 @@
-import { responseHandler } from '@/helpers/response.handler';
+import {
+  responseHandler,
+  responseHandlerPagination,
+} from '@/helpers/response.handler';
 import categoryService from '@/services/category.service';
 import { NextFunction, Request, Response } from 'express';
 
@@ -13,4 +16,4 @@ class CategoryController {
   }
 }
 
-export default new CategoryController(); 
+export default new CategoryController();

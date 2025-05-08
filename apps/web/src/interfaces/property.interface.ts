@@ -22,8 +22,19 @@ export interface IRoom {
   size: number;
   total_room: number;
   facilities: IFacility[];
-  images: IRoomImage[];
+  roomImages: IRoomImage[];
   description?: string;
+}
+
+export interface IRoomCreate {
+  name: string;
+  base_price: string;
+  description: string;
+  capacity: string;
+  size: string;
+  total_room: string;
+  roomImages: string[];
+  facilities: number[];
 }
 
 export interface ITenant {
@@ -48,4 +59,63 @@ export interface IProperty {
   images: IPropertyImage[];
   lowestPriceRoom: IRoom | null;
   rooms?: IRoom[];
+  propertyImages: IPropertyImage[];
+}
+
+export interface IPropertyDetail {
+  id: number;
+  name: string;
+  checkin_time: string;
+  checkout_time: string;
+  description: string;
+  address: string;
+  city_id: string;
+  category_id: string;
+  images: IPropertyImage[] | string[];
+  facilities: IFacility[] | number[];
+  rooms?: {
+    id?: number;
+    name: string;
+    base_price: number | string;
+    description: string;
+    capacity: number | string;
+    size: number | string;
+    total_room: number | string;
+    images: string[];
+    facilities: number[];
+  }[];
+}
+
+export interface IPropertyCreate {
+  name: string;
+  checkin_time: string;
+  checkout_time: string;
+  description: string;
+  address: string;
+  city_id: string;
+  category_id: string;
+  images: string[];
+  facilities: number[];
+  rooms: {
+    name: string;
+    base_price: string;
+    description: string;
+    capacity: string;
+    size: string;
+    total_room: string;
+    images: string[];
+    facilities: number[];
+  }[];
+}
+
+export interface IPropertyUpdate {
+  name: string;
+  checkin_time: string;
+  checkout_time: string;
+  description: string;
+  address: string;
+  city_id: string;
+  category_id: string;
+  images: string[];
+  facilities: number[];
 }

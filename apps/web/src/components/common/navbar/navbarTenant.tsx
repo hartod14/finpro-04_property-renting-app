@@ -136,7 +136,7 @@ export default function Navbar() {
             onClick={() => setIsProfileOpen(!isProfileOpen)}
           >
             <span
-              className={`font-medium ${isScrolled ? 'text-primary' : 'text-white'}`}
+              className={`font-medium ${isScrolled ? 'text-primary' : 'text-black'}`}
             >
               Hi, {session.user.name || 'User'}
             </span>

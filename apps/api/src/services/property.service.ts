@@ -78,7 +78,7 @@ class PropertyService {
                 facility: true,
               },
             },
-            RoomImage: true,
+            roomImages: true,
           },
         },
         propertyHasFacilities: {
@@ -192,7 +192,7 @@ class PropertyService {
               facilities: lowestPriceRoom.roomHasFacilities.map(
                 (rf) => rf.facility,
               ),
-              images: lowestPriceRoom.RoomImage,
+              images: lowestPriceRoom.roomImages,
             }
           : null,
       };
@@ -229,7 +229,7 @@ class PropertyService {
                 facility: true,
               },
             },
-            RoomImage: true,
+            roomImages: true,
           },
         },
         propertyHasFacilities: {
@@ -281,7 +281,7 @@ class PropertyService {
           ...rf.facility,
           type: 'ROOM',
         })),
-        images: room.RoomImage,
+        images: room.roomImages,
       })),
     };
   }
@@ -303,7 +303,7 @@ class PropertyService {
                 facility: true,
               },
             },
-            RoomImage: true,
+            roomImages: true,
           },
         },
         propertyHasFacilities: {
@@ -355,7 +355,7 @@ class PropertyService {
           ...rf.facility,
           type: 'ROOM',
         })),
-        images: room.RoomImage,
+        images: room.roomImages,
       })),
     };
   }
@@ -389,7 +389,7 @@ class PropertyService {
             base_price: 'asc',
           },
           include: {
-            RoomImage: true,
+            roomImages: true,
           },
           take: 1,
         },

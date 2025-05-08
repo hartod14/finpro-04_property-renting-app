@@ -3,3 +3,8 @@ export interface ICategory {
   name: string;
   created_at?: string;
 }
+
+export interface ICreateCategory {
+  name: string;
+}
+

@@ -1,18 +1,7 @@
-import { api } from "./_api";
+import { api } from './_api';
 
 export const uploadImage = async (formData: FormData) => {
-    try { // Retrieve the access token
-  
-      return await api(
-        "/upload-image",
-        "POST",
-        {
-          body: formData,
-        }
-      );
-  
-    } catch (error) {
-      console.error("Upload failed:", error);
-      throw error;
-    }
-  };
+  return await api('/upload-image', 'POST', {
+    body: formData,
+  }).catch((err) => (err instanceof Error ? { error: err.message } : err));
+};

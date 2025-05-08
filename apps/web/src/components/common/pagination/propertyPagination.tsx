@@ -65,10 +65,9 @@ export const PaginationTable: React.FC<props> = props => {
 
     const generatePages = () => {
         let pages: (number | string)[] = [];
-        const range = 2; // Number of pages to show before and after the current page
+        const range = 2;
 
         if (totalPage <= 7) {
-            // If total pages are small, show all
             pages = Array.from({ length: totalPage }, (_, i) => i + 1);
         } else {
             pages.push(1);
