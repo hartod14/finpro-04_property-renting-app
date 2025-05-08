@@ -9,5 +9,6 @@ export const propertyRouter = () => {
     router.get('/slug/:slug', propertyController.getPropertyBySlug)
     router.get('/:id', propertyController.getPropertyById)
 
+
     return router
 }

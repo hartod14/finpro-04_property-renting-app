@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 import { PrismaClient, PaymentMethod } from '@prisma/client';
 import * as bookingService from '../services/booking.service';
-import { BookingStatus } from '../models/booking.model'; 
+import { BookingStatus } from '../models/booking.model';
 
 const prisma = new PrismaClient();
 
 export const createBooking = async (req: Request, res: Response) => {
-  const { userId, roomId, checkinDate, checkoutDate, paymentMethod, amount } = req.body;
+  const { userId, roomId, checkinDate, checkoutDate, paymentMethod } = req.body;
 
   try {
     const booking = await bookingService.createBooking(
@@ -15,7 +15,6 @@ export const createBooking = async (req: Request, res: Response) => {
       new Date(checkinDate),
       new Date(checkoutDate),
       paymentMethod,
-      amount
     );
     res.status(201).json(booking);
   } catch (error: unknown) {
@@ -27,7 +26,35 @@ export const createBooking = async (req: Request, res: Response) => {
   }
 };
 
-export const listBookings = async (req: Request, res: Response): Promise<any> => {
+export const getBookingSummaryByRoomId = async (
+  req: Request,
+  res: Response,
+): Promise<any> => {
+  const { roomId } = req.params;
+  const userId = (req as any).user?.id;
+
+  if (!userId) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  try {
+    const bookingSummary = await bookingService.getBookingSummaryByRoomIdService(Number(roomId), userId);
+
+    if (!bookingSummary) {
+      return res.status(404).json({ message: 'Room or user not found' });
+    }
+
+    return res.status(200).json(bookingSummary);
+  } catch (error) {
+    console.error('Error fetching booking summary:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+export const listBookings = async (
+  req: Request,
+  res: Response,
+): Promise<any> => {
   const { userId } = req.query;
 
   try {
@@ -40,12 +67,12 @@ export const listBookings = async (req: Request, res: Response): Promise<any> =>
         user_id: Number(userId),
       },
       include: {
-        user: true, 
+        user: true,
         room: {
           include: {
             property: {
               include: {
-                propertyImages: true, 
+                propertyImages: true,
               },
             },
           },
@@ -89,25 +116,25 @@ export const listBookings = async (req: Request, res: Response): Promise<any> =>
 
 export const cancelBookingController = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<any> => {
   const { bookingId } = req.params;
-  console.log("Received cancel request for Booking ID:", bookingId); // Log ID yang diterima controller
+  console.log('Received cancel request for Booking ID:', bookingId); // Log ID yang diterima controller
 
   try {
     const id = Number(bookingId);
 
     if (isNaN(id)) {
-      console.log("Invalid booking ID:", bookingId); // Log ketika ID tidak valid
+      console.log('Invalid booking ID:', bookingId); // Log ketika ID tidak valid
       return res.status(400).json({ message: 'Invalid booking ID' });
     }
 
     // Memanggil service untuk membatalkan booking
     const result = await bookingService.cancelBooking(id);
-    console.log("Booking cancellation result:", result); // Log hasil pembatalan
-    return res.status(200).json(result);  // Mengembalikan hasil pembatalan
+    console.log('Booking cancellation result:', result); // Log hasil pembatalan
+    return res.status(200).json(result); // Mengembalikan hasil pembatalan
   } catch (error: any) {
-    console.error("Error in cancelBookingController:", error); // Log error di controller
+    console.error('Error in cancelBookingController:', error); // Log error di controller
 
     // Pastikan backend mengirimkan detail error
     if (error instanceof Error) {

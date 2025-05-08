@@ -48,7 +48,7 @@ export default function PurchaseListPage() {
               },
             },
           );
-
+  
           const sortedBookings = res.data.sort(
             (a: any, b: any) => b.booking.id - a.booking.id,
           );
@@ -60,9 +60,9 @@ export default function PurchaseListPage() {
         }
       }
     };
-
+  
     fetchBookings();
-  }, [session]);
+  }, [session]);  
 
   const handleCancel = (bookingId: number) => {
     handleCancelBooking(bookingId, session?.user?.access_token!, setBookings);

@@ -23,6 +23,14 @@ export const BookingCard = ({
   const [isHovered, setIsHovered] = useState(false);
   const statusColorClass = getStatusColor(booking.booking.status);
 
+  // Menghitung lama hari booking
+  const checkInDate = new Date(formattedCheckInDate);
+  const checkOutDate = new Date(formattedCheckOutDate);
+  const durationInDays = Math.floor((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 3600 * 24));
+
+  // Menghitung total price berdasarkan durasi
+  const totalPrice = booking.room.price * durationInDays;
+
   return (
     <div
       className="border rounded-lg shadow-lg p-5 flex flex-col md:flex-row gap-6 transition-transform duration-300 hover:scale-[1.01] hover:shadow-xl relative"
@@ -82,7 +90,7 @@ export const BookingCard = ({
             <p className="text-gray-700">
               <strong>Price:</strong>{' '}
               <span className="bg-yellow-100 text-yellow-800 px-2 py-1 text-lg font-semibold rounded-lg">
-                Rp {parseInt(booking.room.price).toLocaleString('id-ID')}
+                Rp {totalPrice.toLocaleString('id-ID')}
               </span>
             </p>
           </div>

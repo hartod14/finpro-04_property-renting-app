@@ -20,6 +20,12 @@ export class UserTransactionRouter {
     this.router.post('/bookings', verifyUser, bookingController.createBooking);
     this.router.get('/bookings', verifyUser, bookingController.listBookings);
 
+    this.router.get(
+      '/bookings/room/:roomId',
+      verifyUser,
+      bookingController.getBookingSummaryByRoomId,
+    );
+
     this.router.delete(
       '/bookings/:bookingId',
       verifyUser,
