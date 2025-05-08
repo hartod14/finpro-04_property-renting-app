@@ -84,7 +84,7 @@ export const getBookingSummaryByRoomIdService = async (roomId: number, userId: n
           },
         },
       },
-      RoomImage: {
+      roomImages: {
         where: { deleted_at: null },
         orderBy: { created_at: 'asc' },
         take: 1,
@@ -119,7 +119,7 @@ export const getBookingSummaryByRoomIdService = async (roomId: number, userId: n
       base_price: room.base_price,
       capacity: room.capacity,
       size: room.size,
-      image: room.RoomImage[0]?.path || null,
+      image: room.roomImages[0]?.path || null,
     },
   };
 };

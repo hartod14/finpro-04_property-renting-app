@@ -34,6 +34,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/tenant', request.nextUrl));
   }
 
+  if (pathname.startsWith('/booking') && session?.user?.role == 'TENANT') {
+    return NextResponse.redirect(new URL('/', request.nextUrl));
+  }
+
   return NextResponse.next();
 }
 
