@@ -24,6 +24,7 @@ export interface IRoom {
   facilities: IFacility[];
   roomImages: IRoomImage[];
   description?: string;
+  property: IProperty;
 }
 
 export interface IRoomCreate {

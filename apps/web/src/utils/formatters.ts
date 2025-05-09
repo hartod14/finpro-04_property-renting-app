@@ -39,3 +39,20 @@ export const formatTimeOnly = (
     return undefined;
   }
 };
+
+export const formatDateOnly = (
+  dateString: string | null | undefined,
+): string | undefined => {
+  if (!dateString) return undefined;
+
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    return undefined;
+  }
+
+  return date.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  });
+};

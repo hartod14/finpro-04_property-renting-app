@@ -23,7 +23,11 @@ class TenantPropertyService {
       include: {
         propertyImages: true,
         category: true,
-        rooms: true,
+        rooms: {
+          include: {
+            roomImages: true,
+          },
+        },
         city: true,
       },
       ...pagination(Number(page), Number(limit)),

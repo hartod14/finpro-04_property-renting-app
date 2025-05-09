@@ -5,6 +5,8 @@ export const tenantRoomAvailabilityRouter = () => {
   const router = Router();
 
   router.get('/', tenantRoomAvailabilityController.getAllData);
+  router.post('/', tenantRoomAvailabilityController.createData);
+  router.delete('/:id', tenantRoomAvailabilityController.deleteData);
 
   return router;
 };

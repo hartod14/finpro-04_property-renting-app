@@ -1,4 +1,15 @@
-import { BedDouble, Clipboard, ClipboardList, Edit, Eye, Hotel, House, List, ListCollapse, Trash } from 'lucide-react';
+import {
+  BedDouble,
+  Clipboard,
+  ClipboardList,
+  Edit,
+  Eye,
+  Hotel,
+  House,
+  List,
+  ListCollapse,
+  Trash,
+} from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
 import { FaEdit, FaEye, FaList, FaPencilAlt, FaTrash } from 'react-icons/fa';

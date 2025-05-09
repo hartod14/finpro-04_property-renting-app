@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { responseHandlerPagination } from '@/helpers/response.handler';
+import { responseHandler, responseHandlerPagination } from '@/helpers/response.handler';
 import tenantRoomAvailabilityService from '@/services/tenant-room-availability.service';
 
 class TenantRoomAvailabilityController {
@@ -12,6 +12,25 @@ class TenantRoomAvailabilityController {
         data.data,
         data.total,
       );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async createData(req: Request, res: Response, next: NextFunction) {
+    
+    try {
+      const data = await tenantRoomAvailabilityService.createData(req);
+      responseHandler(res, 'create room availability success', data);
+    } catch (error) { 
+      next(error);
+    }
+  }
+
+  async deleteData(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await tenantRoomAvailabilityService.deleteData(Number(req.params.id));
+      responseHandler(res, 'delete room availability success', data);
     } catch (error) {
       next(error);
     }
