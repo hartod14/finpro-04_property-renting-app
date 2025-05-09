@@ -1,6 +1,7 @@
 'use client';
 
 import PanelButtonAction from '@/components/common/button/panelButtonAction';
+import PanelButtonActionOrders from '@/components/common/button/panelButtonActionOrders';
 import { deleteProperty, getAllProperty } from '@/handlers/tenant-property';
 // import { deleteCategory, getAllCategory } from '@/handlers/tenant-category';
 import { ICategory } from '@/interfaces/category.interface';
@@ -10,7 +11,7 @@ import { useRouter } from 'next/navigation';
 
 import React, { useContext, useEffect, useState } from 'react';
 
-export default function TenantPropertyListModel() {
+export default function TenantPropertyListModelOrders() {
   // const loading = useContext(LoadingContext);
   const [page, setPage] = useState<number>(1);
   const [search, setSearch] = useState<string>('');
@@ -56,16 +57,13 @@ export default function TenantPropertyListModel() {
               </li>
             )) || 'No room type'}
           </ul>,
-          <PanelButtonAction
+          <PanelButtonActionOrders
             key={'button'}
-            onShowRoom={() => {
-              router.push(`/tenant/property/${row.id}/room`);
+            onListOrder={() => {
+              router.push(`/tenant/orders/list-booking/${row.id}`);
             }}
-            onDelete={async () => {
-              await deletePropertyList(row.id);
-            }}
-            onUpdate={() => {
-              router.push(`/tenant/property/edit/${row.id}`);
+            onShowReview={() => {
+              router.push(`/tenant/orders/reviews/${row.id}`);
             }}
           />,
         ]);
@@ -77,19 +75,6 @@ export default function TenantPropertyListModel() {
         ...table,
         body: body,
       });
-      // loading?.setLoading(false);
-    }
-  }
-
-  async function deletePropertyList(id: number) {
-    try {
-      // loading?.setLoading(true);
-      await deleteProperty(id.toString()).then(() => {
-        getPropertyList();
-      });
-    } catch (error) {
-    } finally {
-      // loading?.setLoading(false);
     }
   }
   useEffect(() => {

@@ -1,13 +1,16 @@
-// types/express.d.ts
-import { User } from '@prisma/client'; // atau tipe user sesuai yang kamu pakai
+// types/express/index.d.ts
+
+import { User } from '@prisma/client';
 
 declare global {
   namespace Express {
     interface Request {
       user?: {
         id: number;
-        // tambahkan properti lain jika diperlukan
+        // Tambahkan properti lain jika dibutuhkan
       };
     }
   }
 }
+
+export {};
