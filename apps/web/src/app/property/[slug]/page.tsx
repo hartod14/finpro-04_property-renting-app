@@ -21,6 +21,8 @@ import PropertyDetailSkeleton from '@/components/property/propertyDetailSkeleton
 import React, { useState, useEffect, useRef } from 'react';
 import { getFacilityIconByName } from '@/utils/facilityIcons';
 import { formatTimeOnly } from '@/utils/formatters';
+import { IReview } from '@/interfaces/property.interface';
+import PropertyReviews from '@/components/property/PropertyReviews';
 
 export default function PropertyDetailPage() {
   const { slug } = useParams();
@@ -55,7 +57,6 @@ export default function PropertyDetailPage() {
     const today = new Date();
     return new Date(today.getFullYear(), today.getMonth(), 1);
   };
-  
 
   const getNextMonth = (date: Date): Date => {
     return new Date(date.getFullYear(), date.getMonth() + 1, 1);
@@ -71,6 +72,10 @@ export default function PropertyDetailPage() {
   const [hoverDate, setHoverDate] = useState<Date | null>(null);
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const calendarRef = useRef<HTMLDivElement>(null);
+
+  const [reviews, setReviews] = useState<IReview[]>([]);
+
+  
 
   // Close calendar when clicking outside
   useEffect(() => {
@@ -107,8 +112,6 @@ export default function PropertyDetailPage() {
     );
     return date >= maxDate;
   };
-
-  
 
   const formatDate = (date: Date): string => {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
@@ -346,6 +349,7 @@ export default function PropertyDetailPage() {
       'November',
       'December',
     ];
+    
 
     return (
       <div className="mb-4">
@@ -693,15 +697,17 @@ export default function PropertyDetailPage() {
                 <p className="text-gray-500 text-sm md:text-right">Hosted by</p>
                 <div className="flex flex-row items-center gap-2 mt-1">
                   <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 border border-gray-300">
-                    <Image 
-                      src={property.tenant.profile_picture} 
+                    <Image
+                      src={property.tenant.profile_picture}
                       alt={property.tenant.name}
                       width={40}
                       height={40}
                       className="object-cover w-full h-full"
                     />
                   </div>
-                  <p className="font-medium text-gray-700 text-lg">{property.tenant.name}</p>
+                  <p className="font-medium text-gray-700 text-lg">
+                    {property.tenant.name}
+                  </p>
                 </div>
               </div>
             </div>
@@ -973,7 +979,9 @@ export default function PropertyDetailPage() {
                         </p>
                       </div>
 
-                      <Link href={`/booking/${property.slug}?roomId=${room.id}`}>
+                      <Link
+                        href={`/booking/${property.slug}?roomId=${room.id}`}
+                      >
                         <div className="mt-4 bg-primary text-white px-4 py-2 inline-block rounded hover:bg-primary/90 transition-colors">
                           Book Now
                         </div>
@@ -987,6 +995,7 @@ export default function PropertyDetailPage() {
             <p className="text-gray-500">No rooms available</p>
           )}
         </div>
+        <PropertyReviews propertyId={property.id} />
       </div>
       <Footer />
     </>

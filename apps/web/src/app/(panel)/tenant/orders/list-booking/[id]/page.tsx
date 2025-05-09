@@ -105,10 +105,9 @@ export default function ListBookingPage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto text-black">
-      {/* Tombol panah kiri untuk navigasi ke halaman My Property */}
       <div
         className="flex items-center mb-6 cursor-pointer"
-        onClick={() => router.push('/tenant/property')}
+        onClick={() => router.push('/tenant/orders')}
       >
         <FaArrowLeft size={20} className="mr-2" />
         <span className="text-xl font-semibold">My Properties</span>
@@ -245,65 +244,64 @@ export default function ListBookingPage() {
                   </div>
 
                   {/* Approve & Reject Buttons */}
-<div className="absolute bottom-3 right-4 flex gap-4">
-  {booking.status !== 'REJECTED' &&
-    booking.status !== 'DONE' &&
-    booking.payment?.proof ? (
-    <>
-      <button
-        onClick={() =>
-          Swal.fire({
-            title: 'Are you sure?',
-            text: 'This booking will be approved.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#22c55e',
-            cancelButtonColor: '#ef4444',
-            confirmButtonText: 'Yes, approve it!',
-          }).then((result) => {
-            if (result.isConfirmed) {
-              handleApprove(booking.id);
-              Swal.fire(
-                'Approved!',
-                'Booking has been approved.',
-                'success',
-              );
-            }
-          })
-        }
-        className="w-40 font-bold bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 focus:outline-none"
-      >
-        <CheckCheck className="inline mr-2" /> Approve
-      </button>
-      <button
-        onClick={() =>
-          Swal.fire({
-            title: 'Are you sure?',
-            text: 'This booking will be rejected.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Yes, reject it!',
-          }).then((result) => {
-            if (result.isConfirmed) {
-              handleReject(booking.id);
-              Swal.fire(
-                'Rejected!',
-                'Booking has been rejected.',
-                'success',
-              );
-            }
-          })
-        }
-        className="w-40 font-bold bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 focus:outline-none"
-      >
-        <X className="inline mr-2" /> Reject
-      </button>
-    </>
-  ) : null}
-</div>
-
+                  <div className="absolute bottom-3 right-4 flex gap-4">
+                    {booking.status !== 'REJECTED' &&
+                    booking.status !== 'DONE' &&
+                    booking.payment?.proof ? (
+                      <>
+                        <button
+                          onClick={() =>
+                            Swal.fire({
+                              title: 'Are you sure?',
+                              text: 'This booking will be approved.',
+                              icon: 'warning',
+                              showCancelButton: true,
+                              confirmButtonColor: '#22c55e',
+                              cancelButtonColor: '#ef4444',
+                              confirmButtonText: 'Yes, approve it!',
+                            }).then((result) => {
+                              if (result.isConfirmed) {
+                                handleApprove(booking.id);
+                                Swal.fire(
+                                  'Approved!',
+                                  'Booking has been approved.',
+                                  'success',
+                                );
+                              }
+                            })
+                          }
+                          className="w-40 font-bold bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 focus:outline-none"
+                        >
+                          <CheckCheck className="inline mr-2" /> Approve
+                        </button>
+                        <button
+                          onClick={() =>
+                            Swal.fire({
+                              title: 'Are you sure?',
+                              text: 'This booking will be rejected.',
+                              icon: 'warning',
+                              showCancelButton: true,
+                              confirmButtonColor: '#ef4444',
+                              cancelButtonColor: '#6b7280',
+                              confirmButtonText: 'Yes, reject it!',
+                            }).then((result) => {
+                              if (result.isConfirmed) {
+                                handleReject(booking.id);
+                                Swal.fire(
+                                  'Rejected!',
+                                  'Booking has been rejected.',
+                                  'success',
+                                );
+                              }
+                            })
+                          }
+                          className="w-40 font-bold bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 focus:outline-none"
+                        >
+                          <X className="inline mr-2" /> Reject
+                        </button>
+                      </>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             );

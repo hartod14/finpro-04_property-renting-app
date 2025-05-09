@@ -1,4 +1,11 @@
-import { Clock, Receipt, X, CreditCard } from 'lucide-react';
+import {
+  Clock,
+  Receipt,
+  X,
+  CreditCard,
+  Pencil,
+  MessageCircle,
+} from 'lucide-react';
 import { useState } from 'react';
 
 interface BookingCardProps {
@@ -9,6 +16,7 @@ interface BookingCardProps {
   getStatusColor: (status: string) => string;
   formattedCheckInDate: string;
   formattedCheckOutDate: string;
+  onOpenReviewModal: (bookingId: number) => void;
 }
 
 export const BookingCard = ({
@@ -19,6 +27,7 @@ export const BookingCard = ({
   getStatusColor,
   formattedCheckInDate,
   formattedCheckOutDate,
+  onOpenReviewModal,
 }: BookingCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const statusColorClass = getStatusColor(booking.booking.status);
@@ -26,7 +35,9 @@ export const BookingCard = ({
   // Menghitung lama hari booking
   const checkInDate = new Date(formattedCheckInDate);
   const checkOutDate = new Date(formattedCheckOutDate);
-  const durationInDays = Math.floor((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 3600 * 24));
+  const durationInDays = Math.floor(
+    (checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 3600 * 24),
+  );
 
   // Menghitung total price berdasarkan durasi
   const totalPrice = booking.room.price * durationInDays;
@@ -98,15 +109,24 @@ export const BookingCard = ({
 
         {/* Action Buttons */}
         <div className="mt-4 flex justify-end gap-4 flex-wrap">
-          {booking.booking.status === 'DONE' && (
-            <button
-              onClick={() => onGenerateReceipt(booking)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200"
-            >
-              <Receipt className="w-5 h-5" />
-              Generate Receipt
-            </button>
-          )}
+          {booking.booking.status === 'DONE' &&
+            (new Date(booking.booking.checkoutDate) <= new Date() ? (
+              <button
+                onClick={() => onOpenReviewModal(booking.booking.id)}
+                className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition-colors duration-200"
+              >
+                <MessageCircle className="w-5 h-5" />
+                Review
+              </button>
+            ) : (
+              <button
+                onClick={() => onGenerateReceipt(booking)}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200"
+              >
+                <Receipt className="w-5 h-5" />
+                Generate Receipt
+              </button>
+            ))}
 
           {booking.booking.status === 'WAITING_FOR_PAYMENT' && (
             <button

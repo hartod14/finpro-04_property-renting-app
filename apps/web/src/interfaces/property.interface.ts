@@ -44,6 +44,25 @@ export interface ITenant {
   profile_picture: string;
 }
 
+
+export interface IReview {
+  id: number;
+  rating: number;
+  comment: string;
+  reply?: string;
+  reply_at?: string;
+  created_at: string;
+  user: {
+    name: string;
+    profile_picture: string | null;
+  };
+  tenant?: {
+    name: string;
+    profile_picture: string | null;
+  };  
+}
+
+
 export interface IProperty {
   id: number;
   name: string;
@@ -60,6 +79,7 @@ export interface IProperty {
   lowestPriceRoom: IRoom | null;
   rooms?: IRoom[];
   propertyImages: IPropertyImage[];
+  reviews: IReview[]; 
 }
 
 export interface IPropertyDetail {
