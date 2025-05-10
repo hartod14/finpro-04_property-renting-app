@@ -13,7 +13,6 @@ import { PORT } from './config';
 import { authRouter } from './routers/auth.router';
 import { ErrorHandler } from './helpers/response.handler';
 import { uploadRouter } from './routers/upload.router';
-// import { SampleRouter } from './routers/sample.router';
 import { UserTransactionRouter } from './routers/user-transactions.routes';
 import { TenantTransactionRouter } from './routers/tenant-transaction-management.routes';
 import { cityRouter } from './routers/city.router';
@@ -27,6 +26,8 @@ import { verifyUser } from './middalewares/auth.middleware';
 import { authorizeTenantAction } from './middalewares/authorizeTenantAction';
 import { tenantRoomAvailabilityRouter } from './routers/tenant-room-availability.router';
 import { tenantSeasonRateRouter } from './routers/tenant-season-rate.router';
+import reviewRouter from './routers/review.router';
+import reportRouter from './routers/report.router';
 
 export default class App {
   private app: Application;
@@ -65,7 +66,7 @@ export default class App {
     const tenantTransactionManagementRouter = new TenantTransactionRouter();
 
     this.app.get('/api', (req: Request, res: Response) => {
-      res.send(`Hello, Purwadhika Student API!`);
+      res.send('Hello, Purwadhika Student API!');
     });
 
     //global
@@ -98,13 +99,20 @@ export default class App {
       tenantSeasonRateRouter(),
     );
 
+    // review
+    this.app.use('/api/review', reviewRouter());
+    
+    // report
+    this.app.use('/api/report', reportRouter());
+
+    // transaction
     this.app.use('/api', usertransactionRouter.getRouter());
     this.app.use('/api', tenantTransactionManagementRouter.getRouter());
   }
 
   public start(): void {
     this.app.listen(PORT, () => {
-      console.log(`  ➜  [API] Local:   http://localhost:${PORT}/`);
+      console.log(` ➜  [API] Local:   http://localhost:${PORT}/`);
     });
   }
 }

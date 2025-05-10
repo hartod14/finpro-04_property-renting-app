@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import axios from 'axios';
-import { format } from 'date-fns'; 
+import { format } from 'date-fns';
 import { handleUploadPaymentProof as uploadPaymentProof } from '@/utils/bookings/handleUploadPaymentProof';
 import 'react-datepicker/dist/react-datepicker.css';
 import { generateReceipt } from '@/utils/bookings/generateReceipt';
@@ -16,6 +16,8 @@ import { Pagination } from '@/components/bookings/Pagination';
 import { filterBookings } from '@/utils/bookings/filterBookings';
 import { getTotalPages } from '@/utils/bookings/getTotalPages';
 import { getPaginatedBookings } from '@/utils/bookings/getPaginatedBookings';
+import { ReviewModal } from '@/components/bookings/ReviewModal';
+import Swal from 'sweetalert2';
 
 export default function PurchaseListPage() {
   const { data: session } = useSession();
@@ -28,12 +30,22 @@ export default function PurchaseListPage() {
   const itemsPerPage = 4;
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [selectedBookingId, setSelectedBookingId] = useState<number | null>(null);
+  const [selectedBookingId, setSelectedBookingId] = useState<number | null>(
+    null,
+  );
   const [paymentProof, setPaymentProof] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const filteredBookings = filterBookings(bookings, searchQuery, searchDate);
   const totalPages = getTotalPages(filteredBookings, itemsPerPage);
-  const paginatedBookings = getPaginatedBookings(filteredBookings, currentPage, itemsPerPage);
+  const paginatedBookings = getPaginatedBookings(
+    filteredBookings,
+    currentPage,
+    itemsPerPage,
+  );
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [selectedReviewBookingId, setSelectedReviewBookingId] = useState<
+    number | null
+  >(null);
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -48,7 +60,7 @@ export default function PurchaseListPage() {
               },
             },
           );
-  
+
           const sortedBookings = res.data.sort(
             (a: any, b: any) => b.booking.id - a.booking.id,
           );
@@ -60,9 +72,9 @@ export default function PurchaseListPage() {
         }
       }
     };
-  
+
     fetchBookings();
-  }, [session]);  
+  }, [session]);
 
   const handleCancel = (bookingId: number) => {
     handleCancelBooking(bookingId, session?.user?.access_token!, setBookings);
@@ -103,7 +115,49 @@ export default function PurchaseListPage() {
     generateReceipt(booking);
   };
 
-  // Format tanggal menggunakan date-fns pada booking check-in date
+  const handleOpenReviewModal = (bookingId: number) => {
+    setSelectedReviewBookingId(bookingId);
+    setIsReviewModalOpen(true);
+  };
+
+  const handleSubmitReview = async (
+    bookingId: number,
+    content: string,
+    rating: number,
+  ) => {
+    if (!content || rating === 0) {
+      return Swal.fire('Error', 'Please provide content and rating.', 'error');
+    }
+  
+    const result = await Swal.fire({
+      title: 'Submit Review?',
+      text: 'Are you sure you want to submit this review?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, submit it!',
+      cancelButtonText: 'Cancel',
+    });
+  
+    if (result.isConfirmed) {
+      try {
+        await axios.post(
+          `${process.env.NEXT_PUBLIC_API}/review/create`,
+          { bookingId, rating, comment: content },
+          {
+            headers: {
+              Authorization: `Bearer ${session?.user?.access_token}`,
+            },
+          }
+        );
+        Swal.fire('Success!', 'Your review has been submitted.', 'success');
+        setIsReviewModalOpen(false);
+      } catch (err) {
+        console.error('Failed to submit review:', err);
+        Swal.fire('Error', 'Failed to submit review.', 'error');
+      }
+    }
+  };  
+
   const formatBookingDate = (date: Date) => {
     return format(new Date(date), 'dd MMM yyyy'); // Format tanggal sesuai kebutuhan
   };
@@ -135,12 +189,13 @@ export default function PurchaseListPage() {
               getStatusColor={getStatusColor}
               formattedCheckInDate={format(
                 new Date(booking.booking.checkinDate),
-                'dd MMM yyyy'
+                'dd MMM yyyy',
               )}
               formattedCheckOutDate={format(
                 new Date(booking.booking.checkoutDate),
-                'dd MMM yyyy'
+                'dd MMM yyyy',
               )}
+              onOpenReviewModal={handleOpenReviewModal} // ← Tambahkan baris ini
             />
           ))}
         </div>
@@ -152,6 +207,13 @@ export default function PurchaseListPage() {
         onClose={handleCloseModal}
         onUpload={handleUploadPaymentProof}
         onFileChange={handleFileChange}
+      />
+
+      <ReviewModal
+        isOpen={isReviewModalOpen}
+        bookingId={selectedReviewBookingId}
+        onClose={() => setIsReviewModalOpen(false)}
+        onSubmit={handleSubmitReview}
       />
 
       <Pagination

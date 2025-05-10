@@ -27,23 +27,6 @@ export default function PanelButtonAction(props: ButtonActionProps) {
   const { onDelete, onShow, onUpdate, onListOrder, onShowRoom } = props;
   return (
     <div className="flex gap-2 items-center">
-      {onListOrder && (
-        <div
-          onClick={() => onListOrder()}
-          className="p-2 rounded-md transition-transform transform hover:scale-125 cursor-pointer group"
-        >
-          <ClipboardList
-            width={24}
-            height={24}
-            className=" cursor-pointer text-primary"
-            onClick={onListOrder}
-          />
-          <span className="absolute top-full left-1/2 transform -translate-x-1/2 mb-1 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
-            List Order
-          </span>
-        </div>
-      )}
-
       {onShowRoom && (
         <div
           onClick={() => onShowRoom()}
