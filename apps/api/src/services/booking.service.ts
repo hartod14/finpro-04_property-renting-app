@@ -42,7 +42,7 @@ export const createBooking = async (
   const payment = await prisma.payment.create({
     data: {
       method: paymentMethod,
-      amount: totalPrice,
+      amount: totalPrice, // harga disimpan ke kolom "amount"
     },
   });
 
@@ -55,7 +55,7 @@ export const createBooking = async (
       checkout_date: checkoutDate,
       status: BookingStatus.WAITING_FOR_PAYMENT,
       order_number: orderNumber,
-      payment_id: payment.id, // Tautkan id payment ke booking
+      payment_id: payment.id, // tautkan payment
     },
     include: {
       user: true,

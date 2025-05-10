@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import DefaultImage from '@/../public/default_avatar.jpg';
 import Image from 'next/image';
-import {FaList, FaHotel, FaLock, FaSignOutAlt, FaUser, FaCalendarCheck } from 'react-icons/fa';
+import {FaList, FaHotel, FaLock, FaSignOutAlt, FaUser, FaCalendarCheck, FaProjectDiagram } from 'react-icons/fa';
 
 type Props = {
   children: React.ReactNode;
@@ -25,6 +25,7 @@ export default function TenantSidebar({ children }: Props) {
     // { href: '/user/booking', icon: <FaShoppingBag />, label: 'My Booking' },
     { href: '/tenant/property', icon: <FaHotel />, label: 'Property' },
     { href: '/tenant/orders', icon: <FaCalendarCheck />, label: 'Orders' },
+    { href: '/tenant/report', icon: <FaProjectDiagram />, label: 'Report' },
     { href: '/tenant/account', icon: <FaUser />, label: 'Account' },
     { href: '/tenant/password', icon: <FaLock />, label: 'Password' },
   ];

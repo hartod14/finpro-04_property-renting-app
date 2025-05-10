@@ -25,6 +25,7 @@ import { tenantPropertyRouter } from './routers/tenant-property.router';
 import { verifyUser } from './middalewares/auth.middleware';
 import { authorizeTenantAction } from './middalewares/authorizeTenantAction';
 import reviewRouter from './routers/review.router';
+import reportRouter from './routers/report.router';
 
 export default class App {
   private app: Application;
@@ -86,6 +87,9 @@ export default class App {
 
     // review
     this.app.use('/api/review', reviewRouter());
+    
+    // report
+    this.app.use('/api/report', reportRouter());
 
     // transaction
     this.app.use('/api', usertransactionRouter.getRouter());
