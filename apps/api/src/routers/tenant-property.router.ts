@@ -18,6 +18,7 @@ export const tenantPropertyRouter = () => {
     authorizePropertyOwner,
     tenantPropertyController.updateData,
   );
+
   router.delete(
     '/:id',
     authorizePropertyOwner,
@@ -42,7 +43,6 @@ export const tenantPropertyRouter = () => {
     authorizePropertyOwner,
     tenantPropertyRoomController.createRoom,
   );
-
 
   router.put(
     '/:id/room/:roomId',

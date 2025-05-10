@@ -2,9 +2,8 @@ import { prisma } from '@/config';
 import { pagination } from '@/helpers/pagination';
 import { decodeVerificationJwt } from '@/helpers/verification.jwt';
 import { Request } from 'express';
-import { roomSeed } from 'prisma/seeds/room.seed';
 
-class TenantRoomAvailabilityService {
+class TenantSeasonRateService {
   async getAllData(req: Request) {
     const { search, page, limit, date, status } = req.query;
     const { authorization } = req.headers;
@@ -25,7 +24,7 @@ class TenantRoomAvailabilityService {
             ],
           }
         : {}),
-      roomHasUnavailableDates: {
+      roomHasPeakSeasonRates: {
         some: {
           room: {
             property: {
@@ -55,7 +54,7 @@ class TenantRoomAvailabilityService {
     }
 
     if (search) {
-      whereClause.roomHasUnavailableDates = {
+      whereClause.roomHasPeakSeasonRates = {
         some: {
           room: {
             OR: [
@@ -83,10 +82,10 @@ class TenantRoomAvailabilityService {
       };
     }
 
-    const data = await prisma.roomUnavailableDate.findMany({
+    const data = await prisma.peakSeasonRate.findMany({
       where: whereClause,
       include: {
-        roomHasUnavailableDates: {
+        roomHasPeakSeasonRates: {
           include: {
             room: {
               include: {
@@ -103,7 +102,7 @@ class TenantRoomAvailabilityService {
       ...pagination(Number(page), Number(limit)),
     });
 
-    const total = await prisma.roomUnavailableDate.count({
+    const total = await prisma.peakSeasonRate.count({
       where: whereClause,
     });
 
@@ -130,23 +129,26 @@ class TenantRoomAvailabilityService {
         calculatedStatus = 'incoming';
       }
 
-      let roomHasUnavailableDates = item.roomHasUnavailableDates;
+      // Check if any rooms match the search term, but keep all rooms
+      let roomHasPeakSeasonRates = item.roomHasPeakSeasonRates;
       if (search) {
-        const hasMatchingRoom = item.roomHasUnavailableDates.some(
+        const hasMatchingRoom = item.roomHasPeakSeasonRates.some(
           (roomData) => 
             roomData.room.name.toLowerCase().includes(String(search).toLowerCase()) ||
             roomData.room.property.name.toLowerCase().includes(String(search).toLowerCase())
         );
         
+        // If no rooms match, return empty array
         if (!hasMatchingRoom) {
-          roomHasUnavailableDates = [];
+          roomHasPeakSeasonRates = [];
         }
+        // If matching rooms exist, keep all original rooms
       }
 
       return {
         ...item,
         status: calculatedStatus,
-        roomHasUnavailableDates,
+        roomHasPeakSeasonRates,
       };
     });
 
@@ -154,10 +156,10 @@ class TenantRoomAvailabilityService {
   }
 
   async getDataById(id: number) {
-    const data = await prisma.roomUnavailableDate.findUnique({
+    const data = await prisma.peakSeasonRate.findUnique({
       where: { id },
       include: {
-        roomHasUnavailableDates: {
+        roomHasPeakSeasonRates: {
           include: {
             room: {
               include: {
@@ -174,25 +176,25 @@ class TenantRoomAvailabilityService {
     });
 
     if (!data) {
-      throw new Error('Room availability not found');
+      throw new Error('Season rate not found');
     }
 
     return data;
   }
 
   async createData(req: Request) {
-    const { start_date, end_date, description, rooms } = req.body;
+    const { value_type, value, start_date, end_date, type, description, rooms } = req.body;
     const { authorization } = req.headers;
 
     const token = String(authorization || '').split('Bearer ')[1];
     const user = decodeVerificationJwt(token) as { id: number };
 
-    const overlappingDates = await prisma.roomHasUnavailableDate.findMany({
+    const overlappingDates = await prisma.roomHasPeakSeasonRate.findMany({
       where: {
         room_id: {
           in: rooms.map((room: number) => Number(room)),
         },
-        roomUnavailableDate: {
+        peakSeasonRate: {
           deleted_at: null,
           OR: [
             {
@@ -216,7 +218,7 @@ class TenantRoomAvailabilityService {
             name: true,
           },
         },
-        roomUnavailableDate: {
+        peakSeasonRate: {
           select: {
             start_date: true,
             end_date: true,
@@ -228,13 +230,13 @@ class TenantRoomAvailabilityService {
     if (overlappingDates.length > 0) {
       const conflictingRooms = overlappingDates.map((item) => ({
         roomName: item.room.name,
-        existingStartDate: item.roomUnavailableDate.start_date,
-        existingEndDate: item.roomUnavailableDate.end_date,
+        existingStartDate: item.peakSeasonRate.start_date,
+        existingEndDate: item.peakSeasonRate.end_date,
       }));
 
       throw {
         status: 400,
-        message: 'Date range overlaps with existing unavailable dates',
+        message: 'Date range overlaps with existing season rates',
         details: {
           conflictingRooms,
         },
@@ -242,19 +244,22 @@ class TenantRoomAvailabilityService {
     }
 
     const result = await prisma.$transaction(async (tx) => {
-      const data = await tx.roomUnavailableDate.create({
+      const data = await tx.peakSeasonRate.create({
         data: {
+          value_type,
+          value,
           start_date: new Date(String(start_date)),
           end_date: new Date(String(end_date)),
+          type,
           description,
           tenant_id: user.id,
         },
       });
 
-      await tx.roomHasUnavailableDate.createMany({
+      await tx.roomHasPeakSeasonRate.createMany({
         data: rooms.map((room: number) => ({
           room_id: Number(room),
-          room_unavailable_date_id: data.id,
+          peak_season_rate_id: data.id,
         })),
       });
 
@@ -265,20 +270,35 @@ class TenantRoomAvailabilityService {
   }
 
   async updateData(id: number, req: Request) {
-    const { start_date, end_date, description, rooms } = req.body;
+    const { value_type, value, start_date, end_date, type, description, rooms } = req.body;
     const { authorization } = req.headers;
 
     const token = String(authorization || '').split('Bearer ')[1];
     const user = decodeVerificationJwt(token) as { id: number };
 
-    const overlappingDates = await prisma.roomHasUnavailableDate.findMany({
+    const existingData = await prisma.peakSeasonRate.findUnique({
+      where: { id },
+      include: {
+        roomHasPeakSeasonRates: true,
+      },
+    });
+
+    if (!existingData) {
+      throw new Error('Season rate not found');
+    }
+
+    if (existingData.tenant_id !== user.id) {
+      throw new Error('Unauthorized');
+    }
+
+    const overlappingDates = await prisma.roomHasPeakSeasonRate.findMany({
       where: {
         room_id: {
           in: rooms.map((room: number) => Number(room)),
         },
-        roomUnavailableDate: {
-          deleted_at: null,
+        peakSeasonRate: {
           id: { not: id },
+          deleted_at: null,
           OR: [
             {
               start_date: { lte: new Date(String(start_date)) },
@@ -301,7 +321,7 @@ class TenantRoomAvailabilityService {
             name: true,
           },
         },
-        roomUnavailableDate: {
+        peakSeasonRate: {
           select: {
             start_date: true,
             end_date: true,
@@ -313,13 +333,13 @@ class TenantRoomAvailabilityService {
     if (overlappingDates.length > 0) {
       const conflictingRooms = overlappingDates.map((item) => ({
         roomName: item.room.name,
-        existingStartDate: item.roomUnavailableDate.start_date,
-        existingEndDate: item.roomUnavailableDate.end_date,
+        existingStartDate: item.peakSeasonRate.start_date,
+        existingEndDate: item.peakSeasonRate.end_date,
       }));
 
       throw {
         status: 400,
-        message: 'Date range overlaps with existing unavailable dates',
+        message: 'Date range overlaps with existing season rates',
         details: {
           conflictingRooms,
         },
@@ -327,26 +347,32 @@ class TenantRoomAvailabilityService {
     }
 
     const result = await prisma.$transaction(async (tx) => {
-      const data = await tx.roomUnavailableDate.update({
+      // Delete existing room associations
+      await tx.roomHasPeakSeasonRate.deleteMany({
+        where: {
+          peak_season_rate_id: id,
+        },
+      });
+
+      // Update the peak season rate
+      const data = await tx.peakSeasonRate.update({
         where: { id },
         data: {
+          value_type,
+          value,
           start_date: new Date(String(start_date)),
           end_date: new Date(String(end_date)),
+          type,
           description,
-          tenant_id: user.id,
+          updated_at: new Date(),
         },
       });
 
-      await tx.roomHasUnavailableDate.deleteMany({
-        where: {
-          room_unavailable_date_id: id,
-        },
-      });
-
-      await tx.roomHasUnavailableDate.createMany({
+      // Create new room associations
+      await tx.roomHasPeakSeasonRate.createMany({
         data: rooms.map((room: number) => ({
           room_id: Number(room),
-          room_unavailable_date_id: data.id,
+          peak_season_rate_id: id,
         })),
       });
 
@@ -357,36 +383,36 @@ class TenantRoomAvailabilityService {
   }
 
   async deleteData(id: number) {
-    const existingRecord = await prisma.roomUnavailableDate.findUnique({
+    const existingData = await prisma.peakSeasonRate.findUnique({
       where: { id },
-      include: {
-        roomHasUnavailableDates: true,
-      },
     });
 
-    if (!existingRecord) {
-      throw new Error('Room availability not found');
+    if (!existingData) {
+      throw new Error('Season rate not found');
     }
 
-    try {
-      return await prisma.$transaction(async (tx) => {
-        await tx.roomHasUnavailableDate.deleteMany({
-          where: {
-            room_unavailable_date_id: id,
-          },
-        });
-
-        const data = await tx.roomUnavailableDate.update({
-          where: { id },
-          data: { deleted_at: new Date() },
-        });
-
-        return data;
+    // Soft delete
+    const result = await prisma.$transaction(async (tx) => {
+      // Delete room associations
+      await tx.roomHasPeakSeasonRate.deleteMany({
+        where: {
+          peak_season_rate_id: id,
+        },
       });
-    } catch (error) {
-      throw error;
-    }
+
+      // Update the peak season rate to mark as deleted
+      const data = await tx.peakSeasonRate.update({
+        where: { id },
+        data: {
+          deleted_at: new Date(),
+        },
+      });
+
+      return data;
+    });
+
+    return result;
   }
 }
 
-export default new TenantRoomAvailabilityService();
+export default new TenantSeasonRateService(); 

@@ -26,6 +26,7 @@ import { tenantPropertyRouter } from './routers/tenant-property.router';
 import { verifyUser } from './middalewares/auth.middleware';
 import { authorizeTenantAction } from './middalewares/authorizeTenantAction';
 import { tenantRoomAvailabilityRouter } from './routers/tenant-room-availability.router';
+import { tenantSeasonRateRouter } from './routers/tenant-season-rate.router';
 
 export default class App {
   private app: Application;
@@ -85,7 +86,17 @@ export default class App {
       tenantPropertyRouter(),
     );
 
-    this.app.use('/api/tenant-room-availability', verifyUser, tenantRoomAvailabilityRouter());
+    this.app.use(
+      '/api/tenant-room-availability',
+      verifyUser,
+      tenantRoomAvailabilityRouter(),
+    );
+    
+    this.app.use(
+      '/api/tenant-season-rate',
+      verifyUser,
+      tenantSeasonRateRouter(),
+    );
 
     this.app.use('/api', usertransactionRouter.getRouter());
     this.app.use('/api', tenantTransactionManagementRouter.getRouter());

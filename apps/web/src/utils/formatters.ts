@@ -56,3 +56,11 @@ export const formatDateOnly = (
     year: 'numeric',
   });
 };
+
+export const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'decimal',
+    minimumFractionDigits: 0,
+  }).format(amount);
+};
+

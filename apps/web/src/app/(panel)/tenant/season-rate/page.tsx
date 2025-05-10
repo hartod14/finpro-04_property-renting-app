@@ -3,11 +3,11 @@
 import Button from '@/components/common/button/button';
 import { FaPlus, FaSearch } from 'react-icons/fa';
 import { PanelPagination } from '@/components/common/pagination/panelPagination';
-import TenantRoomAvailabilityListModel from '@/models/tenant-panel/tenantRoomAvailabilityListModel';
+import TenantSeasonRateListModel from '@/models/tenant-panel/tenantSeasonRateListModel';
 import Table from '@/components/common/table/table';
 import Link from 'next/link';
 
-export default function TenantRoomAvailabilityPage() {
+export default function TenantSeasonRatePage() {
   const {
     router,
     table,
@@ -23,7 +23,7 @@ export default function TenantRoomAvailabilityPage() {
     setStatus,
     setLimit,
     setPage,
-  } = TenantRoomAvailabilityListModel();
+  } = TenantSeasonRateListModel();
 
   return (
     <div className="flex flex-col gap-4 pb-2">
@@ -70,12 +70,12 @@ export default function TenantRoomAvailabilityPage() {
         </div>
         
         <div className="flex gap-2">
-          <Link href="/tenant/room-availability/create">
+          <Link href="/tenant/season-rate/create">
             <Button
               color="primaryOrange"
               textColor="white"
               iconPosition="before"
-              name="Add Unavailable Date"
+              name="Add Season Rate"
               icon={<FaPlus />}
             />
           </Link>

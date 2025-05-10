@@ -3,29 +3,17 @@
 import StatusBadge from '@/components/common/badge/statusBadge';
 import PanelButtonAction from '@/components/common/button/panelButtonAction';
 import {
-  deleteProperty,
-  deleteRoom,
-  getAllProperty,
-  getRoomById,
-  getRoomByPropertyId,
-} from '@/handlers/tenant-property';
-import {
-  deleteRoomAvailabilityData,
-  getAllRoomAvailability,
-} from '@/handlers/tenant-room-availability';
-// import { deleteCategory, getAllCategory } from '@/handlers/tenant-category';
-import { ICategory } from '@/interfaces/category.interface';
-import { IProperty, IRoom } from '@/interfaces/property.interface';
-import { IRoomAvailability } from '@/interfaces/room-availability.interface';
-import { formatDateOnly, formatTimeOnly } from '@/utils/formatters';
-import Image from 'next/image';
+  deleteSeasonRateData,
+  getAllSeasonRates,
+} from '@/handlers/tenant-season-rate';
+import { ISeasonRate } from '@/interfaces/season-rate.interface';
+import { formatCurrency, formatDateOnly } from '@/utils/formatters';
 import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+import { FaArrowAltCircleDown, FaArrowAltCircleUp, FaArrowDown } from 'react-icons/fa';
+import { FaArrowUp } from 'react-icons/fa';
 
-import React, { useContext, useEffect, useState } from 'react';
-import { FaUser } from 'react-icons/fa';
-
-export default function TenantRoomAvailabilityListModel() {
-  // const loading = useContext(LoadingContext);
+export default function TenantSeasonRateListModel() {
   const [page, setPage] = useState<number>(1);
   const [search, setSearch] = useState<string>('');
   const [limit, setLimit] = useState<number>(15);
@@ -34,20 +22,26 @@ export default function TenantRoomAvailabilityListModel() {
   const [total, setTotal] = useState<number>(0);
   const [totalPage, setTotalPage] = useState<number>(0);
   const [table, setTable] = useState({
-    head: ['No.', 'Unavailable Date', 'Room', 'Status', 'Note', 'Action'],
+    head: [
+      'No.',
+      'Season Period',
+      'Rate',
+      'Type',
+      'Room',
+      'Status',
+      // 'Note',
+      'Action',
+    ],
     body: [],
   });
   const router = useRouter();
 
-  async function getRoomList() {
-    // loading?.setLoading(true);
-
+  async function getSeasonRateList() {
     const body: any = [];
 
-    const res = await getAllRoomAvailability(search, page, limit, date, status);
+    const res = await getAllSeasonRates(search, page, limit, date, status);
 
-    const data: IRoomAvailability[] = res.data;
-
+    const data: ISeasonRate[] = res.data;
     const total_data: number = res.total_data;
 
     if (data) {
@@ -58,8 +52,30 @@ export default function TenantRoomAvailabilityListModel() {
             {`${formatDateOnly(row.start_date)} - ${formatDateOnly(row.end_date)}`}
           </p>,
           <div>
+            {row.value_type == 'PERCENTAGE'
+              ? `${row.value}%`
+              : `IDR ${formatCurrency(row.value)}`}
+          </div>,
+          <div className={`font-medium `}>
+            {row.type == 'INCREASE' ? (
+              <div className="text-green-600 flex items-center gap-2">
+                <span>
+                  <FaArrowAltCircleUp width={24} height={24} />
+                </span>{' '}
+                Price Increase
+              </div>
+            ) : (
+              <div className="text-red-500 flex items-center gap-2">
+                <span>
+                  <FaArrowAltCircleDown width={24} height={24} />
+                </span>{' '}
+                Price Decrease
+              </div>
+            )}
+          </div>,
+          <div>
             {(() => {
-              const roomsByProperty = row.roomHasUnavailableDates.reduce(
+              const roomsByProperty = row.roomHasPeakSeasonRates.reduce(
                 (acc: any, item: any) => {
                   const propertyId = item.room.property.id;
                   const propertyName = item.room.property.name;
@@ -97,7 +113,7 @@ export default function TenantRoomAvailabilityListModel() {
                       </ul>
                     </div>
                   ))}
-                  {Object.keys(roomsByProperty).length === 0 && 'No rooms'}
+                  {Object.keys(roomsByProperty).length == 0 && 'No rooms'}
                 </div>
               );
             })()}
@@ -105,14 +121,14 @@ export default function TenantRoomAvailabilityListModel() {
           <div className="flex">
             <StatusBadge status={row.status} />
           </div>,
-          row.description,
+          // row.description,
           <PanelButtonAction
             key={'button'}
             onDelete={async () => {
-              await deleteRoomAvailability(String(row.id));
+              await deleteSeasonRate(String(row.id));
             }}
             onUpdate={() => {
-              router.push(`/tenant/room-availability/edit/${row.id}`);
+              router.push(`/tenant/season-rate/edit/${row.id}`);
             }}
           />,
         ]);
@@ -124,29 +140,27 @@ export default function TenantRoomAvailabilityListModel() {
         ...table,
         body: body,
       });
-      // loading?.setLoading(false);
     }
   }
 
-  async function deleteRoomAvailability(id: string) {
+  async function deleteSeasonRate(id: string) {
     try {
-      // loading?.setLoading(true);
-      await deleteRoomAvailabilityData(id).then(() => {
-        getRoomList();
+      await deleteSeasonRateData(id).then(() => {
+        getSeasonRateList();
       });
     } catch (error) {
-    } finally {
-      // loading?.setLoading(false);
+      console.error(error);
     }
   }
+
   useEffect(() => {
-    getRoomList();
+    getSeasonRateList();
   }, [page, limit]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
       setPage(1);
-      getRoomList();
+      getSeasonRateList();
     }, 300);
 
     return () => clearTimeout(handler);
@@ -155,7 +169,7 @@ export default function TenantRoomAvailabilityListModel() {
   useEffect(() => {
     const handler = setTimeout(() => {
       setPage(1);
-      getRoomList();
+      getSeasonRateList();
     }, 300);
 
     return () => clearTimeout(handler);

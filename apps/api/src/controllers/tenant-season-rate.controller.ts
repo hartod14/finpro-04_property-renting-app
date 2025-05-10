@@ -3,15 +3,15 @@ import {
   responseHandler,
   responseHandlerPagination,
 } from '@/helpers/response.handler';
-import tenantRoomAvailabilityService from '@/services/tenant-room-availability.service';
+import tenantSeasonRateService from '@/services/tenant-season-rate.service';
 
-class TenantRoomAvailabilityController {
+class TenantSeasonRateController {
   async getAllData(req: Request, res: Response, next: NextFunction) {
     try {
-      const data = await tenantRoomAvailabilityService.getAllData(req);
+      const data = await tenantSeasonRateService.getAllData(req);
       responseHandlerPagination(
         res,
-        'get all room availability success',
+        'get all season rates success',
         data.data,
         data.total,
       );
@@ -22,10 +22,10 @@ class TenantRoomAvailabilityController {
 
   async getDataById(req: Request, res: Response, next: NextFunction) {
     try {
-      const data = await tenantRoomAvailabilityService.getDataById(
+      const data = await tenantSeasonRateService.getDataById(
         Number(req.params.id),
       );
-      responseHandler(res, 'get room availability by id success', data);
+      responseHandler(res, 'get season rate by id success', data);
     } catch (error) {
       next(error);
     }
@@ -33,8 +33,8 @@ class TenantRoomAvailabilityController {
 
   async createData(req: Request, res: Response, next: NextFunction) {
     try {
-      const data = await tenantRoomAvailabilityService.createData(req);
-      responseHandler(res, 'create room availability success', data);
+      const data = await tenantSeasonRateService.createData(req);
+      responseHandler(res, 'create season rate success', data);
     } catch (error) {
       next(error);
     }
@@ -42,25 +42,26 @@ class TenantRoomAvailabilityController {
 
   async updateData(req: Request, res: Response, next: NextFunction) {
     try {
-      const data = await tenantRoomAvailabilityService.updateData(
+      const data = await tenantSeasonRateService.updateData(
         Number(req.params.id),
         req
       );
-      responseHandler(res, 'update room availability success', data);
+      responseHandler(res, 'update season rate success', data);
     } catch (error) {
       next(error);
     }
   }
+
   async deleteData(req: Request, res: Response, next: NextFunction) {
     try {
-      const data = await tenantRoomAvailabilityService.deleteData(
+      const data = await tenantSeasonRateService.deleteData(
         Number(req.params.id),
       );
-      responseHandler(res, 'delete room availability success', data);
+      responseHandler(res, 'delete season rate success', data);
     } catch (error) {
       next(error);
     }
   }
 }
 
-export default new TenantRoomAvailabilityController();
+export default new TenantSeasonRateController(); 

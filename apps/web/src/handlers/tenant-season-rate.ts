@@ -1,7 +1,7 @@
 import { api } from './_api';
 import { getAccessToken } from './auth';
 
-export const getAllRoomAvailability = async (
+export const getAllSeasonRates = async (
   search: string,
   page: number,
   limit: number,
@@ -9,25 +9,25 @@ export const getAllRoomAvailability = async (
   status: string,
 ) => {
   return await api(
-    `/tenant-room-availability?search=${search}&page=${page}&limit=${limit}&date=${date}&status=${status}`,
+    `/tenant-season-rate?search=${search}&page=${page}&limit=${limit}&date=${date}&status=${status}`,
     'GET',
     undefined,
     await getAccessToken(),
   );
 };
 
-export const getRoomAvailabilityData = async (id: number) => {
+export const getSeasonRateData = async (id: number) => {
   return await api(
-    `/tenant-room-availability/${id}`,
+    `/tenant-season-rate/${id}`,
     'GET',
     undefined,
     await getAccessToken(),
   );
 };
 
-export const createRoomAvailability = async (data: any) => {
+export const createSeasonRate = async (data: any) => {
   return await api(
-    `/tenant-room-availability`,
+    `/tenant-season-rate`,
     'POST',
     {
       body: data,
@@ -37,30 +37,31 @@ export const createRoomAvailability = async (data: any) => {
   );
 };
 
-export const updateRoomAvailability = async (id: number, data: any) => {
-  console.log('Data being sent in handler:', data);
-  
+export const updateSeasonRate = async (id: number, data: any) => {
   // Ensure data is an object with the required properties
   const payload = {
+    value_type: data.value_type,
+    value: data.value,
     start_date: data.start_date,
     end_date: data.end_date,
+    type: data.type,
     description: data.description || '',
     rooms: Array.isArray(data.rooms) ? data.rooms : [],
   };
   
   return await api(
-    `/tenant-room-availability/${id}`,
+    `/tenant-season-rate/${id}`,
     'PUT',
     { body: payload, contentType: 'application/json' },
     await getAccessToken(),
   );
 };
 
-export const deleteRoomAvailabilityData = async (id: string) => {
+export const deleteSeasonRateData = async (id: string) => {
   return await api(
-    `/tenant-room-availability/${id}`,
+    `/tenant-season-rate/${id}`,
     'DELETE',
     undefined,
     await getAccessToken(),
   );
-};
+}; 
