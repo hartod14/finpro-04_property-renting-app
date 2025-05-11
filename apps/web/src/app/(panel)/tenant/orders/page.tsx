@@ -1,47 +1,201 @@
 'use client';
 
-import { FaSearch, FaPlus } from 'react-icons/fa'; // Importing icons for actions
-import Link from 'next/link'; // Import Link
-import TenantPropertyListModel from '@/models/tenant-panel/tenantPropertyListModel';
-import { PanelPagination } from '@/components/common/pagination/panelPagination';
-import Button from '@/components/common/button/button';
-import Table from '@/components/common/table/table';
-import TenantPropertyListModelOrders from '@/models/tenant-panel/tenantPropertyListModelOrders';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useSession } from 'next-auth/react';
+import { FaSearch } from 'react-icons/fa';
+import BookingTable from '@/components/orders/BookingTable';
+import PaymentProofModal from '@/components/orders/PaymentProofModal'; // Import komponen modal baru
+import { X } from 'lucide-react';
+import Swal from 'sweetalert2';
+import ReplyReviewModal from '@/components/orders/ReviewReplyModal';
+import { PanelPagination } from '@/components/common/pagination/panelPagination'; // Assuming this is a pagination component.
+
 export default function TenantPropertyListOrderPage() {
-  const {
-    router,
-    table,
-    page,
-    limit,
-    total,
-    totalPage,
-    search,
-    setSearch,
-    setLimit,
-    setPage,
-  } = TenantPropertyListModelOrders();
+  const { data: session } = useSession();
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [search, setSearch] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [proofImage, setProofImage] = useState('');
+  const [showReplyModal, setShowReplyModal] = useState(false);
+  const [selectedReview, setSelectedReview] = useState<any>(null);
+  const [replyText, setReplyText] = useState('');
+  const [loading, setLoading] = useState(false);
+  
+  // Pagination state management
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [total, setTotal] = useState(0);
+  const [totalPage, setTotalPage] = useState(0);
+
+  useEffect(() => {
+    const fetchAllOrders = async () => {
+      if (!session?.user?.id) return;
+      try {
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_API}/tenant/${session.user.id}/orders`,
+          {
+            params: {
+              search,
+              page,
+              limit
+            },
+            headers: {
+              Authorization: `Bearer ${session.user.access_token}`,
+            },
+          }
+        );
+        setBookings(res.data.bookings); // assuming res.data.bookings contains the booking data
+        setTotal(res.data.total);  // assuming res.data.total contains the total count of items
+        setTotalPage(Math.ceil(res.data.total / limit)); // Calculate the total pages
+      } catch (err) {
+        console.error('Failed to fetch orders:', err);
+      }
+    };
+
+    fetchAllOrders();
+  }, [session, search, page, limit]);  // Trigger fetching on search, page, or limit change
+
+  const handleOpenModal = (proofUrl: string) => {
+    setProofImage(proofUrl);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setProofImage('');
+  };
+
+  const handleApprove = async (bookingId: string) => {
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API}/tenant/${session?.user.id}/booking/${bookingId}/confirm`,
+        { accept: true },
+        {
+          headers: {
+            Authorization: `Bearer ${session?.user.access_token}`,
+          },
+        }
+      );
+      setBookings((prev) =>
+        prev.map((b) => (b.id === bookingId ? { ...b, status: 'DONE' } : b))
+      );
+    } catch (err) {
+      console.error('Failed to approve booking:', err);
+    }
+  };
+
+  const handleReject = async (bookingId: string) => {
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API}/tenant/${session?.user.id}/booking/${bookingId}/confirm`,
+        { accept: false },
+        {
+          headers: {
+            Authorization: `Bearer ${session?.user.access_token}`,
+          },
+        }
+      );
+      setBookings((prev) =>
+        prev.map((b) =>
+          b.id === bookingId ? { ...b, status: 'REJECTED' } : b
+        )
+      );
+    } catch (err) {
+      console.error('Failed to reject booking:', err);
+    }
+  };
+
+  const handleOpenReplyModal = async (propertyId: number, userId: number) => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API}/review/property/${propertyId}`
+      );
+      const review = res.data.data.find((r: any) => r.user.id === userId);
+
+      if (review) {
+        setSelectedReview(review);
+        setReplyText('');
+        setShowReplyModal(true);
+      } else {
+        Swal.fire('Not Found', 'No review found for this customer.', 'info');
+      }
+    } catch (error) {
+      console.error('Error fetching review:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmitReply = async () => {
+    if (!replyText || !selectedReview) return;
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API}/review/reply/${selectedReview.id}`,
+        { reply: replyText },
+        {
+          headers: {
+            Authorization: `Bearer ${session?.user.access_token}`,
+          },
+        }
+      );
+      Swal.fire('Success', 'Reply submitted successfully!', 'success');
+      setShowReplyModal(false);
+    } catch (error: any) {
+      Swal.fire(
+        'Error',
+        error?.response?.data?.message || 'Failed to submit reply.',
+        'error'
+      );
+    }
+  };
 
   return (
-    <div className="flex flex-col gap-4 pb-2">
-      <div className="flex justify-between">
-        <div className="flex bg-white border border-gray-200 rounded-md w-1/4 px-3 py-2">
-          <div className="flex justify-center items-center mr-3 bg-white text-black">
-            <FaSearch width={20} height={20} />
-          </div>
+    <div className="p-6 max-w-7xl mx-auto text-black">
+      <h1 className="text-3xl font-bold mb-6">All Booking Orders</h1>
 
-          <input
-            type="text"
-            value={search}
-            placeholder="Search"
-            className=" w-full focus:outline-none bg-white text-black"
-            name="search"
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
+      {/* Search */}
+      <div className="flex mb-6 bg-white border border-gray-300 rounded-md w-full md:w-1/3 px-3 py-2">
+        <FaSearch className="text-gray-500 mr-3 my-auto" />
+        <input
+          type="text"
+          placeholder="Search by customer name"
+          className="w-full focus:outline-none bg-white text-black"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
       </div>
-      <div className="relative h-[calc(100vh-250px)] overflow-auto text-black">
-        <Table body={table.body} head={table.head} />
-      </div>
+
+      <BookingTable
+  bookings={bookings}
+  search={search}
+  handleOpenModal={handleOpenModal}
+  handleApprove={handleApprove}
+  handleReject={handleReject}
+  handleOpenReplyModal={handleOpenReplyModal}
+/>
+
+
+      {/* Modal: Payment Proof */}
+      <PaymentProofModal
+        showModal={showModal}
+        proofImage={proofImage}
+        onClose={handleCloseModal}
+      />
+
+      {/* Modal: Reply Review */}
+      <ReplyReviewModal
+        showModal={showReplyModal}
+        selectedReview={selectedReview}
+        replyText={replyText}
+        setReplyText={setReplyText}
+        handleSubmitReply={handleSubmitReply}
+        handleCloseModal={() => setShowReplyModal(false)}
+        loading={loading}
+      />
+
+      {/* Pagination */}
       <PanelPagination
         limit={limit}
         page={page}
@@ -49,7 +203,6 @@ export default function TenantPropertyListOrderPage() {
         setLimit={setLimit}
         total={total}
         totalPage={totalPage}
-        totalPerPage={table.body.length}
       />
     </div>
   );
