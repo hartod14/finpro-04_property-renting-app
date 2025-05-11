@@ -58,6 +58,9 @@ export default function TenantPropertyListModel() {
           </ul>,
           <PanelButtonAction
             key={'button'}
+            onListOrder={() => {
+              router.push(`/tenant/orders`);
+            }}
             onShowRoom={() => {
               router.push(`/tenant/property/${row.id}/room`);
             }}
