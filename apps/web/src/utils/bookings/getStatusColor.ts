@@ -11,6 +11,6 @@ export const getStatusColor = (status: string): string => {
     case 'DONE':
       return 'bg-green-100 text-green-800';
     default:
-      return 'bg-gray-100 text-gray-800';  
+      return 'bg-gray-100 text-gray-800';
   }
 };
