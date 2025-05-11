@@ -38,8 +38,8 @@ class PropertyService {
     if (categoryName) {
       filters.category = {
         name: {
-          in: String(categoryName).split(',')
-        }
+          in: String(categoryName).split(','),
+        },
       };
     }
 
@@ -86,7 +86,11 @@ class PropertyService {
                 roomUnavailableDate: true,
               },
             },
-            // roomHasPeakSeasonRates: true,
+            roomHasPeakSeasonRates: {
+              include: {
+                peakSeasonRate: true,
+              },
+            },
           },
         },
         propertyHasFacilities: {
@@ -108,61 +112,75 @@ class PropertyService {
 
     // Filter out rooms that are unavailable during the requested dates
     let filteredProperties = properties;
-    
+
     if (startDate && endDate) {
       // Convert query parameters to Date objects and set to start of day
       const requestStartDate = new Date(String(startDate));
       const requestEndDate = new Date(String(endDate));
-      
+
       // Remove time component for cleaner comparison
       const normalizeDate = (date: Date): string => {
         return date.toISOString().split('T')[0];
       };
-      
+
       const requestStartStr = normalizeDate(requestStartDate);
       const requestEndStr = normalizeDate(requestEndDate);
-      
-      filteredProperties = filteredProperties.map(property => {
+
+      filteredProperties = filteredProperties.map((property) => {
         // Filter out unavailable rooms
-        const availableRooms = property.rooms.filter(room => {
+        const availableRooms = property.rooms.filter((room) => {
           // Check if room has any unavailable dates that overlap with requested dates
-          return !room.roomHasUnavailableDates.some(unavailable => {
-            const roomStartDate = new Date(unavailable.roomUnavailableDate.start_date);
-            const roomEndDate = new Date(unavailable.roomUnavailableDate.end_date);
-            
+          return !room.roomHasUnavailableDates.some((unavailable) => {
+            const roomStartDate = new Date(
+              unavailable.roomUnavailableDate.start_date,
+            );
+            const roomEndDate = new Date(
+              unavailable.roomUnavailableDate.end_date,
+            );
+
             const roomStartStr = normalizeDate(roomStartDate);
             const roomEndStr = normalizeDate(roomEndDate);
-            
+
             // If start date of request falls on any day in the unavailable range
-            if (requestStartStr >= roomStartStr && requestStartStr <= roomEndStr) {
+            if (
+              requestStartStr >= roomStartStr &&
+              requestStartStr <= roomEndStr
+            ) {
               return true;
             }
-            
+
             // If end date of request falls on any day in the unavailable range
             if (requestEndStr >= roomStartStr && requestEndStr <= roomEndStr) {
               return true;
             }
-            
+
             // If request period completely contains the unavailable period
-            if (requestStartStr <= roomStartStr && requestEndStr >= roomEndStr) {
+            if (
+              requestStartStr <= roomStartStr &&
+              requestEndStr >= roomEndStr
+            ) {
               return true;
             }
-            
+
             return false;
           });
         });
-        
+
         return {
           ...property,
-          rooms: availableRooms
+          rooms: availableRooms,
         };
       });
-      
+
       // Filter out properties with no available rooms
-      filteredProperties = filteredProperties.filter(property => property.rooms.length > 0);
+      filteredProperties = filteredProperties.filter(
+        (property) => property.rooms.length > 0,
+      );
     } else {
       // If no date filter, just ensure properties have at least one room
-      filteredProperties = filteredProperties.filter(property => property.rooms.length > 0);
+      filteredProperties = filteredProperties.filter(
+        (property) => property.rooms.length > 0,
+      );
     }
 
     if (facilityID) {
@@ -189,46 +207,147 @@ class PropertyService {
     }
 
     if (sortBy === 'price') {
+      // When sorting by price, ensure we compare based on the adjusted price when available
       filteredProperties.sort((a, b) => {
-        const aRooms = capacity 
-          ? a.rooms.filter(room => room.capacity >= Number(capacity))
+        const aRooms = capacity
+          ? a.rooms.filter((room) => room.capacity >= Number(capacity))
           : a.rooms;
-        
+
         const bRooms = capacity
-          ? b.rooms.filter(room => room.capacity >= Number(capacity))
+          ? b.rooms.filter((room) => room.capacity >= Number(capacity))
           : b.rooms;
 
-        const aPrice = aRooms.length > 0
-          ? Number(aRooms[0].base_price)
-          : Number.MAX_SAFE_INTEGER;
-        
-        const bPrice = bRooms.length > 0
-          ? Number(bRooms[0].base_price)
-          : Number.MAX_SAFE_INTEGER;
+        // Helper function to get the effective price of a room
+        const getEffectivePrice = (room: any) => {
+          if (!room) return Number.MAX_SAFE_INTEGER;
+          
+          // Start with base price
+          let price = Number(room.base_price);
+          
+          // If we have date filters and the room has peak season rates, calculate adjusted price
+          if (startDate && endDate && room.roomHasPeakSeasonRates?.length > 0) {
+            const requestStartDate = new Date(String(startDate));
+            const requestEndDate = new Date(String(endDate));
+            
+            // Look for applicable peak season rates
+            for (const relation of room.roomHasPeakSeasonRates) {
+              const rate = relation.peakSeasonRate;
+              const rateStartDate = new Date(rate.start_date);
+              const rateEndDate = new Date(rate.end_date);
+              
+              // Check if dates overlap
+              if (requestStartDate <= rateEndDate && requestEndDate >= rateStartDate) {
+                // Apply rate adjustment
+                if (rate.value_type === 'PERCENTAGE') {
+                  const percentValue = Number(rate.value) / 100;
+                  if (rate.type === 'INCREASE') {
+                    price += price * percentValue;
+                  } else if (rate.type === 'DECREASE') {
+                    price -= price * percentValue;
+                  }
+                } else if (rate.value_type === 'NOMINAL') {
+                  if (rate.type === 'INCREASE') {
+                    price += Number(rate.value);
+                  } else if (rate.type === 'DECREASE') {
+                    price -= Number(rate.value);
+                  }
+                }
+                // Only apply the first matching rate
+                break;
+              }
+            }
+          }
+          
+          return price;
+        };
 
-        return sortOrder === 'asc' ? aPrice - bPrice : bPrice - aPrice;
+        // Find the lowest effective price for each property's rooms
+        const getLowestPriceRoom = (rooms: any[]) => {
+          if (rooms.length === 0) return null;
+          
+          let lowestRoom = rooms[0];
+          let lowestPrice = getEffectivePrice(lowestRoom);
+          
+          for (let i = 1; i < rooms.length; i++) {
+            const roomPrice = getEffectivePrice(rooms[i]);
+            if (roomPrice < lowestPrice) {
+              lowestPrice = roomPrice;
+              lowestRoom = rooms[i];
+            }
+          }
+          
+          return { room: lowestRoom, price: lowestPrice };
+        };
+        
+        const propertyALowestPrice = getLowestPriceRoom(aRooms)?.price || Number.MAX_SAFE_INTEGER;
+        const propertyBLowestPrice = getLowestPriceRoom(bRooms)?.price || Number.MAX_SAFE_INTEGER;
+        
+        return sortOrder === 'asc' 
+          ? propertyALowestPrice - propertyBLowestPrice 
+          : propertyBLowestPrice - propertyALowestPrice;
       });
     }
-    
-    const formattedProperties = filteredProperties.map((property) => {
-      
-      let lowestPriceRoom = null;
 
+    const formattedProperties = filteredProperties.map((property) => {
+      // First calculate adjusted prices for all rooms
+      const roomsWithCalculatedPrices = property.rooms.map(room => {
+        let calculatedPrice = Number(room.base_price);
+        
+        // Calculate adjusted price if dates are provided
+        if (startDate && endDate && room.roomHasPeakSeasonRates && room.roomHasPeakSeasonRates.length > 0) {
+          const requestStartDate = new Date(String(startDate));
+          const requestEndDate = new Date(String(endDate));
+          
+          for (const peakRateRelation of room.roomHasPeakSeasonRates) {
+            const peakRate = peakRateRelation.peakSeasonRate;
+            const peakStartDate = new Date(peakRate.start_date);
+            const peakEndDate = new Date(peakRate.end_date);
+            
+            // Check if dates overlap
+            if (requestStartDate <= peakEndDate && requestEndDate >= peakStartDate) {
+              // Apply rate adjustment
+              const basePrice = Number(room.base_price);
+              if (peakRate.value_type === 'PERCENTAGE') {
+                const percentValue = Number(peakRate.value) / 100;
+                if (peakRate.type === 'INCREASE') {
+                  calculatedPrice = basePrice + basePrice * percentValue;
+                } else if (peakRate.type === 'DECREASE') {
+                  calculatedPrice = basePrice - basePrice * percentValue;
+                }
+              } else if (peakRate.value_type === 'NOMINAL') {
+                if (peakRate.type === 'INCREASE') {
+                  calculatedPrice = basePrice + Number(peakRate.value);
+                } else if (peakRate.type === 'DECREASE') {
+                  calculatedPrice = basePrice - Number(peakRate.value);
+                }
+              }
+              
+              // Only consider the first applicable peak rate
+              break;
+            }
+          }
+        }
+        
+        return {
+          ...room,
+          calculatedPrice
+        };
+      });
+      
+      // Filter for capacity
+      let eligibleRooms = roomsWithCalculatedPrices;
       if (capacity) {
         const requiredCapacity = Number(capacity);
-        const roomsWithSufficientCapacity = property.rooms.filter(
-          (room) => room.capacity >= requiredCapacity,
+        eligibleRooms = roomsWithCalculatedPrices.filter(
+          room => room.capacity >= requiredCapacity,
         );
-
-        if (roomsWithSufficientCapacity.length > 0) {
-          roomsWithSufficientCapacity.sort(
-            (a, b) => Number(a.base_price) - Number(b.base_price),
-          );
-          lowestPriceRoom = roomsWithSufficientCapacity[0];
-        }
-      } else {
-        lowestPriceRoom = property.rooms.length > 0 ? property.rooms[0] : null;
       }
+      
+      // Sort by calculated price to find true lowest price
+      eligibleRooms.sort((a, b) => a.calculatedPrice - b.calculatedPrice);
+      
+      // Get the lowest price room after adjustments
+      const lowestPriceRoom = eligibleRooms.length > 0 ? eligibleRooms[0] : null;
 
       return {
         id: property.id,
@@ -253,6 +372,7 @@ class PropertyService {
               id: lowestPriceRoom.id,
               name: lowestPriceRoom.name,
               base_price: lowestPriceRoom.base_price,
+              adjusted_price: lowestPriceRoom.calculatedPrice,
               capacity: lowestPriceRoom.capacity,
               size: lowestPriceRoom.size,
               total_room: lowestPriceRoom.total_room,
@@ -260,13 +380,17 @@ class PropertyService {
                 (rf) => rf.facility,
               ),
               images: lowestPriceRoom.roomImages,
+              peak_season_rates: lowestPriceRoom.roomHasPeakSeasonRates.map(
+                (rr) => rr.peakSeasonRate
+              ),
             }
           : null,
       };
     });
 
     // Calculate the accurate total count of filteredProperties to fix pagination display
-    const filteredTotalCount = filteredProperties.length > 0 ? filteredProperties.length : 0;
+    const filteredTotalCount =
+      filteredProperties.length > 0 ? filteredProperties.length : 0;
 
     return {
       properties: formattedProperties,
@@ -490,6 +614,96 @@ class PropertyService {
     });
 
     return formattedProperties;
+  }
+
+  async getRoomsByPropertyId(slug: string, req: Request) {
+    const { startDate, endDate, capacity } = req.query;
+
+    const capacityNumber = capacity ? Number(capacity) : null;
+
+    const whereClause: any = {
+      property: {
+        slug: slug,
+      },
+      deleted_at: null,
+    };
+
+    if (capacityNumber) {
+      whereClause.capacity = {
+        gte: capacityNumber,
+      };
+    }
+
+    const rooms = await prisma.room.findMany({
+      where: whereClause,
+      include: {
+        roomImages: true,
+        roomHasFacilities: {
+          include: {
+            facility: true,
+          },
+        },
+        roomHasUnavailableDates: {
+          include: {
+            roomUnavailableDate: true,
+          },
+        },
+        roomHasPeakSeasonRates: {
+          include: {
+            peakSeasonRate: true,
+          },
+        },
+      },
+    });
+
+    // If we have date parameters, calculate adjusted prices based on peak season rates
+    if (startDate && endDate) {
+      const requestStartDate = new Date(String(startDate));
+      const requestEndDate = new Date(String(endDate));
+
+      return rooms.map(room => {
+        let adjusted_price = Number(room.base_price);
+        
+        // Check if room has peak season rates that overlap with the requested dates
+        if (room.roomHasPeakSeasonRates && room.roomHasPeakSeasonRates.length > 0) {
+          for (const peakRateRelation of room.roomHasPeakSeasonRates) {
+            const peakRate = peakRateRelation.peakSeasonRate;
+            const peakStartDate = new Date(peakRate.start_date);
+            const peakEndDate = new Date(peakRate.end_date);
+            
+            // Check if dates overlap
+            if (requestStartDate <= peakEndDate && requestEndDate >= peakStartDate) {
+              // Apply rate adjustment
+              const basePrice = Number(room.base_price);
+              if (peakRate.value_type === 'PERCENTAGE') {
+                const percentValue = Number(peakRate.value) / 100;
+                if (peakRate.type === 'INCREASE') {
+                  adjusted_price = basePrice + basePrice * percentValue;
+                } else if (peakRate.type === 'DECREASE') {
+                  adjusted_price = basePrice - basePrice * percentValue;
+                }
+              } else if (peakRate.value_type === 'NOMINAL') {
+                if (peakRate.type === 'INCREASE') {
+                  adjusted_price = basePrice + Number(peakRate.value);
+                } else if (peakRate.type === 'DECREASE') {
+                  adjusted_price = basePrice - Number(peakRate.value);
+                }
+              }
+              
+              // Only consider the first applicable peak rate
+              break;
+            }
+          }
+        }
+        
+        return {
+          ...room,
+          adjusted_price: adjusted_price !== Number(room.base_price) ? adjusted_price : undefined
+        };
+      });
+    }
+
+    return rooms;
   }
 }
 

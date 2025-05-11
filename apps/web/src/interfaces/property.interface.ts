@@ -18,6 +18,7 @@ export interface IRoom {
   id: number;
   name: string;
   base_price: number;
+  adjusted_price?: number;
   capacity: number;
   size: number;
   total_room: number;
@@ -25,6 +26,7 @@ export interface IRoom {
   roomImages: IRoomImage[];
   description?: string;
   property: IProperty;
+  roomHasPeakSeasonRates?: any[];
 }
 
 export interface IRoomCreate {
@@ -139,4 +141,9 @@ export interface IPropertyUpdate {
   category_id: string;
   images: string[];
   facilities: number[];
+}
+
+// Extend IRoom to include availability status
+export interface IRoomWithAvailability extends IRoom {
+  isAvailable: boolean;
 }

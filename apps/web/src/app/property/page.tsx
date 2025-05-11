@@ -22,7 +22,7 @@ import {
 import PropertyModel from '@/models/property/propertyModel';
 import Image from 'next/image';
 import { DateRangePicker } from '@/components/ui/calendar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import PropertySkeleton from '@/components/property/propertySkeleton';
 import Footer from '@/components/common/footer/footer';
 import { PaginationTable } from '@/components/common/pagination/propertyPagination';
@@ -145,7 +145,7 @@ export default function PropertyPage() {
                   : 'Number of people'}
               </span>
             </button>
-
+  
             {/* Dropdown menu */}
             <div
               id="guestDropdown"
@@ -763,15 +763,32 @@ export default function PropertyPage() {
                               </div>
                               {property.lowestPriceRoom && (
                                 <>
-                                  <p className="text-primary font-bold text-lg mt-6">
-                                    IDR{' '}
-                                    {Number(
-                                      property.lowestPriceRoom.base_price,
-                                    ).toLocaleString('id-ID')}
-                                  </p>
-                                  <p className="text-gray-400 text-xs">
-                                    not including tax and fees
-                                  </p>
+                                  {property.lowestPriceRoom.adjusted_price && 
+                                    Number(property.lowestPriceRoom.adjusted_price) !== Number(property.lowestPriceRoom.base_price) ? (
+                                    <>
+                                      <p className="text-primary font-bold text-lg mt-6">
+                                        IDR{' '}
+                                        {Number(
+                                          property.lowestPriceRoom.adjusted_price,
+                                        ).toLocaleString('id-ID')}
+                                      </p>
+                                      <p className="text-gray-400 text-xs">
+                                        not including tax and fees
+                                      </p>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <p className="text-primary font-bold text-lg mt-6">
+                                        IDR{' '}
+                                        {Number(
+                                          property.lowestPriceRoom.base_price,
+                                        ).toLocaleString('id-ID')}
+                                      </p>
+                                      <p className="text-gray-400 text-xs">
+                                        not including tax and fees
+                                      </p>
+                                    </>
+                                  )}
                                 </>
                               )}
                             </div>

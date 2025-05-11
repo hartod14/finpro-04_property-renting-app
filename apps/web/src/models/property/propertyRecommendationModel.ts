@@ -19,6 +19,7 @@ interface RecommendedProperty {
     path: string;
   } | null;
   lowestPrice: number | null;
+  adjusted_price?: number | null;
 }
 
 export default function PropertyRecommendationModel(initialParams: RecommendedPropertyParams = {}) {

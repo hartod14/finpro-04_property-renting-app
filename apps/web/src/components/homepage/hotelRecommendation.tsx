@@ -130,12 +130,25 @@ export default function HotelRecommendation() {
                       </div>
                       {property.lowestPrice && (
                         <>
-                          <p className="text-primary font-bold text-lg mt-5">
-                            IDR {Number(property.lowestPrice).toLocaleString('id-ID')}
-                          </p>
-                          <p className="text-gray-400 text-xs">
-                            not including tax and fees
-                          </p>
+                          {property.adjusted_price && property.adjusted_price !== property.lowestPrice ? (
+                            <>
+                              <p className="text-primary font-bold text-lg mt-5">
+                                IDR {Number(property.adjusted_price).toLocaleString('id-ID')}
+                              </p>
+                              <p className="text-gray-400 text-xs">
+                                not including tax and fees
+                              </p>
+                            </>
+                          ) : (
+                            <>
+                              <p className="text-primary font-bold text-lg mt-5">
+                                IDR {Number(property.lowestPrice).toLocaleString('id-ID')}
+                              </p>
+                              <p className="text-gray-400 text-xs">
+                                not including tax and fees
+                              </p>
+                            </>
+                          )}
                         </>
                       )}
                     </div>

@@ -61,6 +61,27 @@ export default function PropertyDetailPage() {
     handleSearch,
     dateRange,
     handleDateRangePickerChange,
+    calendarState,
+    calendarRef,
+    toggleCalendar,
+    formatDisplayDate,
+    getNextMonth,
+    getRoomImages,
+    getRoomFirstImage,
+    isRoomAvailable,
+    getDaysInMonth,
+    getFirstDayOfMonth,
+    handleDateClick,
+    handleHover,
+    isDateEqual,
+    isDateInRange,
+    isDateHighlighted,
+    isDateInPast,
+    isCurrentMonthTheFirstAvailable,
+    isCurrentMonthTheLastAvailable,
+    prevMonth,
+    nextMonth,
+    getLowestRoomPriceForDate
   } = PropertyDetailModel(slug, { 
     initialStartDate: startDate, 
     initialEndDate: endDate, 
@@ -68,209 +89,33 @@ export default function PropertyDetailPage() {
     initialCapacity: capacity
   });
 
-  // Calendar state
-  const getCurrentMonth = (): Date => {
-    const today = new Date();
-    return new Date(today.getFullYear(), today.getMonth(), 1);
-  };
-
-  const getNextMonth = (date: Date): Date => {
-    return new Date(date.getFullYear(), date.getMonth() + 1, 1);
-  };
-
-  const [currentMonth, setCurrentMonth] = useState<Date>(getCurrentMonth());
-  const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(
-    dateRange.from ? new Date(dateRange.from) : null,
-  );
-  const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(
-    dateRange.to ? new Date(dateRange.to) : null,
-  );
-  const [hoverDate, setHoverDate] = useState<Date | null>(null);
-  const [showCalendar, setShowCalendar] = useState<boolean>(false);
-  const calendarRef = useRef<HTMLDivElement>(null);
+  // Check for slug mismatch - this indicates a routing problem
+  if (property && typeof property === 'object' && property.slug !== slug) {
+    return (
+      <>
+        <Navbar forceScrolled={true} />
+        <div className="min-h-screen pt-28 pb-10 bg-[#FDFDFE] flex items-center justify-center">
+          <div className="text-red-500 text-center max-w-2xl px-4">
+            <p className="text-xl font-semibold mb-4">
+              Routing Error: Incorrect Property Loaded
+            </p>
+            <p className="mb-4">
+              The system loaded property "{property.name}" (slug: {property.slug}) 
+              but you requested "{slug}".
+            </p>
+            <Link href="/property">
+              <div className="mt-4 bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 inline-block">
+                Back to properties
+              </div>
+            </Link>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
 
   const [reviews, setReviews] = useState<IReview[]>([]);
-
-  
-
-  // Close calendar when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        calendarRef.current &&
-        !calendarRef.current.contains(event.target as Node)
-      ) {
-        setShowCalendar(false);
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  // Helper functions for calendar
-  const getDaysInMonth = (year: number, month: number): number => {
-    return new Date(year, month + 1, 0).getDate();
-  };
-
-  const getFirstDayOfMonth = (year: number, month: number): number => {
-    return new Date(year, month, 1).getDay();
-  };
-
-  const isMaxMonthReached = (date: Date): boolean => {
-    const today = new Date();
-    const maxDate = new Date(
-      today.getFullYear(),
-      today.getMonth() + 12,
-      today.getDate(),
-    );
-    return date >= maxDate;
-  };
-
-  const formatDate = (date: Date): string => {
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-  };
-
-  const isDateEqual = (date1: Date | null, date2: Date | null): boolean => {
-    if (!date1 || !date2) return false;
-    return formatDate(new Date(date1)) === formatDate(new Date(date2));
-  };
-
-  const isDateInRange = (
-    date: Date,
-    startDate: Date | null,
-    endDate: Date | null,
-  ): boolean => {
-    if (!startDate || !endDate) return false;
-    const d = new Date(date);
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    return d > start && d < end;
-  };
-
-  const isDateBeforeOrEqual = (
-    date1: Date | null,
-    date2: Date | null,
-  ): boolean => {
-    if (!date1 || !date2) return false;
-    return new Date(date1) <= new Date(date2);
-  };
-
-  const isDateInPast = (date: Date): boolean => {
-    // Set today to midnight for accurate comparison
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return date < today;
-  };
-
-  const handleDateClick = (date: Date): void => {
-    // Prevent selecting past dates
-    if (isDateInPast(date)) return;
-
-    if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
-      // Start a new selection
-      setSelectedStartDate(date);
-      setSelectedEndDate(null);
-    } else {
-      // Complete the selection
-      if (isDateBeforeOrEqual(selectedStartDate, date)) {
-        setSelectedEndDate(date);
-        // Update the parent component's date range
-        // Pass the dates directly to match the expected format
-        handleDateRangePickerChange([selectedStartDate, date]);
-        setShowCalendar(false);
-      } else {
-        setSelectedStartDate(date);
-        setSelectedEndDate(null);
-      }
-    }
-  };
-
-  const handleHover = (date: Date): void => {
-    setHoverDate(date);
-  };
-
-  const isDateHighlighted = (date: Date): boolean => {
-    if (selectedStartDate && !selectedEndDate && hoverDate) {
-      if (isDateBeforeOrEqual(selectedStartDate, hoverDate)) {
-        return (
-          isDateInRange(date, selectedStartDate, hoverDate) ||
-          isDateEqual(date, hoverDate)
-        );
-      }
-    }
-    return false;
-  };
-
-  const nextMonth = () => {
-    const newMonth = new Date(
-      currentMonth.getFullYear(),
-      currentMonth.getMonth() + 1,
-      1,
-    );
-    if (!isMaxMonthReached(newMonth)) {
-      setCurrentMonth(newMonth);
-    }
-  };
-
-  const prevMonth = () => {
-    const newMonth = new Date(
-      currentMonth.getFullYear(),
-      currentMonth.getMonth() - 1,
-      1,
-    );
-    const today = new Date();
-    const currentMonthStart = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      1,
-    );
-
-    // Don't allow navigating to months before the current month
-    if (newMonth >= currentMonthStart) {
-      setCurrentMonth(newMonth);
-    }
-  };
-
-  const isCurrentMonthTheFirstAvailable = (): boolean => {
-    const today = new Date();
-    const currentMonthStart = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      1,
-    );
-    return (
-      currentMonth.getFullYear() === currentMonthStart.getFullYear() &&
-      currentMonth.getMonth() === currentMonthStart.getMonth()
-    );
-  };
-
-  const isCurrentMonthTheLastAvailable = (): boolean => {
-    const nextMonthDate = new Date(
-      currentMonth.getFullYear(),
-      currentMonth.getMonth() + 1,
-      1,
-    );
-    return isMaxMonthReached(nextMonthDate);
-  };
-
-  // Helper to format dates consistently
-  const formatDisplayDate = (date: Date | null | undefined) => {
-    if (!date) return '';
-    
-    // Format date to show DD/MM/YYYY to match the listing page format
-    return date.toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
-  };
-
-  // Debug information
-  console.log("Date range from URL:", { startDate, endDate });
-  console.log("Date range in component:", dateRange);
 
   const renderMonthCalendar = (monthDate: Date) => {
     const year = monthDate.getFullYear();
@@ -279,18 +124,8 @@ export default function PropertyDetailPage() {
     const firstDayOfMonth = getFirstDayOfMonth(year, month);
 
     const monthNames = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December',
     ];
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -303,9 +138,9 @@ export default function PropertyDetailPage() {
     // Add cells for each day of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
-      const isStart = isDateEqual(date, selectedStartDate);
-      const isEnd = isDateEqual(date, selectedEndDate);
-      const isInRange = isDateInRange(date, selectedStartDate, selectedEndDate);
+      const isStart = isDateEqual(date, calendarState.selectedStartDate);
+      const isEnd = isDateEqual(date, calendarState.selectedEndDate);
+      const isInRange = isDateInRange(date, calendarState.selectedStartDate, calendarState.selectedEndDate);
       const isHovered = isDateHighlighted(date);
       const isPast = isDateInPast(date);
       const isSunday = date.getDay() === 0;
@@ -331,7 +166,7 @@ export default function PropertyDetailPage() {
           <div
             className={`absolute bottom-0 w-full text-center text-xs font-semibold p-1 ${isPast ? 'text-gray-300' : 'text-primary'}`}
           >
-            500
+            {getLowestRoomPriceForDate(date)}
           </div>
         </div>,
       );
@@ -358,22 +193,6 @@ export default function PropertyDetailPage() {
   };
 
   const renderCalendar = () => {
-    const monthNames = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
-    
-
     return (
       <div className="mb-4">
         <div className="flex justify-between items-center mb-4">
@@ -395,30 +214,11 @@ export default function PropertyDetailPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-2">
-          {renderMonthCalendar(currentMonth)}
-          {renderMonthCalendar(getNextMonth(currentMonth))}
+          {renderMonthCalendar(calendarState.currentMonth)}
+          {renderMonthCalendar(getNextMonth(calendarState.currentMonth))}
         </div>
       </div>
     );
-  };
-
-  // Check if a room has images
-  const getRoomImages = (room: any) => {
-    // Handle different property names
-    return room.roomImages || room.images || [];
-  };
-
-  // Function to get the first image from a room
-  const getRoomFirstImage = (room: any, index = 0) => {
-    const images = getRoomImages(room);
-    return images.length > index ? images[index] : null;
-  };
-
-  // Function to check if a room is available
-  const isRoomAvailable = (roomId: number): boolean => {
-    const available = !unavailableRoomIds.includes(roomId);
-    console.log(`Room ${roomId} available: ${available}, unavailable IDs:`, unavailableRoomIds);
-    return available;
   };
 
   if (loading) {
@@ -823,17 +623,17 @@ export default function PropertyDetailPage() {
             </div>
             <button
               className="w-full flex items-center justify-between text-gray-700 text-sm"
-              onClick={() => setShowCalendar(!showCalendar)}
+              onClick={() => toggleCalendar()}
             >
               <span>
-                {selectedStartDate && selectedEndDate
-                  ? `${formatDisplayDate(selectedStartDate)} - ${formatDisplayDate(selectedEndDate)}`
+                {calendarState.selectedStartDate && calendarState.selectedEndDate
+                  ? `${formatDisplayDate(calendarState.selectedStartDate)} - ${formatDisplayDate(calendarState.selectedEndDate)}`
                   : 'Select dates'}
               </span>
             </button>
 
             {/* Calendar dropdown */}
-            {showCalendar && (
+            {calendarState.showCalendar && (
               <div
                 ref={calendarRef}
                 className="absolute top-full left-0 mt-1 z-50 bg-white border border-gray-200 shadow-lg rounded-lg p-4 w-[640px]"
@@ -890,13 +690,21 @@ export default function PropertyDetailPage() {
             </div>
           </div>
           <button
-            className="w-full md:w-[20%] md:rounded-r-lg bg-primary text-white p-3 hover:bg-primary/90 transition-colors"
-            onClick={() => {
-              handleSearch();
-            }}
+            className="w-full md:w-[20%] md:rounded-r-lg bg-primary text-white p-3 hover:bg-primary/90 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            onClick={handleSearch}
+            disabled={filtering}
           >
             <div className="flex gap-2 items-center justify-center">
-              <FaSearch size={18} /> <span>Search Hotel</span>
+              {filtering ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Searching...</span>
+                </>
+              ) : (
+                <>
+                  <FaSearch size={18} /> <span>Search Rooms</span>
+                </>
+              )}
             </div>
           </button>
         </div>
@@ -904,22 +712,12 @@ export default function PropertyDetailPage() {
         <div className="bg-white rounded-lg p-6 shadow-md">
           <h2 className="text-xl font-semibold mb-4">
             Available Rooms
-            {dateRange.from && dateRange.to && (
-              <div className="mt-2 text-sm font-normal text-gray-600">
-                Showing availability for {formatDisplayDate(dateRange.from)} to {formatDisplayDate(dateRange.to)}. 
-              </div>
-            )}
-            {searchAdults && Number(searchAdults) > 0 && (
-              <div className="text-sm font-normal text-gray-600">
-                Filtering for rooms with capacity for at least {searchAdults} {Number(searchAdults) === 1 ? 'person' : 'people'}.
-              </div>
-            )}
           </h2>
-
+          
           {filtering ? (
             <div className="flex flex-col items-center justify-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mb-4"></div>
-              <p className="text-gray-500">Filtering rooms based on your criteria...</p>
+              <p className="text-gray-500">Finding rooms that match your criteria...</p>
             </div>
           ) : property && property.rooms && property.rooms.length > 0 ? (
             <>
@@ -927,19 +725,20 @@ export default function PropertyDetailPage() {
                 <div className="space-y-6">
                   {filteredRooms.map((room: any) => {
                     const available = room.isAvailable;
+                    
                     return (
                       <div
                         key={room.id}
                         className={`border rounded-lg p-4 transition-all ${
                           available 
                             ? "hover:shadow-md" 
-                            : "opacity-75 border-red-200 relative"
+                            : "opacity-70 border-red-200 relative"
                         }`}
                       >
                         {/* Unavailable label for rooms that aren't available */}
                         {!available && dateRange.from && dateRange.to && (
                           <div className="absolute top-2 left-2 z-10 bg-red-600 text-white px-3 py-1 rounded-md text-sm font-semibold">
-                            Room Unavailable
+                            Room Not Available
                           </div>
                         )}
                         
@@ -1008,7 +807,7 @@ export default function PropertyDetailPage() {
                             <h3 className="text-xl font-semibold">{room.name}</h3>
                             <div className="flex items-center mt-2 text-gray-600">
                               <FaUser className="mr-1" />
-                              <span>
+                              <span className="font-medium">
                                 {room.capacity}{' '}
                                 {room.capacity > 1 ? 'Guests' : 'Guest'} • {room.size}
                                 m²
@@ -1050,17 +849,34 @@ export default function PropertyDetailPage() {
                             )}
 
                             <div className="mt-4">
-                              <p className="text-primary font-bold text-xl">
-                                IDR {Number(room.base_price).toLocaleString('id-ID')}
-                              </p>
-                              <p className="text-gray-400 text-xs">
-                                not including tax and fees
-                              </p>
+                              {(room.adjusted_price || room.calculatedPrice) && 
+                               (Number(room.adjusted_price || room.calculatedPrice) !== Number(room.base_price)) ? (
+                                <>
+                                  <p className="text-primary font-bold text-xl">
+                                    IDR {Number(room.adjusted_price || room.calculatedPrice).toLocaleString('id-ID')}
+                                  </p>
+                                  <p className="text-gray-400 text-xs">
+                                    not including tax and fees
+                                  </p>
+                                </>
+                              ) : (
+                                <>
+                                  <p className="text-primary font-bold text-xl">
+                                    IDR {Number(room.base_price).toLocaleString('id-ID')}
+                                  </p>
+                                  <p className="text-gray-400 text-xs">
+                                    not including tax and fees
+                                  </p>
+                                </>
+                              )}
                             </div>
 
-                            {available || !dateRange.from || !dateRange.to ? (
+                            {available ? (
                               <Link
-                                href={`/booking/${property.slug}?roomId=${room.id}`}
+                                href={`/booking/${property.slug}?roomId=${room.id}${searchAdults ? `&adults=${searchAdults}` : ''}${
+                                  dateRange.from && dateRange.to ? 
+                                  `&startDate=${dateRange.from.toISOString()}&endDate=${dateRange.to.toISOString()}` : ''
+                                }`}
                               >
                                 <div className="mt-4 bg-primary text-white px-4 py-2 inline-block rounded hover:bg-primary/90 transition-colors">
                                   Book Now
@@ -1078,7 +894,7 @@ export default function PropertyDetailPage() {
                   })}
                 </div>
               ) : (
-                <div className="p-4 border rounded-lg bg-yellow-50 text-yellow-800">
+                <div className="p-6 border rounded-lg bg-yellow-50 text-yellow-800">
                   <p className="font-semibold">No rooms match your filter criteria.</p>
                   <p className="mt-2">
                     {searchAdults && Number(searchAdults) > 0 ? (
@@ -1091,7 +907,7 @@ export default function PropertyDetailPage() {
               )}
             </>
           ) : (
-            <p className="text-gray-500">No rooms available</p>
+            <p className="text-gray-500 p-4 text-center">No rooms available for this property</p>
           )}
         </div>
         <PropertyReviews propertyId={property.id} />

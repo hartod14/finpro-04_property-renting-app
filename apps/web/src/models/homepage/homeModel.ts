@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { getUserLocationName } from '@/handlers/geolocation';
 
 export default function HomeModel() {
   const router = useRouter();
   
   const [searchTerm, setSearchTerm] = useState('');
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [locationLoaded, setLocationLoaded] = useState(false);
   
   const today = new Date();
   const tomorrow = new Date(today);
@@ -19,6 +22,44 @@ export default function HomeModel() {
   });
   
   const [searchAdults, setSearchAdults] = useState('2');
+  
+  const getLocation = async () => {
+    if (searchTerm || locationLoaded) {
+      return;
+    }
+    
+    setLocationLoaded(true);
+    setLocationLoading(true);
+    
+    try {
+      const locationPromise = getUserLocationName();
+      const timeoutPromise = new Promise<{locationName: string}>((resolve) => {
+        setTimeout(() => resolve({locationName: ''}), 8000);
+      });
+      
+      const { locationName } = await Promise.race([locationPromise, timeoutPromise]);
+      
+      if (locationName) {
+        setSearchTerm(locationName);
+      }
+    } catch (error) {
+      console.error('Error getting location:', error);
+    } finally {
+      setLocationLoading(false);
+    }
+  };
+  
+  const isBrowser = typeof window !== 'undefined';
+  
+  useEffect(() => {
+    if (!isBrowser) return;
+    
+    const timer = setTimeout(() => {
+      getLocation();
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+  }, [isBrowser]);
   
   const handleSearchTermChange = (value: string) => {
     setSearchTerm(value);
@@ -66,6 +107,7 @@ export default function HomeModel() {
     searchTerm,
     dateRange,
     searchAdults,
+    locationLoading,
     handleSearchTermChange,
     handleDateRangeChange,
     handleAdultsChange,
