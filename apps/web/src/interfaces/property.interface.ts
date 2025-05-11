@@ -102,7 +102,7 @@ export interface IPropertyDetail {
     capacity: number | string;
     size: number | string;
     total_room: number | string;
-    images: string[];
+    roomImages: string[];
     facilities: number[];
   }[];
 }

@@ -57,20 +57,20 @@ export default function PropertyModel() {
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
-  const checkInDate = searchParams.get('checkInDate')
-    ? new Date(searchParams.get('checkInDate') as string)
+  const startDate = searchParams.get('startDate')
+    ? new Date(searchParams.get('startDate') as string)
     : today;
 
-  const checkOutDate = searchParams.get('checkOutDate')
-    ? new Date(searchParams.get('checkOutDate') as string)
+  const endDate = searchParams.get('endDate')
+    ? new Date(searchParams.get('endDate') as string)
     : tomorrow;
 
   const [dateRange, setDateRange] = useState<{
     from: Date | undefined;
     to: Date | undefined;
   }>({
-    from: checkInDate,
-    to: checkOutDate,
+    from: startDate,
+    to: endDate,
   });
 
   const [selectedCategoryNames, setSelectedCategoryNames] = useState<string[]>([]);
@@ -110,11 +110,11 @@ export default function PropertyModel() {
       }
 
       if (dateRange.from) {
-        filters.checkInDate = dateRange.from.toISOString();
+        filters.startDate = dateRange.from.toISOString();
       }
 
       if (dateRange.to) {
-        filters.checkOutDate = dateRange.to.toISOString();
+        filters.endDate = dateRange.to.toISOString();
       }
 
       if (searchAdults && searchAdults !== '') {
@@ -131,6 +131,8 @@ export default function PropertyModel() {
       setProperties(data.properties);
       setTotalItems(data.pagination.total);
       setTotalPages(data.pagination.totalPage);
+
+      console.log(data.properties);
     } catch (err) {
       setError('Failed to load properties. Please try again later.');
     }

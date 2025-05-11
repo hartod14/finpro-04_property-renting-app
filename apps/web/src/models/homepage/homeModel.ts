@@ -40,11 +40,11 @@ export default function HomeModel() {
     }
     
     if (dateRange.from) {
-      searchParams.append('checkInDate', dateRange.from.toISOString());
+      searchParams.append('startDate', dateRange.from.toISOString());
     }
     
     if (dateRange.to) {
-      searchParams.append('checkOutDate', dateRange.to.toISOString());
+      searchParams.append('endDate', dateRange.to.toISOString());
     }
     
     if (searchAdults) {

@@ -1,6 +1,7 @@
 import { prisma } from '@/config';
 import { Request } from 'express';
 import { pagination } from '@/helpers/pagination';
+import { log } from 'console';
 
 class PropertyService {
   async getAllData(req: Request) {
@@ -16,6 +17,8 @@ class PropertyService {
       maxPrice,
       capacity,
       searchTerm,
+      startDate,
+      endDate,
       page = '1',
       limit = '15',
     } = req.query;
@@ -56,10 +59,9 @@ class PropertyService {
         { address: { contains: String(searchTerm), mode: 'insensitive' } },
       ];
     }
-
-    const totalProperties = await prisma.property.count({
-      where: filters,
-    });
+    // const totalProperties = await prisma.property.count({
+    //   where: filters,
+    // });
 
     const properties = await prisma.property.findMany({
       where: filters,
@@ -79,6 +81,12 @@ class PropertyService {
               },
             },
             roomImages: true,
+            roomHasUnavailableDates: {
+              include: {
+                roomUnavailableDate: true,
+              },
+            },
+            // roomHasPeakSeasonRates: true,
           },
         },
         propertyHasFacilities: {
@@ -98,7 +106,64 @@ class PropertyService {
       ...pagination(pageNumber, limitNumber),
     });
 
-    let filteredProperties = properties.filter(property => property.rooms.length > 0);
+    // Filter out rooms that are unavailable during the requested dates
+    let filteredProperties = properties;
+    
+    if (startDate && endDate) {
+      // Convert query parameters to Date objects and set to start of day
+      const requestStartDate = new Date(String(startDate));
+      const requestEndDate = new Date(String(endDate));
+      
+      // Remove time component for cleaner comparison
+      const normalizeDate = (date: Date): string => {
+        return date.toISOString().split('T')[0];
+      };
+      
+      const requestStartStr = normalizeDate(requestStartDate);
+      const requestEndStr = normalizeDate(requestEndDate);
+      
+      filteredProperties = filteredProperties.map(property => {
+        // Filter out unavailable rooms
+        const availableRooms = property.rooms.filter(room => {
+          // Check if room has any unavailable dates that overlap with requested dates
+          return !room.roomHasUnavailableDates.some(unavailable => {
+            const roomStartDate = new Date(unavailable.roomUnavailableDate.start_date);
+            const roomEndDate = new Date(unavailable.roomUnavailableDate.end_date);
+            
+            const roomStartStr = normalizeDate(roomStartDate);
+            const roomEndStr = normalizeDate(roomEndDate);
+            
+            // If start date of request falls on any day in the unavailable range
+            if (requestStartStr >= roomStartStr && requestStartStr <= roomEndStr) {
+              return true;
+            }
+            
+            // If end date of request falls on any day in the unavailable range
+            if (requestEndStr >= roomStartStr && requestEndStr <= roomEndStr) {
+              return true;
+            }
+            
+            // If request period completely contains the unavailable period
+            if (requestStartStr <= roomStartStr && requestEndStr >= roomEndStr) {
+              return true;
+            }
+            
+            return false;
+          });
+        });
+        
+        return {
+          ...property,
+          rooms: availableRooms
+        };
+      });
+      
+      // Filter out properties with no available rooms
+      filteredProperties = filteredProperties.filter(property => property.rooms.length > 0);
+    } else {
+      // If no date filter, just ensure properties have at least one room
+      filteredProperties = filteredProperties.filter(property => property.rooms.length > 0);
+    }
 
     if (facilityID) {
       const facilityIds = String(facilityID).split(',').map(Number);
@@ -144,7 +209,9 @@ class PropertyService {
         return sortOrder === 'asc' ? aPrice - bPrice : bPrice - aPrice;
       });
     }
+    
     const formattedProperties = filteredProperties.map((property) => {
+      
       let lowestPriceRoom = null;
 
       if (capacity) {

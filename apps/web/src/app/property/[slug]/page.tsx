@@ -1,6 +1,6 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import Navbar from '@/components/common/navbar/navbar';
 import Footer from '@/components/common/footer/footer';
 import {
@@ -26,15 +26,26 @@ import PropertyReviews from '@/components/property/PropertyReviews';
 
 export default function PropertyDetailPage() {
   const { slug } = useParams();
+  const searchParams = useSearchParams();
+  
+  // Get parameters from URL - handle both naming conventions
+  const startDate = searchParams.get('startDate');
+  const endDate = searchParams.get('endDate');
+  const adults = searchParams.get('adults');
+  const capacity = searchParams.get('capacity');
+  
   const {
     property,
     loading,
+    filtering,
     error,
+    filteredRooms,
     activeRoomPhoto,
     showPhotoModal,
     showRoomPhotoModal,
     activePhotoIndex,
     activeRoomId,
+    unavailableRoomIds,
     propertyFacilities,
     roomFacilities,
     handleChangeRoomPhoto,
@@ -50,7 +61,12 @@ export default function PropertyDetailPage() {
     handleSearch,
     dateRange,
     handleDateRangePickerChange,
-  } = PropertyDetailModel(slug);
+  } = PropertyDetailModel(slug, { 
+    initialStartDate: startDate, 
+    initialEndDate: endDate, 
+    initialAdults: adults,
+    initialCapacity: capacity
+  });
 
   // Calendar state
   const getCurrentMonth = (): Date => {
@@ -240,14 +256,21 @@ export default function PropertyDetailPage() {
     return isMaxMonthReached(nextMonthDate);
   };
 
-  const formatDisplayDate = (date: Date | null) => {
+  // Helper to format dates consistently
+  const formatDisplayDate = (date: Date | null | undefined) => {
     if (!date) return '';
-    return date.toLocaleDateString('en-US', {
+    
+    // Format date to show DD/MM/YYYY to match the listing page format
+    return date.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
       year: 'numeric',
-      month: 'short',
-      day: 'numeric',
     });
   };
+
+  // Debug information
+  console.log("Date range from URL:", { startDate, endDate });
+  console.log("Date range in component:", dateRange);
 
   const renderMonthCalendar = (monthDate: Date) => {
     const year = monthDate.getFullYear();
@@ -377,6 +400,25 @@ export default function PropertyDetailPage() {
         </div>
       </div>
     );
+  };
+
+  // Check if a room has images
+  const getRoomImages = (room: any) => {
+    // Handle different property names
+    return room.roomImages || room.images || [];
+  };
+
+  // Function to get the first image from a room
+  const getRoomFirstImage = (room: any, index = 0) => {
+    const images = getRoomImages(room);
+    return images.length > index ? images[index] : null;
+  };
+
+  // Function to check if a room is available
+  const isRoomAvailable = (roomId: number): boolean => {
+    const available = !unavailableRoomIds.includes(roomId);
+    console.log(`Room ${roomId} available: ${available}, unavailable IDs:`, unavailableRoomIds);
+    return available;
   };
 
   if (loading) {
@@ -860,137 +902,194 @@ export default function PropertyDetailPage() {
         </div>
 
         <div className="bg-white rounded-lg p-6 shadow-md">
-          <h2 className="text-xl font-semibold mb-4">Available Rooms</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            Available Rooms
+            {dateRange.from && dateRange.to && (
+              <div className="mt-2 text-sm font-normal text-gray-600">
+                Showing availability for {formatDisplayDate(dateRange.from)} to {formatDisplayDate(dateRange.to)}. 
+              </div>
+            )}
+            {searchAdults && Number(searchAdults) > 0 && (
+              <div className="text-sm font-normal text-gray-600">
+                Filtering for rooms with capacity for at least {searchAdults} {Number(searchAdults) === 1 ? 'person' : 'people'}.
+              </div>
+            )}
+          </h2>
 
-          {property.rooms && property.rooms.length > 0 ? (
-            <div className="space-y-6">
-              {property.rooms.map((room) => (
-                <div
-                  key={room.id}
-                  className="border rounded-lg p-4 hover:shadow-md transition-shadow"
-                >
-                  <div className="flex flex-col md:flex-row gap-4">
-                    <div className="w-full md:w-1/3 relative">
+          {filtering ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mb-4"></div>
+              <p className="text-gray-500">Filtering rooms based on your criteria...</p>
+            </div>
+          ) : property && property.rooms && property.rooms.length > 0 ? (
+            <>
+              {filteredRooms && filteredRooms.length > 0 ? (
+                <div className="space-y-6">
+                  {filteredRooms.map((room: any) => {
+                    const available = room.isAvailable;
+                    return (
                       <div
-                        className="relative h-60 rounded-lg overflow-hidden cursor-pointer"
-                        onClick={() =>
-                          room.images &&
-                          room.images.length > 0 &&
-                          openRoomPhotoModal(
-                            room.id,
-                            activeRoomPhoto[room.id] || 0,
-                          )
-                        }
+                        key={room.id}
+                        className={`border rounded-lg p-4 transition-all ${
+                          available 
+                            ? "hover:shadow-md" 
+                            : "opacity-75 border-red-200 relative"
+                        }`}
                       >
-                        {room.images && room.images.length > 0 ? (
-                          <>
-                            <Image
-                              src={
-                                room.images[activeRoomPhoto[room.id] || 0].path
-                              }
-                              alt={room.name}
-                              fill
-                              className="object-cover hover:opacity-95 transition-opacity"
-                            />
-                            <div className="absolute bottom-0 right-0 bg-black/70 text-white px-3 py-1 m-2 rounded-full text-xs">
-                              Click to view all photos
-                            </div>
-                          </>
-                        ) : (
-                          <div className="bg-gray-200 h-full w-full flex items-center justify-center">
-                            <p className="text-gray-500">No image</p>
+                        {/* Unavailable label for rooms that aren't available */}
+                        {!available && dateRange.from && dateRange.to && (
+                          <div className="absolute top-2 left-2 z-10 bg-red-600 text-white px-3 py-1 rounded-md text-sm font-semibold">
+                            Room Unavailable
                           </div>
                         )}
-                      </div>
-
-                      {room.images && room.images.length > 1 && (
-                        <div className="flex mt-2 gap-2 overflow-x-auto">
-                          {room.images.map((img, index) => (
+                        
+                        <div className="flex flex-col md:flex-row gap-4">
+                          <div className="w-full md:w-1/3 relative">
                             <div
-                              key={img.id}
-                              className={`relative w-16 h-16 rounded-md overflow-hidden cursor-pointer ${activeRoomPhoto[room.id] === index ? 'ring-2 ring-primary' : ''}`}
-                              onClick={() =>
-                                handleChangeRoomPhoto(room.id, index)
-                              }
+                              className={`relative h-60 rounded-lg overflow-hidden ${
+                                available ? "cursor-pointer" : "cursor-not-allowed"
+                              }`}
+                              onClick={() => {
+                                const images = getRoomImages(room);
+                                if (available && images.length > 0) {
+                                  openRoomPhotoModal(
+                                    room.id,
+                                    activeRoomPhoto[room.id] || 0,
+                                  );
+                                }
+                              }}
                             >
-                              <Image
-                                src={img.path}
-                                alt={`Room ${index + 1}`}
-                                fill
-                                className="object-cover"
-                              />
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="w-full md:w-2/3">
-                      <h3 className="text-xl font-semibold">{room.name}</h3>
-                      <div className="flex items-center mt-2 text-gray-600">
-                        <FaUser className="mr-1" />
-                        <span>
-                          {room.capacity}{' '}
-                          {room.capacity > 1 ? 'Guests' : 'Guest'} • {room.size}
-                          m²
-                        </span>
-                      </div>
-
-                      {room.description && (
-                        <p className="mt-3 text-gray-600">{room.description}</p>
-                      )}
-
-                      {/* Room Facilities */}
-                      {room.facilities && room.facilities.length > 0 && (
-                        <div className="mt-4">
-                          <h4 className="text-sm font-medium text-gray-700 mb-2">
-                            Room Facilities:
-                          </h4>
-                          <div className="flex flex-wrap gap-3">
-                            {room.facilities.map((facility) => {
-                              const facilityIcon = getFacilityIconByName(
-                                facility.name,
-                              );
-
-                              return (
-                                <div
-                                  key={facility.id}
-                                  className="flex items-center bg-gray-100 px-2 py-1 rounded text-sm"
-                                >
-                                  <span className="text-primary mr-1">
-                                    {facilityIcon}
-                                  </span>
-                                  <span className="text-gray-700 ">
-                                    {facility.name}
-                                  </span>
+                              {getRoomImages(room).length > 0 ? (
+                                <>
+                                  <Image
+                                    src={
+                                      getRoomFirstImage(room, activeRoomPhoto[room.id] || 0)?.path || ''
+                                    }
+                                    alt={room.name}
+                                    fill
+                                    className={`object-cover ${available ? "hover:opacity-95" : ""} transition-opacity`}
+                                  />
+                                  {available && (
+                                    <div className="absolute bottom-0 right-0 bg-black/70 text-white px-3 py-1 m-2 rounded-full text-xs">
+                                      Click to view all photos
+                                    </div>
+                                  )}
+                                </>
+                              ) : (
+                                <div className="bg-gray-200 h-full w-full flex items-center justify-center">
+                                  <p className="text-gray-500">No image</p>
                                 </div>
-                              );
-                            })}
+                              )}
+                            </div>
+
+                            {getRoomImages(room).length > 1 && available && (
+                              <div className="flex mt-2 gap-2 overflow-x-auto">
+                                {getRoomImages(room).map((img: any, index: number) => (
+                                  <div
+                                    key={img.id}
+                                    className={`relative w-16 h-16 rounded-md overflow-hidden cursor-pointer ${activeRoomPhoto[room.id] === index ? 'ring-2 ring-primary' : ''}`}
+                                    onClick={() =>
+                                      handleChangeRoomPhoto(room.id, index)
+                                    }
+                                  >
+                                    <Image
+                                      src={img.path}
+                                      alt={`Room ${index + 1}`}
+                                      fill
+                                      className="object-cover"
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="w-full md:w-2/3">
+                            <h3 className="text-xl font-semibold">{room.name}</h3>
+                            <div className="flex items-center mt-2 text-gray-600">
+                              <FaUser className="mr-1" />
+                              <span>
+                                {room.capacity}{' '}
+                                {room.capacity > 1 ? 'Guests' : 'Guest'} • {room.size}
+                                m²
+                              </span>
+                            </div>
+
+                            {room.description && (
+                              <p className="mt-3 text-gray-600">{room.description}</p>
+                            )}
+
+                            {/* Room Facilities */}
+                            {room.facilities && room.facilities.length > 0 && (
+                              <div className="mt-4">
+                                <h4 className="text-sm font-medium text-gray-700 mb-2">
+                                  Room Facilities:
+                                </h4>
+                                <div className="flex flex-wrap gap-3">
+                                  {room.facilities.map((facility: any) => {
+                                    const facilityIcon = getFacilityIconByName(
+                                      facility.name,
+                                    );
+
+                                    return (
+                                      <div
+                                        key={facility.id}
+                                        className="flex items-center bg-gray-100 px-2 py-1 rounded text-sm"
+                                      >
+                                        <span className="text-primary mr-1">
+                                          {facilityIcon}
+                                        </span>
+                                        <span className="text-gray-700 ">
+                                          {facility.name}
+                                        </span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+
+                            <div className="mt-4">
+                              <p className="text-primary font-bold text-xl">
+                                IDR {Number(room.base_price).toLocaleString('id-ID')}
+                              </p>
+                              <p className="text-gray-400 text-xs">
+                                not including tax and fees
+                              </p>
+                            </div>
+
+                            {available || !dateRange.from || !dateRange.to ? (
+                              <Link
+                                href={`/booking/${property.slug}?roomId=${room.id}`}
+                              >
+                                <div className="mt-4 bg-primary text-white px-4 py-2 inline-block rounded hover:bg-primary/90 transition-colors">
+                                  Book Now
+                                </div>
+                              </Link>
+                            ) : (
+                              <div className="mt-4 bg-gray-400 text-white px-4 py-2 inline-block rounded cursor-not-allowed">
+                                Not Available
+                              </div>
+                            )}
                           </div>
                         </div>
-                      )}
-
-                      <div className="mt-4">
-                        <p className="text-primary font-bold text-xl">
-                          IDR {Number(room.base_price).toLocaleString('id-ID')}
-                        </p>
-                        <p className="text-gray-400 text-xs">
-                          not including tax and fees
-                        </p>
                       </div>
-
-                      <Link
-                        href={`/booking/${property.slug}?roomId=${room.id}`}
-                      >
-                        <div className="mt-4 bg-primary text-white px-4 py-2 inline-block rounded hover:bg-primary/90 transition-colors">
-                          Book Now
-                        </div>
-                      </Link>
-                    </div>
-                  </div>
+                    );
+                  })}
                 </div>
-              ))}
-            </div>
+              ) : (
+                <div className="p-4 border rounded-lg bg-yellow-50 text-yellow-800">
+                  <p className="font-semibold">No rooms match your filter criteria.</p>
+                  <p className="mt-2">
+                    {searchAdults && Number(searchAdults) > 0 ? (
+                      <>There are no rooms available for {searchAdults} {Number(searchAdults) === 1 ? 'person' : 'people'}. Try reducing the number of guests.</>
+                    ) : (
+                      <>No rooms match your current filters. Try adjusting your search parameters.</>
+                    )}
+                  </p>
+                </div>
+              )}
+            </>
           ) : (
             <p className="text-gray-500">No rooms available</p>
           )}

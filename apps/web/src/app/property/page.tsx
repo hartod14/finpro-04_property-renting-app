@@ -29,6 +29,18 @@ import { PaginationTable } from '@/components/common/pagination/propertyPaginati
 import PropertyPageSkeleton from '@/components/property/propertyPageSkeleton';
 import ErrorPage from '@/components/common/error/errorPage';
 
+// Helper function to format dates for URL consistently
+const formatDateForUrl = (date: Date): string => {
+  if (!date) return '';
+  
+  // Normalize the date to avoid timezone issues
+  const normalizedDate = new Date(date);
+  normalizedDate.setHours(0, 0, 0, 0);
+  
+  // Return ISO string format for consistent parsing
+  return normalizedDate.toISOString();
+};
+
 export default function PropertyPage() {
   const {
     openFilters,
@@ -109,8 +121,8 @@ export default function PropertyPage() {
               startDate={dateRange.from ? new Date(dateRange.from) : null}
               endDate={dateRange.to ? new Date(dateRange.to) : null}
               onChange={handleDateRangePickerChange}
-              startDatePlaceholder="Check-in"
-              endDatePlaceholder="Check-out"
+              startDatePlaceholder="Start Date"
+              endDatePlaceholder="End Date"
             />
           </div>
           <div className="w-full md:w-1/4 p-3 flex items-center border-2 border-primary bg-white relative">
@@ -677,7 +689,17 @@ export default function PropertyPage() {
                 properties.map((property) => (
                   <Link
                     key={`property-${property.id}`}
-                    href={`/property/${property.slug}`}
+                    href={`/property/${property.slug}${
+                      dateRange.from || dateRange.to || searchAdults
+                        ? `?${dateRange.from ? `startDate=${formatDateForUrl(dateRange.from)}` : ''}${
+                            dateRange.to ? `${dateRange.from ? '&' : ''}endDate=${formatDateForUrl(dateRange.to)}` : ''
+                          }${
+                            searchAdults
+                              ? `${dateRange.from || dateRange.to ? '&' : ''}adults=${searchAdults}&capacity=${searchAdults}`
+                              : ''
+                          }`
+                        : ''
+                    }`}
                     className="bg-white border border-gray-200 shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow"
                   >
                     <div className="flex flex-col sm:flex-row">
