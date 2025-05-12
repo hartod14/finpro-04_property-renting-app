@@ -17,7 +17,7 @@ import {
 import Swal from 'sweetalert2';
 import { verificationFormik } from '@/helpers/formiks/verification.formik';
 
-function UpdatePasswordForm() {
+export default function UpdatePasswordFormPage() {
   const [errMessage, setErrMessage] = React.useState('');
   const [userId, setUserId] = useState<number>();
   const open = useRef(false);
@@ -143,26 +143,5 @@ function UpdatePasswordForm() {
         </Snackbar>
       </div>
     </div>
-  );
-}
-
-// Loading component for Suspense fallback
-function Loading() {
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 bg-white shadow-lg rounded-lg text-center">
-        <div className="mb-4">
-          <h4 className="text-2xl font-bold mb-2">Loading...</h4>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default function Page() {
-  return (
-    <Suspense fallback={<Loading />}>
-      <UpdatePasswordForm />
-    </Suspense>
   );
 }

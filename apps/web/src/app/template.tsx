@@ -10,9 +10,7 @@ type Props = {
 export default function Template({ children }: Props) {
   return (
     <>
-      <SessionProvider>
-        {children}
-      </SessionProvider>
+      <SessionProvider>{children}</SessionProvider>
     </>
   );
 }

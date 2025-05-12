@@ -88,9 +88,6 @@ export default function PropertyPage() {
     totalPages,
   } = PropertyModel();
 
-  if (loading) {
-    return <PropertyPageSkeleton />;
-  }
 
   if (error) {
     return (

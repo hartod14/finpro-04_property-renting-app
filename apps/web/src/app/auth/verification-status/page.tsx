@@ -1,4 +1,3 @@
-/** @format */
 'use client';
 
 import { Alert, Snackbar } from '@mui/material';
@@ -15,7 +14,7 @@ import {
 import Swal from 'sweetalert2';
 import { verificationFormik } from '@/helpers/formiks/verification.formik';
 
-export default function Page() {
+export default function VerificationStatusPage() {
   const [errMessage, setErrMessage] = React.useState('');
   const open = useRef(false);
   const router = useRouter();
