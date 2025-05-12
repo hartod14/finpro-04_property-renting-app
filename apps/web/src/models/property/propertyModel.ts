@@ -132,7 +132,6 @@ export default function PropertyModel() {
       setTotalItems(data.pagination.total);
       setTotalPages(data.pagination.totalPage);
 
-      console.log(data.properties);
     } catch (err) {
       setError('Failed to load properties. Please try again later.');
     }
