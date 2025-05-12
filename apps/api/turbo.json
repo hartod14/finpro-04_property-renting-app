@@ -1,6 +1,9 @@
 {
   "extends": ["//"],
   "tasks": {
-    "prisma": {}
+    "prisma": {},
+    "build": {
+      "outputs": ["dist/**"]
+    }
   }
 }
