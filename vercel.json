@@ -1,11 +1,9 @@
 {
   "version": 2,
-  "builds": [
-    { "src": "apps/web/package.json", "use": "@vercel/next" },
-    { "src": "apps/api/src/index.ts", "use": "@vercel/node" }
-  ],
-  "routes": [
-    { "src": "/api/(.*)", "dest": "apps/api/src/index.ts" },
-    { "src": "/(.*)", "dest": "apps/web/$1" }
+  "buildCommand": "turbo run build --filter=web",
+  "outputDirectory": "apps/web/.next",
+  "framework": "nextjs",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/apps/web/$1" }
   ]
 } 
