@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import BookingSummary from '@/components/bookings/BookingSummary';
 import BookingSection from '@/components/bookings/BookingSection';
+import { toZonedTime} from 'date-fns-tz'; // Menggunakan zona waktu
 
 interface BookingSummary {
   property: {
@@ -30,28 +31,63 @@ interface BookingSummary {
   };
 }
 
+const formatDisplayDate = (date: Date | null) => {
+  if (!date) return '';
+  // Konversi ke UTC agar tidak tergeser
+  const utcDate = toZonedTime(date, 'UTC');
+  return utcDate.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+};
+
 export default function BookingPage() {
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();
   const params = useParams();
   const slug = params.slug;
+
   const roomId = searchParams.get('roomId');
+  const checkinParam = searchParams.get('checkin');
+  const checkoutParam = searchParams.get('checkout');
+
   const [summary, setSummary] = useState<BookingSummary | null>(null);
   const [checkinDate, setCheckinDate] = useState('');
   const [checkoutDate, setCheckoutDate] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('');
   const [isClient, setIsClient] = useState(false);
 
+  // Ensure this page runs client-side
   useEffect(() => {
     setIsClient(true);
   }, []);
 
+  // Redirect unauthenticated users
   useEffect(() => {
     if (isClient && status === 'unauthenticated') {
       window.location.href = '/auth/user/login';
     }
   }, [isClient, status]);
 
+  // Format and set dates from query params
+  useEffect(() => {
+    if (checkinParam) {
+      const parsedCheckin = new Date(checkinParam);
+      if (!isNaN(parsedCheckin.getTime())) {
+        setCheckinDate(formatDisplayDate(parsedCheckin));
+      }
+    }
+
+    if (checkoutParam) {
+      const parsedCheckout = new Date(checkoutParam);
+      if (!isNaN(parsedCheckout.getTime())) {
+        setCheckoutDate(formatDisplayDate(parsedCheckout));
+      }
+    }
+  }, [checkinParam, checkoutParam]);
+
+  // Fetch booking summary
   useEffect(() => {
     const fetchData = async () => {
       if (!roomId) return;
@@ -75,16 +111,17 @@ export default function BookingPage() {
     fetchData();
   }, [roomId, session?.user?.access_token]);
 
+  // Handle booking submission
   const handleBooking = async () => {
     if (!checkinDate || !checkoutDate || !paymentMethod) {
       Swal.fire('Error', 'Please fill in all booking details.', 'error');
       return;
     }
 
-    const checkin = new Date(checkinDate);
-    const checkout = new Date(checkoutDate);
+    const parsedCheckin = new Date(checkinParam as string);
+    const parsedCheckout = new Date(checkoutParam as string);
 
-    if (checkout <= checkin) {
+    if (parsedCheckout <= parsedCheckin) {
       Swal.fire(
         'Invalid Dates',
         'Checkout date must be after checkin date.',
@@ -103,8 +140,8 @@ export default function BookingPage() {
         body: JSON.stringify({
           userId: session?.user?.id,
           roomId: Number(roomId),
-          checkinDate,
-          checkoutDate,
+          checkinDate: parsedCheckin.toISOString().split('T')[0],
+          checkoutDate: parsedCheckout.toISOString().split('T')[0],
           paymentMethod,
           amount: summary?.room.base_price,
         }),
@@ -117,15 +154,13 @@ export default function BookingPage() {
         );
       }
 
-      const bookingData = await res.json();
       Swal.fire(
         'Success',
         'Booking confirmed! Check your order on profile',
         'success',
       ).then(() => {
         window.location.replace('/user/booking');
-      });      
-      
+      });
     } catch (error: any) {
       console.error('Error creating booking:', error);
       Swal.fire(
@@ -137,10 +172,10 @@ export default function BookingPage() {
   };
 
   const calculateTotalPrice = () => {
-    if (!checkinDate || !checkoutDate || !summary?.room.base_price) return 0;
+    if (!checkinParam || !checkoutParam || !summary?.room.base_price) return 0;
 
-    const checkin = new Date(checkinDate);
-    const checkout = new Date(checkoutDate);
+    const checkin = new Date(checkinParam);
+    const checkout = new Date(checkoutParam);
     const timeDiff = checkout.getTime() - checkin.getTime();
     const days = timeDiff / (1000 * 3600 * 24);
 
@@ -162,18 +197,16 @@ export default function BookingPage() {
           <BookingSummary summary={summary} />
           <BookingSection
             checkinDate={checkinDate}
-            setCheckinDate={setCheckinDate}
             checkoutDate={checkoutDate}
-            setCheckoutDate={setCheckoutDate}
             paymentMethod={paymentMethod}
             setPaymentMethod={setPaymentMethod}
             handleBooking={handleBooking}
             totalPrice={totalPrice}
+            disableDateEdit={true}
           />
         </div>
       </div>
       <Footer />
     </>
   );
-  
 }

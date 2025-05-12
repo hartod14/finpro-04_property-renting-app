@@ -27,3 +27,19 @@ declare module "next-auth/jwt" {
     refresh_token?: string | undefined;
   }
 }
+
+declare global {
+  export interface Window {
+    snap: {
+      pay: (
+        token: string,
+        config: {
+          onSuccess: (res: { order_id: string }) => Promise<void>;
+          onClose: () => void;
+        }
+      ) => void;
+    };
+  }
+}
+
+export {};

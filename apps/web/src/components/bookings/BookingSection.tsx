@@ -1,53 +1,67 @@
-import BookingInput from './BookingInput';
+import { ArrowRight } from 'lucide-react';
 import BookingSelect from './BookingSelect';
 
 interface BookingSectionProps {
   checkinDate: string;
-  setCheckinDate: React.Dispatch<React.SetStateAction<string>>;
   checkoutDate: string;
-  setCheckoutDate: React.Dispatch<React.SetStateAction<string>>;
   paymentMethod: string;
   setPaymentMethod: React.Dispatch<React.SetStateAction<string>>;
   handleBooking: () => void;
   totalPrice: number;
+  disableDateEdit?: boolean;
 }
 
 const BookingSection: React.FC<BookingSectionProps> = ({
   checkinDate,
-  setCheckinDate,
   checkoutDate,
-  setCheckoutDate,
   paymentMethod,
   setPaymentMethod,
   handleBooking,
   totalPrice,
+  disableDateEdit = false,
 }) => {
   return (
-    <div className="space-y-6 bg-white text-black p-4 rounded-xl shadow-sm border">
-      <h2 className="text-xl font-semibold border-b pb-2">Booking Information</h2>
-      <div className="space-y-4">
-        <BookingInput
-          label="Check-In Date"
-          id="checkin"
-          value={checkinDate}
-          onChange={setCheckinDate}
-        />
-        <BookingInput
-          label="Check-Out Date"
-          id="checkout"
-          value={checkoutDate}
-          onChange={setCheckoutDate}
-        />
-        <BookingSelect
-          label="Payment Method"
-          id="paymentMethod"
-          value={paymentMethod}
-          onChange={setPaymentMethod}
-        />
+    <div className="space-y-6 bg-white text-black p-6 rounded-xl shadow-lg border border-gray-200">
+      <h2 className="text-2xl font-semibold border-b pb-3">Booking Information</h2>
+      <div className="flex space-x-4">
+        <div className="flex-1">
+          <label htmlFor="checkin" className="block text-sm font-medium text-gray-700">Check-In Date</label>
+          <input
+            type="text"
+            id="checkin"
+            value={checkinDate}
+            readOnly={disableDateEdit}
+            className={`mt-1 block w-full rounded-lg border-gray-300 shadow-sm sm:text-sm p-3 ${disableDateEdit ? 'bg-primary text-white text-center font-bold cursor-not-allowed' : ''}`}
+          />
+        </div>
+
+         <div className="text-black flex-shrink-0 mt-10">
+          <ArrowRight size={17} />
+        </div>
+
+        <div className="flex-1">
+          <label htmlFor="checkout" className="block text-sm font-medium text-gray-700">Check-Out Date</label>
+          <input
+            type="text"
+            id="checkout"
+            value={checkoutDate}
+            readOnly={disableDateEdit}
+            className={`mt-1 block w-full rounded-lg border-gray-300 shadow-sm sm:text-sm p-3 ${disableDateEdit ? 'bg-primary text-white text-center font-bold cursor-not-allowed' : ''}`}
+          />
+        </div>
       </div>
-      <div className="text-lg font-bold text-green-700">
+
+      <BookingSelect
+        label="Payment Method"
+        id="paymentMethod"
+        value={paymentMethod}
+        onChange={setPaymentMethod}
+      />
+
+      {/* Total Price Section */}
+      <div className="text-lg font-semibold text-green-600 mt-4">
         <p>
-          Total Price:{' '}
+          Total Price: 
           {totalPrice
             ? new Intl.NumberFormat('id-ID', {
                 style: 'currency',
@@ -57,12 +71,14 @@ const BookingSection: React.FC<BookingSectionProps> = ({
             : '-'}
         </p>
       </div>
+
+      {/* Booking Button */}
       <button
         type="button"
         onClick={handleBooking}
-        className="w-full bg-[#1c2930] hover:bg-[#1c2980] text-white font-semibold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg"
+        className="w-full bg-[#1c2930] hover:bg-[#1c2980] text-white font-semibold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg mt-6"
       >
-        Booking
+        Book Now
       </button>
     </div>
   );

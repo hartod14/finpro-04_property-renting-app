@@ -39,15 +39,27 @@ export class UserTransactionRouter {
       paymentController.uploadPaymentProof,
     );
 
+    this.router.post(
+      '/payments/midtrans/:bookingId',
+      verifyUser,
+      paymentController.initiateMidtransPayment,
+    );
+
+    this.router.post(
+      '/payments/midtrans/callback',
+      paymentController.midtransCallback,
+    );
+
+    this.router.patch(
+      '/payments/midtrans/:orderId',
+      verifyUser,
+      paymentController.updateMidtransStatus,
+    );
+
     this.router.get(
       '/payments/expire-unpaid',
       expireUnpaidBookingsMiddleware,
       paymentController.expireUnpaidBookings,
-    );
-
-    this.router.post(
-      '/midtrans/:bookingId',
-      paymentController.createMidtransPayment,
     );
   }
 

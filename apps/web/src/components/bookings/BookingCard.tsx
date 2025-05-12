@@ -10,8 +10,12 @@ import { useState } from 'react';
 
 interface BookingCardProps {
   booking: any;
+  paymentMethod: 'MANUAL' | 'MIDTRANS';
   onCancel: (bookingId: number) => void;
-  onPayNowClick: (bookingId: number) => void;
+  onPayNowClick: (
+    bookingId: number,
+    paymentMethod: 'MANUAL' | 'MIDTRANS',
+  ) => void;
   onGenerateReceipt: (booking: any) => void;
   getStatusColor: (status: string) => string;
   formattedCheckInDate: string;
@@ -21,6 +25,7 @@ interface BookingCardProps {
 
 export const BookingCard = ({
   booking,
+  paymentMethod,
   onCancel,
   onPayNowClick,
   onGenerateReceipt,
@@ -130,11 +135,11 @@ export const BookingCard = ({
 
           {booking.booking.status === 'WAITING_FOR_PAYMENT' && (
             <button
-              onClick={() => onPayNowClick(booking.booking.id)}
+              onClick={() => onPayNowClick(booking.booking.id, paymentMethod)}
               className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors duration-200 flex gap-2"
             >
               <CreditCard className="w-5" />
-              Payment
+              {paymentMethod === 'MIDTRANS' ? 'Payment Gateway' : 'Payment'}
             </button>
           )}
 

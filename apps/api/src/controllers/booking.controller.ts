@@ -38,7 +38,11 @@ export const getBookingSummaryByRoomId = async (
   }
 
   try {
-    const bookingSummary = await bookingService.getBookingSummaryByRoomIdService(Number(roomId), userId);
+    const bookingSummary =
+      await bookingService.getBookingSummaryByRoomIdService(
+        Number(roomId),
+        userId,
+      );
 
     if (!bookingSummary) {
       return res.status(404).json({ message: 'Room or user not found' });
@@ -55,31 +59,57 @@ export const listBookings = async (
   req: Request,
   res: Response,
 ): Promise<any> => {
-  const { userId } = req.query;
+  const { userId, search = '', page = 1, limit = 10 } = req.query;
+
+  if (!userId) {
+    return res.status(400).json({ message: 'User ID is required' });
+  }
+
+  const pageNumber = Number(page) || 1;
+  const limitNumber = Number(limit) || 10;
+  const skip = (pageNumber - 1) * limitNumber;
 
   try {
-    if (!userId) {
-      return res.status(400).json({ message: 'User ID is required' });
-    }
+    const whereClause: any = {
+      user_id: Number(userId),
+    };
 
-    const bookings = await prisma.booking.findMany({
-      where: {
-        user_id: Number(userId),
-      },
-      include: {
-        user: true,
-        room: {
-          include: {
+    if (search) {
+      whereClause.OR = [
+        { order_number: { contains: search as string, mode: 'insensitive' } },
+        { room: { name: { contains: search as string, mode: 'insensitive' } } },
+        {
+          room: {
             property: {
-              include: {
-                propertyImages: true,
-              },
+              name: { contains: search as string, mode: 'insensitive' },
             },
           },
         },
-        payment: true,
-      },
-    });
+      ];
+    }
+
+    const [bookings, total] = await Promise.all([
+      prisma.booking.findMany({
+        where: whereClause,
+        include: {
+          user: true,
+          room: {
+            include: {
+              property: {
+                include: {
+                  propertyImages: true,
+                },
+              },
+            },
+          },
+          payment: true,
+        },
+        skip,
+        take: limitNumber,
+        orderBy: { created_at: 'desc' },
+      }),
+      prisma.booking.count({ where: whereClause }),
+    ]);
 
     const formattedBookings = bookings.map((booking) => ({
       user: {
@@ -107,7 +137,7 @@ export const listBookings = async (
       },
     }));
 
-    return res.status(200).json(formattedBookings);
+    return res.status(200).json({ bookings: formattedBookings, total });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'An unknown error occurred' });

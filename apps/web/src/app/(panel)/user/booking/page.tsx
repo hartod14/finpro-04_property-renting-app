@@ -4,83 +4,88 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import axios from 'axios';
 import { format } from 'date-fns';
-import { handleUploadPaymentProof as uploadPaymentProof } from '@/utils/bookings/handleUploadPaymentProof';
-import 'react-datepicker/dist/react-datepicker.css';
-import { generateReceipt } from '@/utils/bookings/generateReceipt';
+import { enUS } from 'date-fns/locale';
+import Swal from 'sweetalert2';
+
 import { BookingCard } from '@/components/bookings/BookingCard';
 import { UploadPaymentProofModal } from '@/components/bookings/UploadPaymentProofModal';
-import { handleCancelBooking } from '@/utils/bookings/handleCancelBooking';
-import { getStatusColor } from '@/utils/bookings/getStatusColor';
-import { SearchAndFilter } from '@/components/bookings/SearchAndFilter';
-import { Pagination } from '@/components/bookings/Pagination';
-import { filterBookings } from '@/utils/bookings/filterBookings';
-import { getTotalPages } from '@/utils/bookings/getTotalPages';
-import { getPaginatedBookings } from '@/utils/bookings/getPaginatedBookings';
 import { ReviewModal } from '@/components/bookings/ReviewModal';
-import Swal from 'sweetalert2';
+import { PanelPagination } from '@/components/common/pagination/panelPagination';
+import { FaSearch } from 'react-icons/fa';
+
+import { handleUploadPaymentProof } from '@/utils/bookings/handleUploadPaymentProof';
+import { handleCancelBooking } from '@/utils/bookings/handleCancelBooking';
+import { generateReceipt } from '@/utils/bookings/generateReceipt';
+import { getStatusColor } from '@/utils/bookings/getStatusColor';
+
+const LoadSnapScript = () => {
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://app.sandbox.midtrans.com/snap/snap.js';
+    script.setAttribute(
+      'data-client-key',
+      process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || '',
+    );
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
+
+  return null;
+};
 
 export default function PurchaseListPage() {
   const { data: session } = useSession();
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [searchDate, setSearchDate] = useState<Date | null>(null);
 
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemsPerPage = 4;
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(4);
+  const [total, setTotal] = useState(0);
+  const [totalPage, setTotalPage] = useState(0);
 
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState<number | null>(
     null,
   );
   const [paymentProof, setPaymentProof] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const filteredBookings = filterBookings(bookings, searchQuery, searchDate);
-  const totalPages = getTotalPages(filteredBookings, itemsPerPage);
-  const paginatedBookings = getPaginatedBookings(
-    filteredBookings,
-    currentPage,
-    itemsPerPage,
-  );
+
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [selectedReviewBookingId, setSelectedReviewBookingId] = useState<
     number | null
   >(null);
 
-  useEffect(() => {
-    const fetchBookings = async () => {
-      if (session?.user?.id) {
-        try {
-          const res = await axios.get(
-            `${process.env.NEXT_PUBLIC_API}/bookings`,
-            {
-              params: { userId: session.user.id },
-              headers: {
-                Authorization: `Bearer ${session?.user?.access_token}`,
-              },
-            },
-          );
+  // Move fetchBookings function here
+  const fetchBookings = async () => {
+    if (!session?.user?.id) return;
+    setLoading(true);
+    try {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API}/bookings`, {
+        params: { userId: session.user.id, search, page, limit },
+        headers: { Authorization: `Bearer ${session.user.access_token}` },
+      });
 
-          const sortedBookings = res.data.sort(
-            (a: any, b: any) => b.booking.id - a.booking.id,
-          );
-          setBookings(sortedBookings);
-        } catch (error) {
-          console.error('Failed to fetch bookings:', error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchBookings();
-  }, [session]);
-
-  const handleCancel = (bookingId: number) => {
-    handleCancelBooking(bookingId, session?.user?.access_token!, setBookings);
+      setBookings(res.data.bookings || []);
+      setTotal(res.data.total || 0);
+      setTotalPage(Math.ceil((res.data.total || 0) / limit));
+    } catch (error) {
+      console.error('Failed to fetch bookings:', error);
+      setBookings([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (loading) return <p className="text-black">Loading...</p>;
+  useEffect(() => {
+    fetchBookings();
+  }, [session, search, page, limit]);
+
+  const handleCancel = (bookingId: number) => {
+    handleCancelBooking(bookingId, session?.user?.access_token!, () => {
+      setPage(1);
+    });
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -90,9 +95,16 @@ export default function PurchaseListPage() {
     }
   };
 
-  const handlePayNowClick = (bookingId: number) => {
-    setSelectedBookingId(bookingId);
-    setIsModalOpen(true);
+  const handlePayNowClick = (
+    bookingId: number,
+    paymentMethod: 'MANUAL' | 'MIDTRANS',
+  ) => {
+    if (paymentMethod === 'MANUAL') {
+      setSelectedBookingId(bookingId);
+      setIsModalOpen(true);
+    } else if (paymentMethod === 'MIDTRANS') {
+      handlePayment(bookingId); // This will trigger the Snap payment
+    }
   };
 
   const handleCloseModal = () => {
@@ -101,13 +113,13 @@ export default function PurchaseListPage() {
     setPaymentProof(null);
   };
 
-  const handleUploadPaymentProof = () => {
-    uploadPaymentProof(
+  const handleUploadPayment = () => {
+    handleUploadPaymentProof(
       selectedBookingId,
       paymentProof,
       session?.user?.access_token!,
       setIsModalOpen,
-      setBookings,
+      () => setPage(1),
     );
   };
 
@@ -128,26 +140,23 @@ export default function PurchaseListPage() {
     if (!content || rating === 0) {
       return Swal.fire('Error', 'Please provide content and rating.', 'error');
     }
-  
+
     const result = await Swal.fire({
       title: 'Submit Review?',
       text: 'Are you sure you want to submit this review?',
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Yes, submit it!',
-      cancelButtonText: 'Cancel',
     });
-  
+
     if (result.isConfirmed) {
       try {
         await axios.post(
           `${process.env.NEXT_PUBLIC_API}/review/create`,
           { bookingId, rating, comment: content },
           {
-            headers: {
-              Authorization: `Bearer ${session?.user?.access_token}`,
-            },
-          }
+            headers: { Authorization: `Bearer ${session?.user?.access_token}` },
+          },
         );
         Swal.fire('Success!', 'Your review has been submitted.', 'success');
         setIsReviewModalOpen(false);
@@ -156,70 +165,147 @@ export default function PurchaseListPage() {
         Swal.fire('Error', 'Failed to submit review.', 'error');
       }
     }
-  };  
+  };
 
-  const formatBookingDate = (date: Date) => {
-    return format(new Date(date), 'dd MMM yyyy'); // Format tanggal sesuai kebutuhan
+  const handlePayment = async (bookingId: number) => {
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API}/payments/midtrans/${bookingId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${session?.user?.access_token}`,
+        },
+      }
+    );
+
+    const { snapToken, orderNumber } = response.data;
+
+    if (!snapToken || typeof window.snap?.pay !== 'function') {
+      return Swal.fire('Error', 'Midtrans Snap is not available.', 'error');
+    }
+
+    // Type assertion to any to avoid TypeScript error
+    window.snap.pay(snapToken, {
+      onSuccess: async function (res: any) {
+        Swal.fire('Success!', 'Payment successful.', 'success');
+        try {
+          // Immediately update the payment status to 'DONE'
+          await axios.patch(
+            `${process.env.NEXT_PUBLIC_API}/payments/midtrans/${res.order_id}`,
+            {},
+            {
+              headers: {
+                Authorization: `Bearer ${session?.user?.access_token}`,
+              },
+            }
+          );
+
+          // Call the API to update the status to 'DONE'
+          await axios.patch(
+            `${process.env.NEXT_PUBLIC_API}/bookings/status/${res.order_id}`,
+            { status: 'DONE' }, // Updating the status to 'DONE' directly after payment success
+            {
+              headers: {
+                Authorization: `Bearer ${session?.user?.access_token}`,
+              },
+            }
+          );
+
+          // Update the local state directly
+          setBookings((prevBookings) =>
+            prevBookings.map((booking) =>
+              booking.booking.id === bookingId
+                ? { ...booking, booking: { ...booking.booking, status: 'DONE' } }
+                : booking
+            )
+          );
+
+        } catch (err) {
+          console.error('Status update failed:', err);
+        }
+      },
+      onPending: () =>
+        Swal.fire('Pending', 'Waiting for your payment...', 'info'),
+      onError: () => Swal.fire('Failed', 'Payment failed.', 'error'),
+      onClose: () =>
+        Swal.fire('Cancelled', 'You closed the payment popup.', 'info'),
+    } as any); // Assert as 'any' to bypass the error
+  } catch (err) {
+    console.error('Midtrans error:', err);
+    Swal.fire('Error', 'Failed to initiate payment.', 'error');
+  }
+};
+
+  const formatBookingDate = (date: string) => {
+    return format(new Date(date), 'dd MMM yyyy', { locale: enUS });
   };
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6 text-black">
-      <div className="flex justify-between items-center mb-6">
+      <LoadSnapScript /> {/* Memuat Snap.js */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <h1 className="text-2xl font-semibold text-gray-800">Purchase List</h1>
-        <div className="flex items-center space-x-4">
-          <SearchAndFilter
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            searchDate={searchDate}
-            setSearchDate={setSearchDate}
-          />
+
+        <div className="flex items-center gap-4 w-full md:w-auto">
+          <div className="flex items-center bg-white border border-gray-300 rounded-md px-3 py-2 w-full md:w-64">
+            <FaSearch className="text-gray-500 mr-3" />
+            <input
+              type="text"
+              placeholder="Search bookings..."
+              className="w-full focus:outline-none bg-white text-black"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
         </div>
       </div>
-      {bookings.length === 0 ? (
+      {loading ? (
+        <p>Loading...</p>
+      ) : (bookings?.length || 0) === 0 ? (
         <p>No bookings found.</p>
       ) : (
-        <div className="space-y-6">
-          {paginatedBookings.map((booking, index) => (
+        <div className="space-y-6 mb-6">
+          {bookings.map((booking) => (
             <BookingCard
-              key={index}
+              key={booking.booking.id}
               booking={booking}
+              paymentMethod={booking.booking.paymentMethod}
               onCancel={handleCancel}
               onPayNowClick={handlePayNowClick}
               onGenerateReceipt={handleGenerateReceipt}
               getStatusColor={getStatusColor}
-              formattedCheckInDate={format(
-                new Date(booking.booking.checkinDate),
-                'dd MMM yyyy',
+              formattedCheckInDate={formatBookingDate(
+                booking.booking.checkinDate,
               )}
-              formattedCheckOutDate={format(
-                new Date(booking.booking.checkoutDate),
-                'dd MMM yyyy',
+              formattedCheckOutDate={formatBookingDate(
+                booking.booking.checkoutDate,
               )}
-              onOpenReviewModal={handleOpenReviewModal} // ← Tambahkan baris ini
+              onOpenReviewModal={handleOpenReviewModal}
             />
           ))}
         </div>
       )}
-
       <UploadPaymentProofModal
         isOpen={isModalOpen}
         previewImage={previewImage}
         onClose={handleCloseModal}
-        onUpload={handleUploadPaymentProof}
+        onUpload={handleUploadPayment}
         onFileChange={handleFileChange}
       />
-
       <ReviewModal
         isOpen={isReviewModalOpen}
         bookingId={selectedReviewBookingId}
         onClose={() => setIsReviewModalOpen(false)}
         onSubmit={handleSubmitReview}
       />
-
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        setCurrentPage={setCurrentPage}
+      <PanelPagination
+        limit={limit}
+        page={page}
+        setPage={setPage}
+        setLimit={setLimit}
+        total={total}
+        totalPage={totalPage}
       />
     </div>
   );
