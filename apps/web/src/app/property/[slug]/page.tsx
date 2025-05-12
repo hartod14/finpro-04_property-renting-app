@@ -23,6 +23,7 @@ import { getFacilityIconByName } from '@/utils/facilityIcons';
 import { formatTimeOnly } from '@/utils/formatters';
 import { IReview } from '@/interfaces/property.interface';
 import PropertyReviews from '@/components/property/PropertyReviews';
+import { toZonedTime } from 'date-fns-tz';
 
 export default function PropertyDetailPage() {
   const { slug } = useParams();
@@ -240,14 +241,15 @@ export default function PropertyDetailPage() {
     return isMaxMonthReached(nextMonthDate);
   };
 
-  const formatDisplayDate = (date: Date | null) => {
-    if (!date) return '';
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
+const formatDisplayDate = (date: Date | null) => {
+  if (!date) return '';
+  const utcDate = toZonedTime(date, 'UTC');
+  return utcDate.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+};
 
   const renderMonthCalendar = (monthDate: Date) => {
     const year = monthDate.getFullYear();
@@ -980,7 +982,7 @@ export default function PropertyDetailPage() {
                       </div>
 
                       <Link
-                        href={`/booking/${property.slug}?roomId=${room.id}`}
+                        href={`/booking/${property.slug}?roomId=${room.id}&checkin=${formatDisplayDate(dateRange.from)}&checkout=${formatDisplayDate(dateRange.to)}`}
                       >
                         <div className="mt-4 bg-primary text-white px-4 py-2 inline-block rounded hover:bg-primary/90 transition-colors">
                           Book Now

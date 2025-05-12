@@ -252,6 +252,7 @@
     checkin_date  DateTime      @db.Date
     checkout_date DateTime      @db.Date
     status        BookingStatus
+    created_at   DateTime      @default(now())
 
     user    User    @relation(fields: [user_id], references: [id])
     room    Room    @relation(fields: [room_id], references: [id])

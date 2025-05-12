@@ -21,7 +21,7 @@ export default function TenantPropertyListOrderPage() {
   const [selectedReview, setSelectedReview] = useState<any>(null);
   const [replyText, setReplyText] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   // Pagination state management
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -38,15 +38,15 @@ export default function TenantPropertyListOrderPage() {
             params: {
               search,
               page,
-              limit
+              limit,
             },
             headers: {
               Authorization: `Bearer ${session.user.access_token}`,
             },
-          }
+          },
         );
         setBookings(res.data.bookings); // assuming res.data.bookings contains the booking data
-        setTotal(res.data.total);  // assuming res.data.total contains the total count of items
+        setTotal(res.data.total); // assuming res.data.total contains the total count of items
         setTotalPage(Math.ceil(res.data.total / limit)); // Calculate the total pages
       } catch (err) {
         console.error('Failed to fetch orders:', err);
@@ -54,7 +54,7 @@ export default function TenantPropertyListOrderPage() {
     };
 
     fetchAllOrders();
-  }, [session, search, page, limit]);  // Trigger fetching on search, page, or limit change
+  }, [session, search, page, limit]); // Trigger fetching on search, page, or limit change
 
   const handleOpenModal = (proofUrl: string) => {
     setProofImage(proofUrl);
@@ -75,10 +75,10 @@ export default function TenantPropertyListOrderPage() {
           headers: {
             Authorization: `Bearer ${session?.user.access_token}`,
           },
-        }
+        },
       );
       setBookings((prev) =>
-        prev.map((b) => (b.id === bookingId ? { ...b, status: 'DONE' } : b))
+        prev.map((b) => (b.id === bookingId ? { ...b, status: 'DONE' } : b)),
       );
     } catch (err) {
       console.error('Failed to approve booking:', err);
@@ -94,12 +94,12 @@ export default function TenantPropertyListOrderPage() {
           headers: {
             Authorization: `Bearer ${session?.user.access_token}`,
           },
-        }
+        },
       );
       setBookings((prev) =>
         prev.map((b) =>
-          b.id === bookingId ? { ...b, status: 'REJECTED' } : b
-        )
+          b.id === bookingId ? { ...b, status: 'REJECTED' } : b,
+        ),
       );
     } catch (err) {
       console.error('Failed to reject booking:', err);
@@ -110,7 +110,7 @@ export default function TenantPropertyListOrderPage() {
     try {
       setLoading(true);
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API}/review/property/${propertyId}`
+        `${process.env.NEXT_PUBLIC_API}/review/property/${propertyId}`,
       );
       const review = res.data.data.find((r: any) => r.user.id === userId);
 
@@ -138,7 +138,7 @@ export default function TenantPropertyListOrderPage() {
           headers: {
             Authorization: `Bearer ${session?.user.access_token}`,
           },
-        }
+        },
       );
       Swal.fire('Success', 'Reply submitted successfully!', 'success');
       setShowReplyModal(false);
@@ -146,7 +146,7 @@ export default function TenantPropertyListOrderPage() {
       Swal.fire(
         'Error',
         error?.response?.data?.message || 'Failed to submit reply.',
-        'error'
+        'error',
       );
     }
   };
@@ -168,14 +168,13 @@ export default function TenantPropertyListOrderPage() {
       </div>
 
       <BookingTable
-  bookings={bookings}
-  search={search}
-  handleOpenModal={handleOpenModal}
-  handleApprove={handleApprove}
-  handleReject={handleReject}
-  handleOpenReplyModal={handleOpenReplyModal}
-/>
-
+        bookings={bookings}
+        search={search}
+        handleOpenModal={handleOpenModal}
+        handleApprove={handleApprove}
+        handleReject={handleReject}
+        handleOpenReplyModal={handleOpenReplyModal}
+      />
 
       {/* Modal: Payment Proof */}
       <PaymentProofModal

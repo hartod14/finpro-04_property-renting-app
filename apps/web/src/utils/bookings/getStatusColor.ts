@@ -1,4 +1,13 @@
-export const getStatusColor = (status: string): string => {
+export type BookingStatus =
+  | 'WAITING_FOR_PAYMENT'
+  | 'WAITING_FOR_CONFIRMATION'
+  | 'EXPIRED'
+  | 'CANCELLED'
+  | 'REJECTED'
+  | 'DONE'
+  | string;
+
+export const getStatusColor = (status: BookingStatus): string => {
   switch (status) {
     case 'WAITING_FOR_PAYMENT':
       return 'bg-yellow-100 text-yellow-800';
