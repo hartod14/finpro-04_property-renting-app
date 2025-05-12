@@ -1,0 +1,8 @@
+.turbo
+node_modules
+prisma/migrations
+**/*.spec.ts
+.env.example
+.git
+.github
+.husky 
