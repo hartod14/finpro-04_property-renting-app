@@ -57,20 +57,20 @@ export default function PropertyModel() {
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
-  const checkInDate = searchParams.get('checkInDate')
-    ? new Date(searchParams.get('checkInDate') as string)
+  const startDate = searchParams.get('startDate')
+    ? new Date(searchParams.get('startDate') as string)
     : today;
 
-  const checkOutDate = searchParams.get('checkOutDate')
-    ? new Date(searchParams.get('checkOutDate') as string)
+  const endDate = searchParams.get('endDate')
+    ? new Date(searchParams.get('endDate') as string)
     : tomorrow;
 
   const [dateRange, setDateRange] = useState<{
     from: Date | undefined;
     to: Date | undefined;
   }>({
-    from: checkInDate,
-    to: checkOutDate,
+    from: startDate,
+    to: endDate,
   });
 
   const [selectedCategoryNames, setSelectedCategoryNames] = useState<string[]>([]);
@@ -110,11 +110,11 @@ export default function PropertyModel() {
       }
 
       if (dateRange.from) {
-        filters.checkInDate = dateRange.from.toISOString();
+        filters.startDate = dateRange.from.toISOString();
       }
 
       if (dateRange.to) {
-        filters.checkOutDate = dateRange.to.toISOString();
+        filters.endDate = dateRange.to.toISOString();
       }
 
       if (searchAdults && searchAdults !== '') {
@@ -131,6 +131,7 @@ export default function PropertyModel() {
       setProperties(data.properties);
       setTotalItems(data.pagination.total);
       setTotalPages(data.pagination.totalPage);
+
     } catch (err) {
       setError('Failed to load properties. Please try again later.');
     }
@@ -332,10 +333,33 @@ export default function PropertyModel() {
 
   const handleDateRangePickerChange = (dates: [Date | null, Date | null]) => {
     const [start, end] = dates;
-    handleDateRangeChange({
-      from: start || undefined,
-      to: end || undefined,
-    });
+    
+    // If both dates are provided, check they are not the same
+    if (start && end) {
+      // Format to yyyy-mm-dd for proper date comparison (without time)
+      const startFormatted = start.toISOString().split('T')[0];
+      const endFormatted = end.toISOString().split('T')[0];
+      
+      // Only update if end date is after start date
+      if (endFormatted > startFormatted) {
+        handleDateRangeChange({
+          from: start,
+          to: end,
+        });
+      } else if (startFormatted === endFormatted) {
+        // If same date was selected, just update the start date
+        handleDateRangeChange({
+          from: start,
+          to: undefined,
+        });
+      }
+    } else {
+      // Handle case when only one date or no dates are selected
+      handleDateRangeChange({
+        from: start || undefined,
+        to: end || undefined,
+      });
+    }
   };
 
   const handleFacilityClick = (facilityId: number) => {

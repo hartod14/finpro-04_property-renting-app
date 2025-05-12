@@ -105,6 +105,13 @@ export default function Navbar({ forceScrolled = false }: NavbarProps) {
                 <Link href="/auth/user/login">
                   <Button color="white" name="Login" textColor="black" />
                 </Link>
+                <Link href="/property">
+                  <Button
+                    color="white"
+                    name="Search Property"
+                    textColor="black"
+                  />
+                </Link>
                 <Link href="/for-tenant">
                   <Button color="white" name="For Tenant" textColor="black" />
                 </Link>
@@ -142,7 +149,7 @@ export default function Navbar({ forceScrolled = false }: NavbarProps) {
                     </Link>
                   </>
                 )}
-                <Link href="/search-property" className="text-black py-2">
+                <Link href="/property" className="text-black py-2">
                   Search Property
                 </Link>
                 <button
@@ -161,6 +168,13 @@ export default function Navbar({ forceScrolled = false }: NavbarProps) {
       {session?.user?.id ? (
         <div className="hidden md:block relative" ref={profileRef}>
           <div className="flex items-center">
+            <Link href="/property">
+              <Button
+                name="Search Property"
+                color={isScrolled ? 'white' : 'transparent'}
+                textColor={isScrolled ? 'black' : 'white'}
+              />
+            </Link>
             {session?.user?.role === 'USER' && (
               <>
                 <Link href="/user/booking">
@@ -172,13 +186,6 @@ export default function Navbar({ forceScrolled = false }: NavbarProps) {
                 </Link>
               </>
             )}
-            <Link href="/search-property">
-              <Button
-                name="Search Property"
-                color={isScrolled ? 'white' : 'transparent'}
-                textColor={isScrolled ? 'black' : 'white'}
-              />
-            </Link>
             <div
               className="flex items-center gap-2 cursor-pointer ms-2"
               onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -229,13 +236,22 @@ export default function Navbar({ forceScrolled = false }: NavbarProps) {
         </div>
       ) : (
         <div className="hidden md:flex items-center gap-4">
-          <Link href="/for-tenant">
-            <Button
-              name="For Tenant"
-              color={isScrolled ? 'white' : 'transparent'}
-              textColor={isScrolled ? 'black' : 'white'}
-            />
-          </Link>
+          <div className="flex items-center gap-1">
+            <Link href="/property">
+              <Button
+                name="Search Property"
+                color={isScrolled ? 'white' : 'transparent'}
+                textColor={isScrolled ? 'black' : 'white'}
+              />
+            </Link>
+            <Link href="/for-tenant">
+              <Button
+                name="For Tenant"
+                color={isScrolled ? 'white' : 'transparent'}
+                textColor={isScrolled ? 'black' : 'white'}
+              />
+            </Link>
+          </div>
           <Link href="/auth/user/login">
             <Button
               name="Login"

@@ -22,12 +22,24 @@ import {
 import PropertyModel from '@/models/property/propertyModel';
 import Image from 'next/image';
 import { DateRangePicker } from '@/components/ui/calendar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import PropertySkeleton from '@/components/property/propertySkeleton';
 import Footer from '@/components/common/footer/footer';
 import { PaginationTable } from '@/components/common/pagination/propertyPagination';
 import PropertyPageSkeleton from '@/components/property/propertyPageSkeleton';
 import ErrorPage from '@/components/common/error/errorPage';
+
+// Helper function to format dates for URL consistently
+const formatDateForUrl = (date: Date): string => {
+  if (!date) return '';
+  
+  // Normalize the date to avoid timezone issues
+  const normalizedDate = new Date(date);
+  normalizedDate.setHours(0, 0, 0, 0);
+  
+  // Return ISO string format for consistent parsing
+  return normalizedDate.toISOString();
+};
 
 export default function PropertyPage() {
   const {
@@ -109,8 +121,8 @@ export default function PropertyPage() {
               startDate={dateRange.from ? new Date(dateRange.from) : null}
               endDate={dateRange.to ? new Date(dateRange.to) : null}
               onChange={handleDateRangePickerChange}
-              startDatePlaceholder="Check-in"
-              endDatePlaceholder="Check-out"
+              startDatePlaceholder="Start Date"
+              endDatePlaceholder="End Date"
             />
           </div>
           <div className="w-full md:w-1/4 p-3 flex items-center border-2 border-primary bg-white relative">
@@ -133,7 +145,7 @@ export default function PropertyPage() {
                   : 'Number of people'}
               </span>
             </button>
-
+  
             {/* Dropdown menu */}
             <div
               id="guestDropdown"
@@ -677,7 +689,17 @@ export default function PropertyPage() {
                 properties.map((property) => (
                   <Link
                     key={`property-${property.id}`}
-                    href={`/property/${property.slug}`}
+                    href={`/property/${property.slug}${
+                      dateRange.from || dateRange.to || searchAdults
+                        ? `?${dateRange.from ? `startDate=${formatDateForUrl(dateRange.from)}` : ''}${
+                            dateRange.to ? `${dateRange.from ? '&' : ''}endDate=${formatDateForUrl(dateRange.to)}` : ''
+                          }${
+                            searchAdults
+                              ? `${dateRange.from || dateRange.to ? '&' : ''}adults=${searchAdults}&capacity=${searchAdults}`
+                              : ''
+                          }`
+                        : ''
+                    }`}
                     className="bg-white border border-gray-200 shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow"
                   >
                     <div className="flex flex-col sm:flex-row">
@@ -732,24 +754,55 @@ export default function PropertyPage() {
                                   />
                                 </div>
                                 <div className="pt-2">
-                                  <span className="font-semibold text-gray-700">
-                                    8.9
-                                  </span>
-                                  /10
+                                  {property.reviews && property.reviews.length > 0 ? (
+                                    <>
+                                      <span className="font-semibold text-gray-700">
+                                        {(property.reviews.reduce((acc, review) => acc + review.rating, 0) / property.reviews.length).toFixed(1)}
+                                      </span>
+                                      /5
+                                    </>
+                                  ) : (
+                                    <span className="font-semibold text-gray-700">No ratings yet</span>
+                                  )}
                                 </div>
-                                <div className="pt-2">(104 reviews)</div>
+                                <div className="pt-2">
+                                  {property.reviews && property.reviews.length > 0 
+                                    ? `(${property.reviews.length} ${property.reviews.length === 1 ? 'review' : 'reviews'})` 
+                                    : '(No reviews yet)'}
+                                </div>
                               </div>
                               {property.lowestPriceRoom && (
                                 <>
-                                  <p className="text-primary font-bold text-lg mt-6">
-                                    IDR{' '}
-                                    {Number(
-                                      property.lowestPriceRoom.base_price,
-                                    ).toLocaleString('id-ID')}
-                                  </p>
-                                  <p className="text-gray-400 text-xs">
-                                    not including tax and fees
-                                  </p>
+                                  {property.lowestPriceRoom.adjusted_price && 
+                                    Number(property.lowestPriceRoom.adjusted_price) !== Number(property.lowestPriceRoom.base_price) ? (
+                                    <>
+                                      <div className="flex items-center mt-6">
+                                        <p className="text-primary font-bold text-lg">
+                                          IDR{' '}
+                                          {Number(
+                                            property.lowestPriceRoom.adjusted_price,
+                                          ).toLocaleString('id-ID')}
+                                        </p>
+                                      </div>
+                                      <p className="text-gray-400 text-xs">
+                                        not including tax and fees
+                                      </p>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <div className="flex items-center mt-6">
+                                        <p className="text-primary font-bold text-lg">
+                                          IDR{' '}
+                                          {Number(
+                                            property.lowestPriceRoom.base_price,
+                                          ).toLocaleString('id-ID')}
+                                        </p>
+                                      </div>
+                                      <p className="text-gray-400 text-xs">
+                                        not including tax and fees
+                                      </p>
+                                    </>
+                                  )}
                                 </>
                               )}
                             </div>

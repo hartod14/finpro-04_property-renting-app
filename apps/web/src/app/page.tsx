@@ -7,16 +7,26 @@ import BestDealsCaraosel from '@/components/homepage/bestDealsCaraosel';
 import HotelRecommendation from '@/components/homepage/hotelRecommendation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FaArrowRight, FaSearch, FaUser } from 'react-icons/fa';
+import {
+  FaArrowRight,
+  FaSearch,
+  FaUser,
+  FaMapMarkerAlt,
+  FaSpinner,
+} from 'react-icons/fa';
 import { DateRangePicker } from '@/components/ui/calendar';
 import HomeModel from '@/models/homepage/homeModel';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
+// OpenCage API key
+const openCageApiKey = process.env.NEXT_PUBLIC_OPENCAGE_API_KEY as string;
 
 export default function Home() {
   const {
     searchTerm,
     dateRange,
     searchAdults,
+    locationLoading,
     handleSearchTermChange,
     handleDateRangeChange,
     handleAdultsChange,
@@ -72,21 +82,29 @@ export default function Home() {
           <div className="bg-primary2 p-4 sm:p-8 rounded-lg text-white">
             <div className="lg:flex w-full">
               <div className="mb-5 flex-auto lg:w-1/2">
-                <label
-                  htmlFor="search-term"
-                  className="block mb-2 font-medium"
-                >
+                <label htmlFor="search-term" className="block mb-2 font-medium">
                   Where do you want to stay?
                 </label>
-                <div id="search-container" className="flex items-center w-full  bg-gray-50 border border-gray-300 px-3 py-[14px] rounded-lg lg:rounded-r-none">
+                <div
+                  id="search-container"
+                  className="flex items-center w-full bg-gray-50 border border-gray-300 px-3 py-[14px] rounded-lg lg:rounded-r-none"
+                >
                   <div className="w-8 h-8 bg-gray-100 rounded-full mr-2 flex items-center justify-center text-primary">
-                    <FaSearch size={14} />
+                    {locationLoading ? (
+                      <FaSpinner size={14} className="animate-spin" />
+                    ) : (
+                      <FaMapMarkerAlt size={14} />
+                    )}
                   </div>
                   <input
                     type="text"
                     id="search-term"
                     className="border-2 bg-gray-50 text-gray-900 text shadow-none w-full"
-                    placeholder="Search location, property..."
+                    placeholder={
+                      locationLoading
+                        ? 'Getting your location...'
+                        : 'Search location, property...'
+                    }
                     value={searchTerm}
                     onChange={(e) => handleSearchTermChange(e.target.value)}
                     style={{ outline: 'none', boxShadow: 'none' }}
@@ -95,10 +113,7 @@ export default function Home() {
               </div>
               <div className="sm:flex grow-8 lg:w-1/2">
                 <div className="mb-5 flex-auto">
-                  <label
-                    htmlFor="check-in"
-                    className="block mb-2 font-medium"
-                  >
+                  <label htmlFor="check-in" className="block mb-2 font-medium">
                     Check-in & check-out
                   </label>
                   <div className="bg-gray-50 border border-gray-300 text-gray-900 rounded-r-lg sm:rounded-r-none rounded-l-lg lg:rounded-none focus:outline-none focus:ring-0 focus:border-gray-300 block w-full p-2.5 cursor-pointer">
@@ -176,7 +191,10 @@ export default function Home() {
               </div>
             </div>
             <div className="flex justify-end w-full">
-              <button onClick={handleSearch} className="focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0">
+              <button
+                onClick={handleSearch}
+                className="focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
+              >
                 <Button
                   color="primary"
                   textColor="white"
