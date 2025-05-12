@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import DefaultImage from '@/../public/default_avatar.jpg';
 import Image from 'next/image';
-import {FaList, FaHotel, FaLock, FaSignOutAlt, FaUser, FaCalendarCheck, FaProjectDiagram } from 'react-icons/fa';
+import { FaList, FaHotel, FaLock, FaSignOutAlt, FaUser, FaCalendar, FaCalendarCheck, FaProjectDiagram } from 'react-icons/fa';
 
 type Props = {
   children: React.ReactNode;
@@ -24,6 +24,8 @@ export default function TenantSidebar({ children }: Props) {
 
     // { href: '/user/booking', icon: <FaShoppingBag />, label: 'My Booking' },
     { href: '/tenant/property', icon: <FaHotel />, label: 'Property' },
+    { href: '/tenant/room-availability', icon: <FaLock />, label: 'Room Availability' },
+    { href: '/tenant/season-rate', icon: <FaCalendar />, label: 'Season Rate' },
     { href: '/tenant/orders', icon: <FaCalendarCheck />, label: 'Orders' },
     { href: '/tenant/report', icon: <FaProjectDiagram />, label: 'Report' },
     { href: '/tenant/account', icon: <FaUser />, label: 'Account' },
@@ -43,9 +45,8 @@ export default function TenantSidebar({ children }: Props) {
       <div>
         {/* Sidebar */}
         <div
-          className={`fixed pt-24 md:pt-10 top-0 left-0 h-screen bg-gray-800 text-white w-64 p-5 transition-transform transform overflow-y-auto ${
-            isOpen ? 'translate-x-0' : '-translate-x-full'
-          } md:translate-x-0 md:w-64`}
+          className={`fixed pt-24 md:pt-10 top-0 left-0 h-screen bg-gray-800 text-white w-64 p-5 transition-transform transform overflow-y-auto ${isOpen ? 'translate-x-0' : '-translate-x-full'
+            } md:translate-x-0 md:w-64`}
         >
           <Image
             src={'/logo_white.png'}
@@ -88,11 +89,10 @@ export default function TenantSidebar({ children }: Props) {
                   <Link
                     href={menu.href}
                     onClick={() => setIsOpen(false)}
-                    className={`flex items-center gap-3 p-3 rounded ${
-                      activeMenu == menu.label
-                        ? 'bg-gray-700'
-                        : 'hover:bg-gray-700'
-                    }`}
+                    className={`flex items-center gap-3 p-3 rounded ${activeMenu == menu.label
+                      ? 'bg-gray-700'
+                      : 'hover:bg-gray-700'
+                      }`}
                   >
                     <span className="mr-1">{menu.icon}</span>
                     <span className="">{menu.label}</span>

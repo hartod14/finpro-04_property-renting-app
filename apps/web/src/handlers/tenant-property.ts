@@ -2,9 +2,9 @@ import { api } from './_api';
 import { getAccessToken } from './auth';
 
 export const getAllProperty = async (
-  name: string,
-  page: number,
-  limit: number,
+  name: string | "",
+  page: number | "",
+  limit: number | "",
 ) => {
   return await api(
     `/tenant-property?search=${name}&page=${page}&limit=${limit}`,

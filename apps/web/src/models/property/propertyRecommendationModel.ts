@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getRecommendedProperties, RecommendedPropertyParams } from '@/handlers/property';
-
+import { IReview } from '@/interfaces/property.interface';
 interface RecommendedProperty {
   id: number;
   name: string;
@@ -19,6 +19,8 @@ interface RecommendedProperty {
     path: string;
   } | null;
   lowestPrice: number | null;
+  adjusted_price?: number | null;
+  reviews: IReview[];
 }
 
 export default function PropertyRecommendationModel(initialParams: RecommendedPropertyParams = {}) {

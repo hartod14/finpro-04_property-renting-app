@@ -17,7 +17,8 @@ import { FaMapMarkerAlt } from 'react-icons/fa';
 export default function HotelRecommendation() {
   const [cities, setCities] = useState<ICity[]>([]);
   const [selectedCityId, setSelectedCityId] = useState<number | null>(null);
-  const { properties, loading, error, updateParams } = PropertyRecommendationModel({ limit: 8 });
+  const { properties, loading, error, updateParams } =
+    PropertyRecommendationModel({ limit: 8 });
 
   // Fetch cities
   useEffect(() => {
@@ -25,7 +26,7 @@ export default function HotelRecommendation() {
       try {
         const cityData = await getAllCity();
         setCities(cityData);
-        
+
         // Set the first city as default selected
         if (cityData.length > 0) {
           setSelectedCityId(cityData[0].id);
@@ -64,11 +65,14 @@ export default function HotelRecommendation() {
           ))}
         </ul>
       </div>
-      
+
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 py-10">
           {[...Array(4)].map((_, index) => (
-            <div key={index} className="bg-gray-100 animate-pulse h-64 rounded-lg"></div>
+            <div
+              key={index}
+              className="bg-gray-100 animate-pulse h-64 rounded-lg"
+            ></div>
           ))}
         </div>
       ) : (
@@ -94,9 +98,11 @@ export default function HotelRecommendation() {
                 <Link href={`/property/${property.slug}`} className="">
                   <figure>
                     <Image
-                      src={property.image && property.image.path
-                        ? property.image.path 
-                        : '/homepage/kuta-bali.png'}
+                      src={
+                        property.image && property.image.path
+                          ? property.image.path
+                          : '/homepage/kuta-bali.png'
+                      }
                       alt={property.name}
                       width={480}
                       height={240}
@@ -123,19 +129,62 @@ export default function HotelRecommendation() {
                           />
                         </div>
                         <div className="pt-2">
-                          <span className="font-semibold text-gray-700">8.9</span>
-                          /10
+                          {property?.reviews && property?.reviews.length > 0 ? (
+                            <>
+                              <span className="font-semibold text-gray-700">
+                                {(
+                                  property.reviews.reduce(
+                                    (acc, review) => acc + review.rating,
+                                    0,
+                                  ) / property.reviews.length
+                                ).toFixed(1)}
+                              </span>
+                              /5
+                            </>
+                          ) : (
+                            <span className="font-semibold text-gray-700">
+                              No ratings yet
+                            </span>
+                          )}
                         </div>
-                        <div className="pt-2">(104 reviews)</div>
+                        {property?.reviews && property?.reviews.length > 0 && (
+                          <div className="pt-2">
+                            {`(${property.reviews.length} ${
+                              property.reviews.length == 1
+                                ? 'review'
+                                : 'reviews'
+                            })`}
+                          </div>
+                        )}
                       </div>
                       {property.lowestPrice && (
                         <>
-                          <p className="text-primary font-bold text-lg mt-5">
-                            IDR {Number(property.lowestPrice).toLocaleString('id-ID')}
-                          </p>
-                          <p className="text-gray-400 text-xs">
-                            not including tax and fees
-                          </p>
+                          {property.adjusted_price &&
+                          property.adjusted_price !== property.lowestPrice ? (
+                            <>
+                              <p className="text-primary font-bold text-lg mt-5">
+                                IDR{' '}
+                                {Number(property.adjusted_price).toLocaleString(
+                                  'id-ID',
+                                )}
+                              </p>
+                              <p className="text-gray-400 text-xs">
+                                not including tax and fees
+                              </p>
+                            </>
+                          ) : (
+                            <>
+                              <p className="text-primary font-bold text-lg mt-5">
+                                IDR{' '}
+                                {Number(property.lowestPrice).toLocaleString(
+                                  'id-ID',
+                                )}
+                              </p>
+                              <p className="text-gray-400 text-xs">
+                                not including tax and fees
+                              </p>
+                            </>
+                          )}
                         </>
                       )}
                     </div>
@@ -150,10 +199,14 @@ export default function HotelRecommendation() {
           )}
         </Swiper>
       )}
-      
+
       <div>
         <Link href={'/property'} className="flex justify-center mt-3">
-          <Button color='primary' name='View all properties' textColor='white' />
+          <Button
+            color="primary"
+            name="View all properties"
+            textColor="white"
+          />
         </Link>
       </div>
     </div>

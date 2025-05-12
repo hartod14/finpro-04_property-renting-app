@@ -97,7 +97,11 @@ export class ReportService {
       include: {
         rooms: {
           include: {
-            roomUnavailableDates: true,
+            roomHasUnavailableDates: {
+              include: {
+                roomUnavailableDate: true,
+              },
+            },
             bookings: {
               where: {
                 status: "DONE",
@@ -118,9 +122,9 @@ export class ReportService {
       rooms: property.rooms.map((room) => ({
         roomId: room.id,
         roomName: room.name,
-        unavailableDates: room.roomUnavailableDates.map((d) => ({
-          start: d.start_date,
-          end: d.end_date,
+        unavailableDates: room.roomHasUnavailableDates.map((d) => ({
+          start: d.roomUnavailableDate.start_date,
+          end: d.roomUnavailableDate.end_date,
         })),
         bookedDates: room.bookings.map((b) => ({
           start: b.checkin_date,

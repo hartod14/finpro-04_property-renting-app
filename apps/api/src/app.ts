@@ -24,6 +24,8 @@ import { tenantCategoryRouter } from './routers/ternant-category.router';
 import { tenantPropertyRouter } from './routers/tenant-property.router';
 import { verifyUser } from './middalewares/auth.middleware';
 import { authorizeTenantAction } from './middalewares/authorizeTenantAction';
+import { tenantRoomAvailabilityRouter } from './routers/tenant-room-availability.router';
+import { tenantSeasonRateRouter } from './routers/tenant-season-rate.router';
 import reviewRouter from './routers/review.router';
 import reportRouter from './routers/report.router';
 
@@ -83,6 +85,18 @@ export default class App {
       verifyUser,
       // authorizeTenantAction,
       tenantPropertyRouter(),
+    );
+
+    this.app.use(
+      '/api/tenant-room-availability',
+      verifyUser,
+      tenantRoomAvailabilityRouter(),
+    );
+    
+    this.app.use(
+      '/api/tenant-season-rate',
+      verifyUser,
+      tenantSeasonRateRouter(),
     );
 
     // review

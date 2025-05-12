@@ -68,10 +68,21 @@ const PropertyRecommendations: React.FC<PropertyRecommendationsProps> = ({
               </div>
               {property.lowestPrice && (
                 <div className="mt-3">
-                  <p className="text-primary font-bold">
-                    IDR {Number(property.lowestPrice).toLocaleString('id-ID')}
-                  </p>
-                  <p className="text-gray-400 text-xs">per night</p>
+                  {property.adjusted_price && property.adjusted_price !== property.lowestPrice ? (
+                    <>
+                      <p className="text-primary font-bold">
+                        IDR {Number(property.adjusted_price).toLocaleString('id-ID')}
+                      </p>
+                      <p className="text-gray-400 text-xs">per night</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-primary font-bold">
+                        IDR {Number(property.lowestPrice).toLocaleString('id-ID')}
+                      </p>
+                      <p className="text-gray-400 text-xs">per night</p>
+                    </>
+                  )}
                 </div>
               )}
             </div>

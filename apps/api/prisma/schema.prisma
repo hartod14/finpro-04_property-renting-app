@@ -1,283 +1,317 @@
-  // This is your Prisma schema file,
-  // learn more about it in the docs: https://pris.ly/d/prisma-schema
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-  generator client {
-    provider = "prisma-client-js"
-  }
+generator client {
+  provider = "prisma-client-js"
+}
 
-  datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
-  }
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
-  enum Role {
-    USER
-    TENANT
-  }
+enum Role {
+  USER
+  TENANT
+}
 
-  enum FaciltyType {
-    PROPERTY
-    ROOM
-  }
+enum FaciltyType {
+  PROPERTY
+  ROOM
+}
 
-  enum ValueType {
-    NOMINAL
-    PERCENTAGE
-  }
+enum ValueType {
+  NOMINAL
+  PERCENTAGE
+}
 
-  enum BookingStatus {
-    WAITING_FOR_PAYMENT
-    WAITING_FOR_CONFIRMATION
-    EXPIRED
-    CANCELLED
-    REJECTED
-    DONE
-  }
+enum RateType {
+  INCREASE
+  DECREASE
+}
 
-  enum PaymentMethod {
-    MANUAL
-    MIDTRANS
-  }
+enum BookingStatus {
+  WAITING_FOR_PAYMENT
+  WAITING_FOR_CONFIRMATION
+  EXPIRED
+  CANCELLED
+  REJECTED
+  DONE
+}
 
-  model User {
-    id              Int       @id @default(autoincrement())
-    email           String    @unique @db.VarChar(100)
-    phone           String?   @db.VarChar(15)
-    password        String?   @db.Text
-    name            String?   @default("User")
-    profile_picture String?   @db.Text
-    is_verified     Boolean   @default(false)
-    role            Role
-    google_id       String?   @unique @db.Text
-    facebook_id     String?   @unique @db.Text
-    created_at      DateTime  @default(now())
-    updated_at      DateTime? @updatedAt
-    deleted_at      DateTime?
+enum PaymentMethod {
+  MANUAL
+  MIDTRANS
+}
 
-    properties    Property[]
-    userReviews   Review[]   @relation(name: "UserReviews")
-    tenantReplies Review[]   @relation(name: "TenantReplies")
-    Booking       Booking[]
-    Category      Category[]
+model User {
+  id              Int       @id @default(autoincrement())
+  email           String    @unique @db.VarChar(100)
+  phone           String?   @db.VarChar(15)
+  password        String?   @db.Text
+  name            String?   @default("User")
+  profile_picture String?   @db.Text
+  is_verified     Boolean   @default(false)
+  role            Role
+  google_id       String?   @unique @db.Text
+  facebook_id     String?   @unique @db.Text
+  created_at      DateTime  @default(now())
+  updated_at      DateTime? @updatedAt
+  deleted_at      DateTime?
 
-    @@map("users")
-  }
+  properties          Property[]
+  userReviews         Review[]              @relation(name: "UserReviews")
+  tenantReplies       Review[]              @relation(name: "TenantReplies")
+  Booking             Booking[]
+  Category            Category[]
+  roomUnavailableDate RoomUnavailableDate[]
+  peakSeasonRate      PeakSeasonRate[]
 
-  model City {
-    id   Int    @id @default(autoincrement())
-    name String
+  @@map("users")
+}
 
-    properties Property[]
+model City {
+  id   Int    @id @default(autoincrement())
+  name String
 
-    @@map("cities")
-  }
+  properties Property[]
 
-  model Category {
-    id         Int       @id @default(autoincrement())
-    tenant_id  Int
-    name       String
-    created_at DateTime  @default(now())
-    updated_at DateTime? @updatedAt
-    deleted_at DateTime?
+  @@map("cities")
+}
 
-    properties Property[]
-    tenant     User       @relation(fields: [tenant_id], references: [id])
+model Category {
+  id         Int       @id @default(autoincrement())
+  tenant_id  Int
+  name       String
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt
+  deleted_at DateTime?
 
-    @@map("categories")
-  }
+  properties Property[]
+  tenant     User       @relation(fields: [tenant_id], references: [id])
 
-  model Facility {
-    id                  Int                   @id @default(autoincrement())
-    type                FaciltyType
-    name                String
-    deleted_at          DateTime?
-    PropertyHasFacility PropertyHasFacility[]
-    RoomHasFacility     RoomHasFacility[]
+  @@map("categories")
+}
 
-    @@map("facilites")
-  }
+model Facility {
+  id                  Int                   @id @default(autoincrement())
+  type                FaciltyType
+  name                String
+  deleted_at          DateTime?
+  PropertyHasFacility PropertyHasFacility[]
+  RoomHasFacility     RoomHasFacility[]
 
-  model RoomImage {
-    id         Int       @id @default(autoincrement())
-    room_id    Int
-    path       String    @db.Text
-    created_at DateTime  @default(now())
-    updated_at DateTime? @updatedAt
-    deleted_at DateTime?
+  @@map("facilites")
+}
 
-    room Room @relation(fields: [room_id], references: [id])
+model RoomImage {
+  id         Int       @id @default(autoincrement())
+  room_id    Int
+  path       String    @db.Text
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt
+  deleted_at DateTime?
 
-    @@map("room_images")
-  }
+  room Room @relation(fields: [room_id], references: [id])
 
-  model Property {
-    id            Int       @id @default(autoincrement())
-    tenant_id     Int
-    category_id   Int
-    city_id       Int
-    name          String
-    slug          String?   @unique @db.Text
-    description   String?   @db.Text
-    address       String    @db.Text
-    checkin_time  DateTime? @db.Time()
-    checkout_time DateTime? @db.Time()
-    created_at    DateTime  @default(now())
-    updated_at    DateTime? @updatedAt
-    deleted_at    DateTime?
+  @@map("room_images")
+}
 
-    tenant                User                  @relation(fields: [tenant_id], references: [id])
-    category              Category              @relation(fields: [category_id], references: [id])
-    city                  City                  @relation(fields: [city_id], references: [id])
-    propertyHasFacilities PropertyHasFacility[]
-    rooms                 Room[]
-    peakSeasonRates       PeakSeasonRate[]
-    reviews               Review[]
-    propertyImages        PropertyImage[]
+model Property {
+  id            Int       @id @default(autoincrement())
+  tenant_id     Int
+  category_id   Int
+  city_id       Int
+  name          String
+  slug          String?   @unique @db.Text
+  description   String?   @db.Text
+  address       String    @db.Text
+  checkin_time  DateTime? @db.Time()
+  checkout_time DateTime? @db.Time()
+  created_at    DateTime  @default(now())
+  updated_at    DateTime? @updatedAt
+  deleted_at    DateTime?
 
-    @@map("properties")
-  }
+  tenant                User                  @relation(fields: [tenant_id], references: [id])
+  category              Category              @relation(fields: [category_id], references: [id])
+  city                  City                  @relation(fields: [city_id], references: [id])
+  propertyHasFacilities PropertyHasFacility[]
+  rooms                 Room[]
+  reviews               Review[]
+  propertyImages        PropertyImage[]
 
-  model PropertyImage {
-    id          Int       @id @default(autoincrement())
-    property_id Int
-    path        String    @db.Text
-    created_at  DateTime  @default(now())
-    updated_at  DateTime? @updatedAt
-    deleted_at  DateTime?
+  @@map("properties")
+}
 
-    property Property @relation(fields: [property_id], references: [id])
+model PropertyImage {
+  id          Int       @id @default(autoincrement())
+  property_id Int
+  path        String    @db.Text
+  created_at  DateTime  @default(now())
+  updated_at  DateTime? @updatedAt
+  deleted_at  DateTime?
 
-    @@map("property_images")
-  }
+  property Property @relation(fields: [property_id], references: [id])
 
-  model PropertyHasFacility {
-    id          Int @id @default(autoincrement())
-    facility_id Int
-    property_id Int
+  @@map("property_images")
+}
 
-    facility Facility @relation(fields: [facility_id], references: [id])
-    property Property @relation(fields: [property_id], references: [id])
+model PropertyHasFacility {
+  id          Int @id @default(autoincrement())
+  facility_id Int
+  property_id Int
 
-    @@map("property_has_facilities")
-  }
+  facility Facility @relation(fields: [facility_id], references: [id])
+  property Property @relation(fields: [property_id], references: [id])
 
-  model Review {
-    id          Int       @id @default(autoincrement())
-    user_id     Int
-    tenant_id   Int
-    property_id Int
-    rating      Int
-    comment     String    @db.Text
-    reply       String?   @db.Text
-    created_at  DateTime  @default(now())
-    updated_at  DateTime? @updatedAt
-    deleted_at  DateTime?
+  @@map("property_has_facilities")
+}
 
-    user     User     @relation(name: "UserReviews", fields: [user_id], references: [id])
-    tenant   User     @relation(name: "TenantReplies", fields: [tenant_id], references: [id])
-    property Property @relation(fields: [property_id], references: [id])
+model Review {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  tenant_id   Int
+  property_id Int
+  rating      Int
+  comment     String    @db.Text
+  reply       String?   @db.Text
+  created_at  DateTime  @default(now())
+  updated_at  DateTime? @updatedAt
+  deleted_at  DateTime?
 
-    @@map("reviews")
-  }
+  user     User     @relation(name: "UserReviews", fields: [user_id], references: [id])
+  tenant   User     @relation(name: "TenantReplies", fields: [tenant_id], references: [id])
+  property Property @relation(fields: [property_id], references: [id])
 
-  model Room {
-    id          Int       @id @default(autoincrement())
-    name        String
-    property_id Int
-    base_price  Decimal   @db.Decimal(15, 2)
-    description String?   @db.Text
-    capacity    Int
-    size        Decimal   @db.Decimal(15, 2)
-    total_room  Int
-    created_at  DateTime  @default(now())
-    updated_at  DateTime? @updatedAt
-    deleted_at  DateTime?
+  @@map("reviews")
+}
 
-    property             Property              @relation(fields: [property_id], references: [id])
-    roomHasFacilities    RoomHasFacility[]
-    roomUnavailableDates RoomUnavailableDate[]
-    bookings             Booking[]
-    roomImages           RoomImage[]
+model Room {
+  id          Int       @id @default(autoincrement())
+  name        String
+  property_id Int
+  base_price  Decimal   @db.Decimal(15, 2)
+  description String?   @db.Text
+  capacity    Int
+  size        Decimal   @db.Decimal(15, 2)
+  total_room  Int
+  created_at  DateTime  @default(now())
+  updated_at  DateTime? @updatedAt
+  deleted_at  DateTime?
 
-    @@map("rooms")
-  }
+  property                Property                 @relation(fields: [property_id], references: [id])
+  roomHasFacilities       RoomHasFacility[]
+  bookings                Booking[]
+  roomImages              RoomImage[]
+  roomHasUnavailableDates RoomHasUnavailableDate[]
+  roomHasPeakSeasonRates  RoomHasPeakSeasonRate[]
 
-  model RoomHasFacility {
-    id          Int @id @default(autoincrement())
-    facility_id Int
-    room_id     Int
+  @@map("rooms")
+}
 
-    facility Facility @relation(fields: [facility_id], references: [id])
-    room     Room     @relation(fields: [room_id], references: [id])
+model RoomHasFacility {
+  id          Int @id @default(autoincrement())
+  facility_id Int
+  room_id     Int
 
-    @@map("room_has_facilities")
-  }
+  facility Facility @relation(fields: [facility_id], references: [id])
+  room     Room     @relation(fields: [room_id], references: [id])
 
-  model RoomUnavailableDate {
-    id         Int       @id @default(autoincrement())
-    room_id    Int
-    start_date DateTime  @db.Date
-    end_date   DateTime  @db.Date
-    created_at DateTime  @default(now())
-    updated_at DateTime? @updatedAt
-    deleted_at DateTime?
+  @@map("room_has_facilities")
+}
 
-    room Room @relation(fields: [room_id], references: [id])
+model RoomUnavailableDate {
+  id          Int       @id @default(autoincrement())
+  tenant_id   Int
+  start_date  DateTime  @db.Date
+  end_date    DateTime  @db.Date
+  description String?   @db.Text
+  created_at  DateTime  @default(now())
+  updated_at  DateTime? @updatedAt
+  deleted_at  DateTime?
 
-    @@map("room_unavailable_dates")
-  }
+  roomHasUnavailableDates RoomHasUnavailableDate[]
+  tenant                  User                     @relation(fields: [tenant_id], references: [id])
 
-  model PeakSeasonRate {
-    id          Int       @id @default(autoincrement())
-    property_id Int
-    value_type  ValueType
-    value       Decimal   @db.Decimal(15, 2)
-    start_date  DateTime  @db.Date
-    end_date    DateTime  @db.Date
-    created_at  DateTime  @default(now())
-    updated_at  DateTime? @updatedAt
-    deleted_at  DateTime?
+  @@map("room_unavailable_dates")
+}
 
-    property Property @relation(fields: [property_id], references: [id])
+model RoomHasUnavailableDate {
+  id                       Int @id @default(autoincrement())
+  room_id                  Int
+  room_unavailable_date_id Int
 
-    @@map("peak_season_dates")
-  }
+  room                Room                @relation(fields: [room_id], references: [id])
+  roomUnavailableDate RoomUnavailableDate @relation(fields: [room_unavailable_date_id], references: [id])
 
-  model Booking {
-    id            Int           @id @default(autoincrement())
-    user_id       Int
-    room_id       Int
-    payment_id    Int           @unique
-    order_number  String        @db.Text
-    checkin_date  DateTime      @db.Date
-    checkout_date DateTime      @db.Date
-    status        BookingStatus
-    created_at   DateTime      @default(now())
+  @@map("room_has_unavailable_dates")
+}
 
-    user    User    @relation(fields: [user_id], references: [id])
-    room    Room    @relation(fields: [room_id], references: [id])
-    payment Payment @relation(fields: [payment_id], references: [id])
+model PeakSeasonRate {
+  id          Int       @id @default(autoincrement())
+  tenant_id   Int
+  value_type  ValueType
+  value       Decimal   @db.Decimal(15, 2)
+  start_date  DateTime  @db.Date
+  end_date    DateTime  @db.Date
+  type        RateType
+  description String?   @db.Text
+  created_at  DateTime  @default(now())
+  updated_at  DateTime? @updatedAt
+  deleted_at  DateTime?
 
-    @@map("bookings")
-  }
+  roomHasPeakSeasonRates RoomHasPeakSeasonRate[]
+  tenant                 User                    @relation(fields: [tenant_id], references: [id])
 
-  model Payment {
-    id           Int           @id @default(autoincrement())
-    amount       Decimal       @db.Decimal(15, 2)
-    method       PaymentMethod
-    proof        String?   
-    payment_date DateTime?
-    created_at   DateTime      @default(now())
-    updated_at   DateTime?     @updatedAt
+  @@map("peak_season_dates")
+}
 
-    booking Booking?
+model RoomHasPeakSeasonRate {
+  id                  Int @id @default(autoincrement())
+  room_id             Int
+  peak_season_rate_id Int
 
-    @@map("payments")
-  }
+  room           Room           @relation(fields: [room_id], references: [id])
+  peakSeasonRate PeakSeasonRate @relation(fields: [peak_season_rate_id], references: [id])
 
-  //Additional
-  model Banner {
-    id        Int     @id @default(autoincrement())
-    image     String  @db.Text
-    is_active Boolean
-  }
+  @@map("room_has_peak_season_rates")
+}
+
+model Booking {
+  id            Int           @id @default(autoincrement())
+  user_id       Int
+  room_id       Int
+  payment_id    Int           @unique
+  order_number  String        @db.Text
+  checkin_date  DateTime      @db.Date
+  checkout_date DateTime      @db.Date
+  status        BookingStatus
+  created_at    @default(now())
+
+  user    User    @relation(fields: [user_id], references: [id])
+  room    Room    @relation(fields: [room_id], references: [id])
+  payment Payment @relation(fields: [payment_id], references: [id])
+
+  @@map("bookings")
+}
+
+model Payment {
+  id           Int           @id @default(autoincrement())
+  amount       Decimal       @db.Decimal(15, 2)
+  method       PaymentMethod
+  proof        String?
+  payment_date DateTime?
+  created_at   DateTime      @default(now())
+  updated_at   DateTime?     @updatedAt
+
+  booking Booking?
+
+  @@map("payments")
+}
+
+//Additional
+model Banner {
+  id        Int     @id @default(autoincrement())
+  image     String  @db.Text
+  is_active Boolean
+}

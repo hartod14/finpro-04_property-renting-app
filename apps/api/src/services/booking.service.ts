@@ -26,14 +26,16 @@ export const createBooking = async (
   // Tentukan harga per malam (gunakan tarif musim puncak jika ada)
   const peakSeasonRate = await prisma.peakSeasonRate.findFirst({
     where: {
-      property_id: room.property_id,
+      // room_id: roomId,
       start_date: { lte: checkinDate },
       end_date: { gte: checkoutDate },
     },
   });
 
   const basePrice = room.base_price.toNumber();
-  const pricePerNight = peakSeasonRate ? peakSeasonRate.value.toNumber() : basePrice;
+  const pricePerNight = peakSeasonRate
+    ? peakSeasonRate.value.toNumber()
+    : basePrice;
 
   // Hitung total harga berdasarkan jumlah malam
   const totalPrice = pricePerNight * numberOfNights;
@@ -71,7 +73,10 @@ export const createBooking = async (
   return booking;
 };
 
-export const getBookingSummaryByRoomIdService = async (roomId: number, userId: number) => {
+export const getBookingSummaryByRoomIdService = async (
+  roomId: number,
+  userId: number,
+) => {
   const room = await prisma.room.findUnique({
     where: { id: roomId },
     include: {
@@ -106,7 +111,7 @@ export const getBookingSummaryByRoomIdService = async (roomId: number, userId: n
       name: user.name,
       email: user.email,
       image: user.profile_picture,
-      phone: user.phone
+      phone: user.phone,
     },
     property: {
       name: room.property.name,
@@ -136,7 +141,7 @@ export const listBookings = async (userId: number) => {
           property: {
             include: {
               propertyImages: true,
-              peakSeasonRates: true, // Sertakan peakSeasonRates pada property
+              // peakSeasonRates: true, // Sertakan peakSeasonRates pada property
             },
           },
         },
@@ -149,17 +154,23 @@ export const listBookings = async (userId: number) => {
     const room = booking.room;
     const checkinDate = booking.checkin_date;
     const checkoutDate = booking.checkout_date;
-    const nights = Math.ceil((checkoutDate.getTime() - checkinDate.getTime()) / (1000 * 3600 * 24));
-  
-    const peakRate = room.property.peakSeasonRates.find((rate) => {
-      return checkinDate >= rate.start_date && checkoutDate <= rate.end_date;
-    });
-  
+    const nights = Math.ceil(
+      (checkoutDate.getTime() - checkinDate.getTime()) / (1000 * 3600 * 24),
+    );
+
+    // const peakRate = room.property.peakSeasonRates.find((rate) => {
+    //   return checkinDate >= rate.start_date && checkoutDate <= rate.end_date;
+    // });
+
+    const peakRate = 0
+
     const basePrice = room.base_price;
-    const pricePerNight = peakRate ? peakRate.value.toNumber() : basePrice.toNumber();
-    
-    const totalPrice = pricePerNight * nights;  // Total price calculation
-  
+    const pricePerNight = peakRate
+      // ? peakRate.value.toNumber()
+      // : basePrice.toNumber();
+
+    const totalPrice = pricePerNight * nights; // Total price calculation
+
     return {
       user: {
         name: booking.user?.name,
@@ -175,7 +186,7 @@ export const listBookings = async (userId: number) => {
         name: room.name,
         capacity: room.capacity,
         pricePerNight,
-        totalPrice,  // Add totalPrice here
+        totalPrice, // Add totalPrice here
       },
       booking: {
         id: booking.id,
@@ -184,10 +195,10 @@ export const listBookings = async (userId: number) => {
         checkoutDate: booking.checkout_date,
         status: booking.status,
         paymentMethod: booking.payment?.method ?? null,
-        amount: booking.payment?.amount ?? totalPrice,  // Use calculated totalPrice if payment amount is not available
+        amount: booking.payment?.amount ?? totalPrice, // Use calculated totalPrice if payment amount is not available
       },
     };
-  });  
+  });
 
   return formattedBookings;
 };

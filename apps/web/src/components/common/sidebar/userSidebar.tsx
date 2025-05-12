@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { FaShoppingBag, FaUser, FaLock, FaSignOutAlt } from 'react-icons/fa';
@@ -32,7 +32,7 @@ export default function UserSidebar() {
 
   const handleLogout = () => {
     // Handle logout
-    console.log('Logging out');
+    signOut();
   };
 
   const menuItems = [

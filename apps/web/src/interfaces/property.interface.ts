@@ -18,12 +18,18 @@ export interface IRoom {
   id: number;
   name: string;
   base_price: number;
+  adjusted_price?: number;
   capacity: number;
   size: number;
   total_room: number;
   facilities: IFacility[];
   roomImages: IRoomImage[];
   description?: string;
+  property: IProperty;
+  roomHasPeakSeasonRates?: any[];
+  roomHasUnavailableDates?: any[];
+  bookings?: IBooking[];
+  rooms_left?: number;
 }
 
 export interface IRoomCreate {
@@ -101,7 +107,7 @@ export interface IPropertyDetail {
     capacity: number | string;
     size: number | string;
     total_room: number | string;
-    images: string[];
+    roomImages: string[];
     facilities: number[];
   }[];
 }
@@ -138,4 +144,21 @@ export interface IPropertyUpdate {
   category_id: string;
   images: string[];
   facilities: number[];
+}
+
+// Extend IRoom to include availability status
+export interface IRoomWithAvailability extends IRoom {
+  isAvailable: boolean;
+  rooms_left: number;
+}
+
+export interface IBooking {
+  id: number;
+  user_id: number;
+  room_id: number;
+  payment_id: number;
+  order_number: string;
+  checkin_date: string;
+  checkout_date: string;
+  status: string;
 }
