@@ -23,7 +23,6 @@ import { getFacilityIconByName } from '@/utils/facilityIcons';
 import { formatTimeOnly } from '@/utils/formatters';
 import { IReview } from '@/interfaces/property.interface';
 import PropertyReviews from '@/components/property/PropertyReviews';
-import { toZonedTime } from 'date-fns-tz';
 
 export default function PropertyDetailPage() {
   const { slug } = useParams();
@@ -1002,11 +1001,7 @@ export default function PropertyDetailPage() {
 
                             {available ? (
                               <Link
-                                href={`/booking/${property.slug}?roomId=${room.id}${searchAdults ? `&adults=${searchAdults}` : ''}${
-                                  dateRange.from && dateRange.to
-                                    ? `&startDate=${dateRange.from.toISOString()}&endDate=${dateRange.to.toISOString()}`
-                                    : ''
-                                }`}
+                                href={`/booking/${property.slug}?roomId=${room.id}&checkin=${formatDisplayDate(dateRange.from)}&checkout=${formatDisplayDate(dateRange.to)}`}
                               >
                                 <div className="mt-4 bg-primary text-white px-4 py-2 inline-block rounded hover:bg-primary/90 transition-colors">
                                   Book Now
@@ -1020,15 +1015,8 @@ export default function PropertyDetailPage() {
                           </div>
                         </div>
                       </div>
-                      <Link
-                        href={`/booking/${property.slug}?roomId=${room.id}&checkin=${formatDisplayDate(dateRange.from)}&checkout=${formatDisplayDate(dateRange.to)}`}
-                      >
-                        <div className="mt-4 bg-primary text-white px-4 py-2 inline-block rounded hover:bg-primary/90 transition-colors">
-                          Book Now
-                        </div>
-                      </Link>
-                    </div>
-                  </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="p-6 border rounded-lg bg-yellow-50 text-yellow-800">
