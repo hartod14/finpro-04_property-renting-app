@@ -49,10 +49,10 @@ class PropertyController {
     }
   }
 
-  async getRoomsByPropertyId(req: Request, res: Response, next: NextFunction) {
+  async getRoomsByPropertySlug(req: Request, res: Response, next: NextFunction) {
     try {
       const { slug } = req.params;
-      const data = await propertyService.getRoomsByPropertyId(slug, req);
+      const data = await propertyService.getRoomsByPropertySlug(slug, req);
       responseHandler(res, 'get rooms by property id success', data);
     } catch (error) {
       next(error);

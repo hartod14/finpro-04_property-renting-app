@@ -27,6 +27,9 @@ export interface IRoom {
   description?: string;
   property: IProperty;
   roomHasPeakSeasonRates?: any[];
+  roomHasUnavailableDates?: any[];
+  bookings?: IBooking[];
+  rooms_left?: number;
 }
 
 export interface IRoomCreate {
@@ -146,4 +149,16 @@ export interface IPropertyUpdate {
 // Extend IRoom to include availability status
 export interface IRoomWithAvailability extends IRoom {
   isAvailable: boolean;
+  rooms_left: number;
+}
+
+export interface IBooking {
+  id: number;
+  user_id: number;
+  room_id: number;
+  payment_id: number;
+  order_number: string;
+  checkin_date: string;
+  checkout_date: string;
+  status: string;
 }

@@ -754,36 +754,50 @@ export default function PropertyPage() {
                                   />
                                 </div>
                                 <div className="pt-2">
-                                  <span className="font-semibold text-gray-700">
-                                    8.9
-                                  </span>
-                                  /10
+                                  {property.reviews && property.reviews.length > 0 ? (
+                                    <>
+                                      <span className="font-semibold text-gray-700">
+                                        {(property.reviews.reduce((acc, review) => acc + review.rating, 0) / property.reviews.length).toFixed(1)}
+                                      </span>
+                                      /5
+                                    </>
+                                  ) : (
+                                    <span className="font-semibold text-gray-700">No ratings yet</span>
+                                  )}
                                 </div>
-                                <div className="pt-2">(104 reviews)</div>
+                                <div className="pt-2">
+                                  {property.reviews && property.reviews.length > 0 
+                                    ? `(${property.reviews.length} ${property.reviews.length === 1 ? 'review' : 'reviews'})` 
+                                    : '(No reviews yet)'}
+                                </div>
                               </div>
                               {property.lowestPriceRoom && (
                                 <>
                                   {property.lowestPriceRoom.adjusted_price && 
                                     Number(property.lowestPriceRoom.adjusted_price) !== Number(property.lowestPriceRoom.base_price) ? (
                                     <>
-                                      <p className="text-primary font-bold text-lg mt-6">
-                                        IDR{' '}
-                                        {Number(
-                                          property.lowestPriceRoom.adjusted_price,
-                                        ).toLocaleString('id-ID')}
-                                      </p>
+                                      <div className="flex items-center mt-6">
+                                        <p className="text-primary font-bold text-lg">
+                                          IDR{' '}
+                                          {Number(
+                                            property.lowestPriceRoom.adjusted_price,
+                                          ).toLocaleString('id-ID')}
+                                        </p>
+                                      </div>
                                       <p className="text-gray-400 text-xs">
                                         not including tax and fees
                                       </p>
                                     </>
                                   ) : (
                                     <>
-                                      <p className="text-primary font-bold text-lg mt-6">
-                                        IDR{' '}
-                                        {Number(
-                                          property.lowestPriceRoom.base_price,
-                                        ).toLocaleString('id-ID')}
-                                      </p>
+                                      <div className="flex items-center mt-6">
+                                        <p className="text-primary font-bold text-lg">
+                                          IDR{' '}
+                                          {Number(
+                                            property.lowestPriceRoom.base_price,
+                                          ).toLocaleString('id-ID')}
+                                        </p>
+                                      </div>
                                       <p className="text-gray-400 text-xs">
                                         not including tax and fees
                                       </p>

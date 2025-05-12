@@ -215,24 +215,46 @@ export default function PropertyDetailModel(
         selectedEndDate: null,
       }));
     } else {
-      if (isDateBeforeOrEqual(calendarState.selectedStartDate, date)) {
+      // Get the selected start date and the clicked date
+      const startDate = new Date(calendarState.selectedStartDate!);
+      const clickedDate = new Date(date);
+
+      // Format to yyyy-mm-dd for proper date comparison (without time)
+      const startFormatted = startDate.toISOString().split('T')[0];
+      const clickedFormatted = clickedDate.toISOString().split('T')[0];
+
+      // Check if the clicked date is after the start date (not the same day)
+      if (clickedFormatted > startFormatted) {
         setCalendarState((prev) => ({
           ...prev,
           selectedEndDate: date,
           showCalendar: false,
         }));
         handleDateRangePickerChange([calendarState.selectedStartDate, date]);
-      } else {
+      } else if (clickedFormatted < startFormatted) {
+        // If user clicks a date before the start date, make that the new start date
         setCalendarState((prev) => ({
           ...prev,
           selectedStartDate: date,
           selectedEndDate: null,
         }));
       }
+      // If they click the same date, do nothing (don't allow same date for check-in and check-out)
     }
   };
 
   const handleHover = (date: Date): void => {
+    // Don't highlight anything if the date is in the past
+    if (isDateInPast(date)) return;
+
+    // Don't highlight if it's the same date as the start date
+    if (
+      calendarState.selectedStartDate &&
+      isDateEqual(date, calendarState.selectedStartDate)
+    ) {
+      return;
+    }
+
     setCalendarState((prev) => ({ ...prev, hoverDate: date }));
   };
 
@@ -242,6 +264,12 @@ export default function PropertyDetailModel(
       !calendarState.selectedEndDate &&
       calendarState.hoverDate
     ) {
+      // Don't highlight the start date itself
+      if (isDateEqual(date, calendarState.selectedStartDate)) {
+        return false;
+      }
+
+      // Make sure the hover date is after the start date
       if (
         isDateBeforeOrEqual(
           calendarState.selectedStartDate,
@@ -332,7 +360,7 @@ export default function PropertyDetailModel(
     const fetchPropertyDetail = async () => {
       try {
         setLoading(true);
-        
+
         if (!propertySlug) return;
 
         let slugValue = '';
@@ -348,26 +376,26 @@ export default function PropertyDetailModel(
         let data;
         if (dateRange.from || dateRange.to || searchAdults) {
           const filters: any = {};
-          
+
           if (dateRange.from) {
             filters.startDate = dateRange.from.toISOString();
           }
-          
+
           if (dateRange.to) {
             filters.endDate = dateRange.to.toISOString();
           }
-          
+
           if (searchAdults) {
             filters.capacity = searchAdults;
           }
-          
+
           data = await getPropertyBySlugWithFilters(slugValue, filters);
         } else {
           // No filters yet, just fetch basic property data
           data = await getPropertyBySlug(slugValue);
         }
-        
-        setProperty(data);
+
+        setProperty(data);      
 
         if (data && data.rooms) {
           const initialActivePhotos = data.rooms.reduce(
@@ -379,15 +407,19 @@ export default function PropertyDetailModel(
           );
           setActiveRoomPhoto(initialActivePhotos);
 
-          // Check for unavailable rooms if there are dates selected
+          // Check for unavailable rooms and calculate rooms left if there are dates selected
           if (dateRange.from && dateRange.to) {
             const unavailableIds: number[] = [];
             data.rooms.forEach((room: any) => {
-              const isAvailable = checkRoomAvailability(
+              const { isAvailable, rooms_left } = checkRoomAvailability(
                 room,
                 dateRange.from!,
                 dateRange.to!,
               );
+
+              // Add rooms_left property to each room
+              room.rooms_left = rooms_left;
+
               if (!isAvailable) {
                 unavailableIds.push(room.id);
               }
@@ -412,19 +444,23 @@ export default function PropertyDetailModel(
             (room: any) => {
               // Default availability if no dates are selected
               let isAvailable = true;
+              let rooms_left = room.total_room;
 
-              // Check availability if dates are selected
+              // Check availability and rooms left if dates are selected
               if (dateRange.from && dateRange.to) {
-                isAvailable = checkRoomAvailability(
+                const result = checkRoomAvailability(
                   room,
                   dateRange.from,
                   dateRange.to,
                 );
+                isAvailable = result.isAvailable;
+                rooms_left = result.rooms_left;
               }
 
               return {
                 ...room,
                 isAvailable,
+                rooms_left,
               };
             },
           );
@@ -455,16 +491,7 @@ export default function PropertyDetailModel(
     room: any,
     startDate: Date,
     endDate: Date,
-  ): boolean => {
-    // If the room has no unavailability data, assume it's available
-    if (
-      !room.roomHasUnavailableDates ||
-      !Array.isArray(room.roomHasUnavailableDates) ||
-      room.roomHasUnavailableDates.length === 0
-    ) {
-      return true;
-    }
-
+  ): { isAvailable: boolean; rooms_left: number } => {
     // Format date to YYYY-MM-DD format, ignoring time completely
     const formatDateString = (date: Date): string => {
       const year = date.getFullYear();
@@ -477,36 +504,105 @@ export default function PropertyDetailModel(
     const requestStartStr = formatDateString(startDate);
     const requestEndStr = formatDateString(endDate);
 
-    // Check each unavailable date range
-    for (const unavailable of room.roomHasUnavailableDates) {
-      if (!unavailable.roomUnavailableDate) continue;
+    // Check unavailable dates first
+    if (
+      room.roomHasUnavailableDates &&
+      Array.isArray(room.roomHasUnavailableDates) &&
+      room.roomHasUnavailableDates.length > 0
+    ) {
+      // Check each unavailable date range
+      for (const unavailable of room.roomHasUnavailableDates) {
+        if (!unavailable.roomUnavailableDate) continue;
 
-      // Get the unavailable date range from the database as Date objects
-      const unavailableStartRaw = new Date(
-        unavailable.roomUnavailableDate.start_date,
-      );
-      const unavailableEndRaw = new Date(
-        unavailable.roomUnavailableDate.end_date,
-      );
+        // Get the unavailable date range from the database as Date objects
+        const unavailableStartRaw = new Date(
+          unavailable.roomUnavailableDate.start_date,
+        );
+        const unavailableEndRaw = new Date(
+          unavailable.roomUnavailableDate.end_date,
+        );
 
-      // Convert to YYYY-MM-DD format strings
-      const unavailableStartStr = formatDateString(unavailableStartRaw);
-      const unavailableEndStr = formatDateString(unavailableEndRaw);
+        // Convert to YYYY-MM-DD format strings
+        const unavailableStartStr = formatDateString(unavailableStartRaw);
+        const unavailableEndStr = formatDateString(unavailableEndRaw);
 
-      // A booking doesn't overlap with unavailable dates if:
-      // 1. Booking checkout is strictly before unavailable start date, OR
-      // 2. Booking checkin is strictly after unavailable end date
-      const noOverlap =
-        requestEndStr < unavailableStartStr ||
-        requestStartStr > unavailableEndStr;
+        // A booking doesn't overlap with unavailable dates if:
+        // 1. Booking checkout is strictly before unavailable start date, OR
+        // 2. Booking checkin is strictly after unavailable end date
+        const noOverlap =
+          requestEndStr < unavailableStartStr ||
+          requestStartStr > unavailableEndStr;
 
-      // If there is an overlap, the room is unavailable
-      if (!noOverlap) {
-        return false;
+        // If there is an overlap, the room is completely unavailable
+        if (!noOverlap) {
+          return { isAvailable: false, rooms_left: 0 };
+        }
       }
     }
 
-    return true;
+    // Check bookings with status "DONE" to calculate rooms left
+    let rooms_left = room.total_room;
+
+    if (
+      room.bookings &&
+      Array.isArray(room.bookings) &&
+      room.bookings.length > 0
+    ) {
+      // Create a map to store booked room count for each date
+      const dateBookingMap: Record<string, number> = {};
+
+      // Get all dates between start and end date
+      const getDatesInRange = (start: Date, end: Date): string[] => {
+        const dates: string[] = [];
+        const currentDate = new Date(start);
+
+        // Exclude the checkout date from the range
+        const endDateExclusive = new Date(end);
+        endDateExclusive.setDate(endDateExclusive.getDate() - 1);
+
+        while (currentDate <= endDateExclusive) {
+          dates.push(formatDateString(currentDate));
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+        return dates;
+      };
+
+      // Calculate all dates in request range (excluding checkout date)
+      const requestDates = getDatesInRange(startDate, endDate);
+
+      // Initialize booking count for each date
+      requestDates.forEach((date) => {
+        dateBookingMap[date] = 0;
+      });
+
+      // Count bookings for each date in the requested range
+      for (const booking of room.bookings) {
+        // Only consider DONE bookings
+        if (booking.status !== 'DONE') continue;
+
+        const bookingStart = new Date(booking.checkin_date);
+        const bookingEnd = new Date(booking.checkout_date);
+        const bookingDates = getDatesInRange(bookingStart, bookingEnd);
+
+        // Increase booking count for each date that overlaps with the request
+        bookingDates.forEach((date) => {
+          if (requestDates.includes(date)) {
+            dateBookingMap[date] = (dateBookingMap[date] || 0) + 1;
+          }
+        });
+      }
+
+      // Find the maximum number of bookings on any single day
+      const maxBookings = Math.max(...Object.values(dateBookingMap), 0);
+
+      // Calculate rooms left
+      rooms_left = room.total_room - maxBookings;
+    }
+
+    return {
+      isAvailable: rooms_left > 0,
+      rooms_left: rooms_left,
+    };
   };
 
   // Update the room availability when date range changes or when property loads
@@ -515,7 +611,7 @@ export default function PropertyDetailModel(
       const unavailableIds: number[] = [];
 
       property.rooms.forEach((room: any) => {
-        const isAvailable = checkRoomAvailability(
+        const { isAvailable } = checkRoomAvailability(
           room,
           dateRange.from!,
           dateRange.to!,
@@ -599,49 +695,59 @@ export default function PropertyDetailModel(
 
         // Prepare filter parameters including dates
         const filters: any = {};
-        
+
         // Add capacity filter if available
         const capacityNumber = searchAdults ? parseInt(searchAdults, 10) : 0;
         if (capacityNumber > 0) {
           filters.capacity = capacityNumber;
         }
-        
+
         // Add date filters if available to calculate adjusted prices
         if (dateRange.from) {
           filters.startDate = dateRange.from.toISOString();
         }
-        
+
         if (dateRange.to) {
           filters.endDate = dateRange.to.toISOString();
         }
-        
+
         // Use getPropertyBySlugWithFilters to get the property with adjusted room prices
         if (Object.keys(filters).length > 0) {
-          const filteredProperty = await getPropertyBySlugWithFilters(slugValue, filters);
-          
+          const filteredProperty = await getPropertyBySlugWithFilters(
+            slugValue,
+            filters,
+          );
+
           if (filteredProperty) {
             // Set availability status for rooms
-            const roomsWithAvailability = (filteredProperty.rooms || []).map((room: any) => {
-              // Make sure room images are properly mapped
-              if (room.roomImages && !room.images) {
-                room.images = room.roomImages;
-              }
-              
-              // Check availability if dates are selected
-              let isAvailable = true;
-              if (dateRange.from && dateRange.to) {
-                isAvailable = checkRoomAvailability(
-                  room,
-                  dateRange.from,
-                  dateRange.to,
-                );
-              }
-              
-              return {
-                ...room,
-                isAvailable,
-              };
-            });
+            const roomsWithAvailability = (filteredProperty.rooms || []).map(
+              (room: any) => {
+                // Make sure room images are properly mapped
+                if (room.roomImages && !room.images) {
+                  room.images = room.roomImages;
+                }
+
+                // Check availability and rooms left if dates are selected
+                let isAvailable = true;
+                let rooms_left = room.total_room;
+
+                if (dateRange.from && dateRange.to) {
+                  const result = checkRoomAvailability(
+                    room,
+                    dateRange.from,
+                    dateRange.to,
+                  );
+                  isAvailable = result.isAvailable;
+                  rooms_left = result.rooms_left;
+                }
+
+                return {
+                  ...room,
+                  isAvailable,
+                  rooms_left,
+                };
+              },
+            );
 
             // Sort rooms by availability (available rooms first)
             const sortedRooms = [...roomsWithAvailability].sort((a, b) => {
@@ -663,7 +769,7 @@ export default function PropertyDetailModel(
               );
               setActiveRoomPhoto(initialActivePhotos);
             }
-            
+
             // Update the property with the filtered one
             setProperty(filteredProperty);
           }
@@ -671,19 +777,24 @@ export default function PropertyDetailModel(
           // No filters applied, show all rooms from the current property
           const roomsWithAvailability = (currentProperty.rooms || []).map(
             (room: any) => {
-              // Check availability if dates are selected
+              // Check availability and rooms left if dates are selected
               let isAvailable = true;
+              let rooms_left = room.total_room;
+
               if (dateRange.from && dateRange.to) {
-                isAvailable = checkRoomAvailability(
+                const result = checkRoomAvailability(
                   room,
                   dateRange.from,
                   dateRange.to,
                 );
+                isAvailable = result.isAvailable;
+                rooms_left = result.rooms_left;
               }
 
               return {
                 ...room,
                 isAvailable,
+                rooms_left,
               };
             },
           );
@@ -908,20 +1019,23 @@ export default function PropertyDetailModel(
     }
 
     // Calculate adjusted price for each room based on the date
-    const roomPrices = property.rooms.map(room => {
+    const roomPrices = property.rooms.map((room) => {
       let roomPrice = Number(room.base_price);
-      
+
       // Check if room has peak season rates
-      if (room.roomHasPeakSeasonRates && room.roomHasPeakSeasonRates.length > 0) {
+      if (
+        room.roomHasPeakSeasonRates &&
+        room.roomHasPeakSeasonRates.length > 0
+      ) {
         for (const peakRateRelation of room.roomHasPeakSeasonRates) {
           const peakRate = peakRateRelation.peakSeasonRate;
           const peakStartDate = new Date(peakRate.start_date);
           const peakEndDate = new Date(peakRate.end_date);
-          
+
           // Reset time part for proper comparison
           const dateToCheck = new Date(date);
           dateToCheck.setHours(0, 0, 0, 0);
-          
+
           // Check if date is within peak season period
           if (dateToCheck >= peakStartDate && dateToCheck <= peakEndDate) {
             // Apply rate adjustment
@@ -943,13 +1057,13 @@ export default function PropertyDetailModel(
           }
         }
       }
-      
+
       return roomPrice;
     });
-    
+
     // Find the lowest price among all adjusted room prices
     const lowestPrice = Math.min(...roomPrices);
-    
+
     // Format to show price in thousands with commas
     // 200,000 -> "200"
     // 1,000,000 -> "1,000"

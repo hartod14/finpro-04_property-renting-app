@@ -117,7 +117,7 @@ export const getUserLocationName = async (): Promise<{
               errorMessage = 'Geolocation request timed out';
               break;
           }
-          console.error(`Geolocation error (${error.code}): ${errorMessage}`);
+          // console.error(`Geolocation error (${error.code}): ${errorMessage}`);
           resolve({ locationName: '' });
         },
         {

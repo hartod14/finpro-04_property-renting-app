@@ -97,10 +97,33 @@ export default function HomeModel() {
   
   const handleDateRangePickerChange = (dates: [Date | null, Date | null]) => {
     const [start, end] = dates;
-    handleDateRangeChange({
-      from: start || undefined,
-      to: end || undefined,
-    });
+    
+    // If both dates are provided, check they are not the same
+    if (start && end) {
+      // Format to yyyy-mm-dd for proper date comparison (without time)
+      const startFormatted = start.toISOString().split('T')[0];
+      const endFormatted = end.toISOString().split('T')[0];
+      
+      // Only update if end date is after start date
+      if (endFormatted > startFormatted) {
+        handleDateRangeChange({
+          from: start,
+          to: end,
+        });
+      } else if (startFormatted === endFormatted) {
+        // If same date was selected, just update the start date
+        handleDateRangeChange({
+          from: start,
+          to: undefined,
+        });
+      }
+    } else {
+      // Handle case when only one date or no dates are selected
+      handleDateRangeChange({
+        from: start || undefined,
+        to: end || undefined,
+      });
+    }
   };
   
   return {

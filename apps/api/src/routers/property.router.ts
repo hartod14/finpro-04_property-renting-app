@@ -7,7 +7,7 @@ export const propertyRouter = () => {
     router.get('/', propertyController.getAllProperty)
     router.get('/recommended', propertyController.getRecommendedProperties)
     router.get('/slug/:slug', propertyController.getPropertyBySlug)
-    router.get('/slug/:slug/rooms', propertyController.getRoomsByPropertyId)
+    router.get('/slug/:slug/rooms', propertyController.getRoomsByPropertySlug)
     router.get('/:id', propertyController.getPropertyById)
 
 
