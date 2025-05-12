@@ -4,34 +4,6 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
-      "env": [
-        "NEXT_PUBLIC_API",
-        "AUTH_TRUST_HOST",
-        "AUTH_DOMAIN",
-        "AUTH_URL",
-        "AUTH_SECRET",
-        "GOOGLE_CLIENT_ID",
-        "GOOGLE_CLIENT_SECRET",
-        "FACEBOOK_CLIENT_ID",
-        "FACEBOOK_CLIENT_SECRET",
-        "NEXT_PUBLIC_OPENCAGE_API_KEY"
-      ]
-    },
-    "web#build": {
-      "dependsOn": ["^build"],
-      "env": [
-        "NEXT_PUBLIC_API",
-        "AUTH_TRUST_HOST",
-        "AUTH_DOMAIN",
-        "AUTH_URL",
-        "AUTH_SECRET",
-        "GOOGLE_CLIENT_ID",
-        "GOOGLE_CLIENT_SECRET",
-        "FACEBOOK_CLIENT_ID",
-        "FACEBOOK_CLIENT_SECRET",
-        "NEXT_PUBLIC_OPENCAGE_API_KEY"
-      ],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "lint": {},
