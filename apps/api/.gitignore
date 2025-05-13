@@ -4,3 +4,4 @@ node_modules
 # Don't exclude dist for Vercel deployment
 # dist/
 .vercel
+.env*.local

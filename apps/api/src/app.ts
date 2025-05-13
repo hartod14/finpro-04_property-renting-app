@@ -111,16 +111,16 @@ export default class App {
   }
 
   public start(): void {
-    if (process.env.NODE_ENV === 'production') {
-      this.app.listen(PORT, () => {
-        console.log(` ➜  [API] Production:   http://localhost:3001/`);
+    // if (process.env.NODE_ENV === 'production') {
+      this.app.listen(3000, () => {
+        console.log("Server ready on port 3000.")
       });
-    }
+    // }
 
-    if (process.env.NODE_ENV === 'local') {
-      this.app.listen(PORT, () => {
-        console.log(` ➜  [API] Local:   http://localhost:${PORT}/`);
-      });
-    }
+    // if (process.env.NODE_ENV === 'local') {
+    //   this.app.listen(PORT, () => {
+    //     console.log(` ➜  [API] Local:   http://localhost:${PORT}/`);
+    //   });
+    // }
   }
 }
