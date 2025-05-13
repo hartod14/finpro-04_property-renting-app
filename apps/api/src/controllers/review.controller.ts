@@ -1,5 +1,5 @@
-import { ErrorHandler, responseHandler } from '@/helpers/response.handler';
-import reviewService from '@/services/review.service';
+import { ErrorHandler, responseHandler } from '../helpers/response.handler';
+import reviewService from '../services/review.service';
 import { NextFunction, Request, Response } from 'express';
 
 class ReviewController {

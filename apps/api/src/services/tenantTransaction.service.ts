@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { BookingStatus, PaymentMethod } from '@prisma/client';
-import { sendConfirmationEmail, sendReminderEmail } from '@/utils/email';
+import { sendConfirmationEmail, sendReminderEmail } from '../utils/email';
 
 const prisma = new PrismaClient();
 

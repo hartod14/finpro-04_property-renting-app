@@ -1,8 +1,7 @@
-import { prisma } from '@/config';
-import { pagination } from '@/helpers/pagination';
-import { decodeVerificationJwt } from '@/helpers/verification.jwt';
+import { prisma } from '../config';
+import { pagination } from '../helpers/pagination';
+import { decodeVerificationJwt } from '../helpers/verification.jwt';
 import { Request } from 'express';
-import { roomSeed } from 'prisma/seeds/room.seed';
 
 class TenantRoomAvailabilityService {
   async getAllData(req: Request) {

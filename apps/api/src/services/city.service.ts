@@ -1,5 +1,4 @@
-import { prisma } from '@/config';
-import { ErrorHandler } from '@/helpers/response.handler';
+import { prisma } from '../config';
 
 class CityService {
   async getAllData() {

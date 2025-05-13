@@ -1,5 +1,5 @@
-import categoryController from '@/controllers/category.controller';
-import { verifyUser } from '@/middalewares/auth.middleware';
+import categoryController from '../controllers/category.controller';
+import { verifyUser } from '../middalewares/auth.middleware';
 import { Router } from 'express';
 
 export const categoryRouter = () => {

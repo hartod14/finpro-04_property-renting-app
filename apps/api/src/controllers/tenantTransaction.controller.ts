@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { tenantTransactionService } from '@/services/tenantTransaction.service';
+import { tenantTransactionService } from '../services/tenantTransaction.service';
 
 export const tenantTransactionController = {
   async getTenantOrders(req: Request, res: Response) {

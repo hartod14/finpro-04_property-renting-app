@@ -2,8 +2,8 @@ import { NextFunction, Request, Response } from 'express';
 import {
   responseHandler,
   responseHandlerPagination,
-} from '@/helpers/response.handler';
-import tenantRoomAvailabilityService from '@/services/tenant-room-availability.service';
+} from '../helpers/response.handler';
+import tenantRoomAvailabilityService from '../services/tenant-room-availability.service';
 
 class TenantRoomAvailabilityController {
   async getAllData(req: Request, res: Response, next: NextFunction) {

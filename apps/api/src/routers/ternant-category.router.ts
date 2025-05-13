@@ -1,6 +1,6 @@
-import tenantCategoryController from '@/controllers/tenant-category.controller';
+import tenantCategoryController from '../controllers/tenant-category.controller';
 import { Router } from 'express';
-import { authorizeCategoryOwner } from '@/middalewares/authorizeCategoryOwner.middleware';
+import { authorizeCategoryOwner } from '../middalewares/authorizeCategoryOwner.middleware';
 
 export const tenantCategoryRouter = () => {
   const router = Router();

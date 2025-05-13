@@ -1,5 +1,5 @@
-import reviewController from '@/controllers/review.controller';
-import { verifyUser } from '@/middalewares/auth.middleware';
+import reviewController from '../controllers/review.controller';
+import { verifyUser } from '../middalewares/auth.middleware';
 import { Router } from 'express';
 
 export const reviewRouter = () => {

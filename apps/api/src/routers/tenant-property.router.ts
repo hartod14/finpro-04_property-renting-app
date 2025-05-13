@@ -1,6 +1,6 @@
-import tenantPropertyRoomController from '@/controllers/tenant-property-room.controller';
-import tenantPropertyController from '@/controllers/tenant-property.controller';
-import { authorizePropertyOwner } from '@/middalewares/authorizePropertyOwner.middleware';
+import tenantPropertyRoomController from '../controllers/tenant-property-room.controller';
+import tenantPropertyController from '../controllers/tenant-property.controller';
+import { authorizePropertyOwner } from '../middalewares/authorizePropertyOwner.middleware';
 import { Router } from 'express';
 
 export const tenantPropertyRouter = () => {

@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { ReportController } from "@/controllers/report.controller";
-import { verifyUser } from "@/middalewares/auth.middleware";
+import { ReportController } from "../controllers/report.controller";
+import { verifyUser } from "../middalewares/auth.middleware";
 
 const reportController = new ReportController();
 

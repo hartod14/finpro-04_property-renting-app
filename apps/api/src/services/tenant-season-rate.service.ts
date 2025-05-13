@@ -1,6 +1,6 @@
-import { prisma } from '@/config';
-import { pagination } from '@/helpers/pagination';
-import { decodeVerificationJwt } from '@/helpers/verification.jwt';
+import { prisma } from '../config';
+import { pagination } from '../helpers/pagination';
+import { decodeVerificationJwt } from '../helpers/verification.jwt';
 import { Request } from 'express';
 
 class TenantSeasonRateService {

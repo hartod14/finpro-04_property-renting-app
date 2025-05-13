@@ -2,7 +2,7 @@
 import { PrismaClient, BookingStatus } from '@prisma/client';
 import { validateImage } from '../utils/validation';
 import cron from 'node-cron';
-import { cloudinaryUpload } from '@/helpers/cloudinary';
+import { cloudinaryUpload } from '../helpers/cloudinary';
 const midtransClient = require('midtrans-client');
 
 const prisma = new PrismaClient();

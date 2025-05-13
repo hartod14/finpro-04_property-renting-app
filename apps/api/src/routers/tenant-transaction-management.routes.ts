@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { tenantTransactionController } from '@/controllers/tenantTransaction.controller';
-import { verifyUser } from '@/middalewares/auth.middleware';
-import { authorizeTenantAction } from '@/middalewares/authorizeTenantAction';
+import { tenantTransactionController } from '../controllers/tenantTransaction.controller';
+import { verifyUser } from '../middalewares/auth.middleware';
+import { authorizeTenantAction } from '../middalewares/authorizeTenantAction';
 
 export class TenantTransactionRouter {
   private router: Router;

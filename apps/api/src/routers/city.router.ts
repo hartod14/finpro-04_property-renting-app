@@ -1,4 +1,4 @@
-import cityController from "@/controllers/city.controller"
+import cityController from "../controllers/city.controller"
 import { Router } from "express"
 
 export const cityRouter = () => {

@@ -1,6 +1,6 @@
-import { prisma } from '@/config';
-import { decodeVerificationJwt } from '@/helpers/verification.jwt';
-import { pagination } from '@/helpers/pagination';
+import { prisma } from '../config';
+import { decodeVerificationJwt } from '../helpers/verification.jwt';
+import { pagination } from '../helpers/pagination';
 import { Request } from 'express';
 import slugify from 'slugify';
 class TenantPropertyService {

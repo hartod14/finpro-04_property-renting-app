@@ -1,4 +1,4 @@
-import propertyController from "@/controllers/property.controller";
+import propertyController from "../controllers/property.controller";
 import { Router } from "express";
 
 export const propertyRouter = () => {

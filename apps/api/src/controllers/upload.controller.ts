@@ -2,7 +2,7 @@
 
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler, responseHandler } from '../helpers/response.handler';
-import uploadService from '@/services/upload.service';
+import uploadService from '../services/upload.service';
 class UploadImageController {
   async uploadImage(req: Request, res: Response, next: NextFunction) {
     try {

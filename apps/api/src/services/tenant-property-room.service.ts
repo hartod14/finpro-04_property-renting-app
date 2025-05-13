@@ -1,5 +1,5 @@
-import { pagination } from '@/helpers/pagination';
-import prisma from '@/prisma';
+import { pagination } from '../helpers/pagination';
+import prisma from '../prisma';
 import { Request } from 'express';
 
 class TenantPropertyRoomService {
