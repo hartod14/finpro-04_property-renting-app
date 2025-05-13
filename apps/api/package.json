@@ -6,7 +6,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production node dist/src/index.js",
     "dev": "cross-env NODE_ENV=local ts-node-dev -r tsconfig-paths/register src/index.ts",
-    "build": "prisma generate && tsup",
+    "build": "tsup &&prisma generate",
     "serve": "cross-env NODE_ENV=production node dist/src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prisma": "npx prisma",
