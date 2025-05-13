@@ -99,7 +99,3 @@ app.use(
 app.listen(3000, () => {
   console.log(` ➜  run on port 3000`);
 });
-
-// app.listen(PORT, () => {
-//   console.log(` ➜  [API] Local:   http://localhost:${PORT}/`);
-// });
