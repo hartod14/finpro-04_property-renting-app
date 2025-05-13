@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/index.ts",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "node dist/index.js",
     "dev": "cross-env NODE_ENV=local ts-node-dev -r tsconfig-paths/register src/index.ts",
     "build": "prisma generate && tsc && tsc-alias",
     "serve": "cross-env NODE_ENV=production node dist/index.js",
