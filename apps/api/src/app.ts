@@ -92,7 +92,7 @@ export default class App {
       verifyUser,
       tenantRoomAvailabilityRouter(),
     );
-    
+
     this.app.use(
       '/api/tenant-season-rate',
       verifyUser,
@@ -101,7 +101,7 @@ export default class App {
 
     // review
     this.app.use('/api/review', reviewRouter());
-    
+
     // report
     this.app.use('/api/report', reportRouter());
 
@@ -111,9 +111,9 @@ export default class App {
   }
 
   public start(): void {
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV === 'production') {
       this.app.listen(PORT, () => {
-        console.log(` ➜  [API] Production:   http://localhost:${PORT}/`);
+        console.log(` ➜  [API] Production:   http://localhost:3001/`);
       });
     }
 
@@ -123,6 +123,4 @@ export default class App {
       });
     }
   }
-
-  
 }
