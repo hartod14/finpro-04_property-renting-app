@@ -1001,7 +1001,7 @@ export default function PropertyDetailPage() {
 
                             {available ? (
                               <Link
-                                href={`/booking/${property.slug}?roomId=${room.id}&checkin=${formatDisplayDate(dateRange.from)}&checkout=${formatDisplayDate(dateRange.to)}`}
+                                href={`/booking/${property.slug}?roomId=${room.id}&startDate=${calendarState.selectedStartDate?.toISOString()}&endDate=${calendarState.selectedEndDate?.toISOString()}&adults=${searchAdults}`}
                               >
                                 <div className="mt-4 bg-primary text-white px-4 py-2 inline-block rounded hover:bg-primary/90 transition-colors">
                                   Book Now

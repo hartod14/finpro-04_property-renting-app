@@ -33,6 +33,11 @@ const LoadSnapScript = () => {
   return null;
 };
 
+const formatDisplayDate = (date: Date | null | undefined) => {
+  if (!date) return '';
+  return format(date, 'dd MMMM yyyy'); // Using `date-fns` format for consistent formatting
+};
+
 export default function PurchaseListPage() {
   const { data: session } = useSession();
   const [bookings, setBookings] = useState<any[]>([]);
@@ -56,7 +61,6 @@ export default function PurchaseListPage() {
     number | null
   >(null);
 
-  // Move fetchBookings function here
   const fetchBookings = async () => {
     if (!session?.user?.id) return;
     setLoading(true);
@@ -179,18 +183,16 @@ export default function PurchaseListPage() {
       }
     );
 
-    const { snapToken, orderNumber } = response.data;
+    const { snapToken } = response.data;
 
     if (!snapToken || typeof window.snap?.pay !== 'function') {
       return Swal.fire('Error', 'Midtrans Snap is not available.', 'error');
     }
 
-    // Type assertion to any to avoid TypeScript error
     window.snap.pay(snapToken, {
       onSuccess: async function (res: any) {
         Swal.fire('Success!', 'Payment successful.', 'success');
         try {
-          // Immediately update the payment status to 'DONE'
           await axios.patch(
             `${process.env.NEXT_PUBLIC_API}/payments/midtrans/${res.order_id}`,
             {},
@@ -200,27 +202,7 @@ export default function PurchaseListPage() {
               },
             }
           );
-
-          // Call the API to update the status to 'DONE'
-          await axios.patch(
-            `${process.env.NEXT_PUBLIC_API}/bookings/status/${res.order_id}`,
-            { status: 'DONE' }, // Updating the status to 'DONE' directly after payment success
-            {
-              headers: {
-                Authorization: `Bearer ${session?.user?.access_token}`,
-              },
-            }
-          );
-
-          // Update the local state directly
-          setBookings((prevBookings) =>
-            prevBookings.map((booking) =>
-              booking.booking.id === bookingId
-                ? { ...booking, booking: { ...booking.booking, status: 'DONE' } }
-                : booking
-            )
-          );
-
+          fetchBookings();
         } catch (err) {
           console.error('Status update failed:', err);
         }
@@ -230,16 +212,13 @@ export default function PurchaseListPage() {
       onError: () => Swal.fire('Failed', 'Payment failed.', 'error'),
       onClose: () =>
         Swal.fire('Cancelled', 'You closed the payment popup.', 'info'),
-    } as any); // Assert as 'any' to bypass the error
+    } as any);
   } catch (err) {
     console.error('Midtrans error:', err);
     Swal.fire('Error', 'Failed to initiate payment.', 'error');
   }
 };
 
-  const formatBookingDate = (date: string) => {
-    return format(new Date(date), 'dd MMM yyyy', { locale: enUS });
-  };
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6 text-black">
@@ -275,10 +254,10 @@ export default function PurchaseListPage() {
               onPayNowClick={handlePayNowClick}
               onGenerateReceipt={handleGenerateReceipt}
               getStatusColor={getStatusColor}
-              formattedCheckInDate={formatBookingDate(
+              formattedCheckInDate={formatDisplayDate(
                 booking.booking.checkinDate,
               )}
-              formattedCheckOutDate={formatBookingDate(
+              formattedCheckOutDate={formatDisplayDate(
                 booking.booking.checkoutDate,
               )}
               onOpenReviewModal={handleOpenReviewModal}
@@ -306,7 +285,7 @@ export default function PurchaseListPage() {
         setLimit={setLimit}
         total={total}
         totalPage={totalPage}
-      />
-    </div>
-  );
+ />
+</div>
+ );
 }
