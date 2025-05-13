@@ -23,6 +23,15 @@ interface BookingCardProps {
   onOpenReviewModal: (bookingId: number) => void;
 }
 
+const formatRupiah = (amount: number): string => {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+  }).format(amount);
+};
+
+
 export const BookingCard = ({
   booking,
   paymentMethod,
@@ -45,7 +54,7 @@ export const BookingCard = ({
   );
 
   // Menghitung total price berdasarkan durasi
-  const totalPrice = booking.room.price * durationInDays;
+  const totalPrice = booking.booking.amount
 
   return (
     <div
@@ -106,7 +115,7 @@ export const BookingCard = ({
             <p className="text-gray-700">
               <strong>Price:</strong>{' '}
               <span className="bg-yellow-100 text-yellow-800 px-2 py-1 text-lg font-semibold rounded-lg">
-                Rp {totalPrice.toLocaleString('id-ID')}
+                {formatRupiah(totalPrice)}
               </span>
             </p>
           </div>
@@ -169,3 +178,4 @@ export const BookingCard = ({
     </div>
   );
 };
+

@@ -35,7 +35,7 @@ const BookingSection: React.FC<BookingSectionProps> = ({
           />
         </div>
 
-         <div className="text-black flex-shrink-0 mt-10">
+        <div className="text-black flex-shrink-0 mt-10">
           <ArrowRight size={17} />
         </div>
 

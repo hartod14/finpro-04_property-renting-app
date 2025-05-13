@@ -22,7 +22,7 @@ export class UserTransactionRouter {
 
     this.router.get(
       '/bookings/room/:roomId',
-      verifyUser,
+      verifyUser, // Pastikan verifikasi user dilakukan di sini
       bookingController.getBookingSummaryByRoomId,
     );
 

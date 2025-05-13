@@ -16,39 +16,63 @@ export const createBooking = async (
 
   const room = await prisma.room.findUnique({
     where: { id: roomId },
+    include: {
+      roomHasPeakSeasonRates: {
+        include: {
+          peakSeasonRate: true,
+        },
+      },
+    },
   });
 
   if (!room) throw new Error('Room not found');
 
-  const diffTime = checkoutDate.getTime() - checkinDate.getTime();
-  const numberOfNights = diffTime / (1000 * 3600 * 24);
+  const peakSeasonRates = room.roomHasPeakSeasonRates || [];
+  let totalPrice = 0;
 
-  // Tentukan harga per malam (gunakan tarif musim puncak jika ada)
-  const peakSeasonRate = await prisma.peakSeasonRate.findFirst({
-    where: {
-      // room_id: roomId,
-      start_date: { lte: checkinDate },
-      end_date: { gte: checkoutDate },
-    },
-  });
+  for (
+    let d = new Date(checkinDate);
+    d < checkoutDate;
+    d.setDate(d.getDate() + 1)
+  ) {
+    let nightlyPrice = Number(room.base_price);
 
-  const basePrice = room.base_price.toNumber();
-  const pricePerNight = peakSeasonRate
-    ? peakSeasonRate.value.toNumber()
-    : basePrice;
+    for (const peakRateRelation of peakSeasonRates) {
+      const peakRate = peakRateRelation.peakSeasonRate;
+      const peakStartDate = new Date(peakRate.start_date);
+      const peakEndDate = new Date(peakRate.end_date);
 
-  // Hitung total harga berdasarkan jumlah malam
-  const totalPrice = pricePerNight * numberOfNights;
+      if (d >= peakStartDate && d <= peakEndDate) {
+        if (peakRate.value_type === 'PERCENTAGE') {
+          const percentValue = Number(peakRate.value) / 100;
+          if (peakRate.type === 'INCREASE') {
+            nightlyPrice += nightlyPrice * percentValue;
+          } else if (peakRate.type === 'DECREASE') {
+            nightlyPrice -= nightlyPrice * percentValue;
+          }
+        } else if (peakRate.value_type === 'NOMINAL') {
+          if (peakRate.type === 'INCREASE') {
+            nightlyPrice += Number(peakRate.value);
+          } else if (peakRate.type === 'DECREASE') {
+            nightlyPrice -= Number(peakRate.value);
+          }
+        }
 
-  // Buat transaksi pembayaran dengan harga yang dihitung
+        nightlyPrice = Math.max(nightlyPrice, 0);
+        break;
+      }
+    }
+
+    totalPrice += nightlyPrice;
+  }
+
   const payment = await prisma.payment.create({
     data: {
       method: paymentMethod,
-      amount: totalPrice, // harga disimpan ke kolom "amount"
+      amount: totalPrice,
     },
   });
 
-  // Simpan booking dengan id payment yang baru
   const booking = await prisma.booking.create({
     data: {
       user_id: userId,
@@ -57,13 +81,17 @@ export const createBooking = async (
       checkout_date: checkoutDate,
       status: BookingStatus.WAITING_FOR_PAYMENT,
       order_number: orderNumber,
-      payment_id: payment.id, // tautkan payment
+      payment_id: payment.id,
     },
     include: {
       user: true,
       room: {
         include: {
-          property: true,
+          property: {
+            include: {
+              propertyImages: true,
+            },
+          },
         },
       },
       payment: true,
@@ -76,6 +104,8 @@ export const createBooking = async (
 export const getBookingSummaryByRoomIdService = async (
   roomId: number,
   userId: number,
+  startDate?: string,
+  endDate?: string
 ) => {
   const room = await prisma.room.findUnique({
     where: { id: roomId },
@@ -94,6 +124,11 @@ export const getBookingSummaryByRoomIdService = async (
         orderBy: { created_at: 'asc' },
         take: 1,
       },
+      roomHasPeakSeasonRates: {
+        include: {
+          peakSeasonRate: true,
+        },
+      },
     },
   });
 
@@ -104,6 +139,52 @@ export const getBookingSummaryByRoomIdService = async (
   });
 
   if (!user) return null;
+
+  let adjusted_price: number | undefined;
+
+  // Hitung adjusted_price jika ada startDate dan endDate
+  if (startDate && endDate) {
+    const requestStartDate = new Date(startDate);
+    const requestEndDate = new Date(endDate);
+
+    const peakSeasonRates = room.roomHasPeakSeasonRates || [];
+    let totalPrice = 0;
+
+    // Loop per malam (tidak termasuk endDate)
+    for (let d = new Date(requestStartDate); d < requestEndDate; d.setDate(d.getDate() + 1)) {
+      let nightlyPrice = Number(room.base_price);
+
+      for (const peakRateRelation of peakSeasonRates) {
+        const peakRate = peakRateRelation.peakSeasonRate;
+        const peakStartDate = new Date(peakRate.start_date);
+        const peakEndDate = new Date(peakRate.end_date);
+
+        if (d >= peakStartDate && d <= peakEndDate) {
+          if (peakRate.value_type === 'PERCENTAGE') {
+            const percentValue = Number(peakRate.value) / 100;
+            if (peakRate.type === 'INCREASE') {
+              nightlyPrice += nightlyPrice * percentValue;
+            } else if (peakRate.type === 'DECREASE') {
+              nightlyPrice -= nightlyPrice * percentValue;
+            }
+          } else if (peakRate.value_type === 'NOMINAL') {
+            if (peakRate.type === 'INCREASE') {
+              nightlyPrice += Number(peakRate.value);
+            } else if (peakRate.type === 'DECREASE') {
+              nightlyPrice -= Number(peakRate.value);
+            }
+          }
+
+          nightlyPrice = Math.max(nightlyPrice, 0); 
+          break; // hanya ambil satu peak rate yang cocok
+        }
+      }
+
+      totalPrice += nightlyPrice;
+    }
+
+    adjusted_price = totalPrice;
+  }
 
   return {
     user: {
@@ -122,6 +203,7 @@ export const getBookingSummaryByRoomIdService = async (
       id: room.id,
       name: room.name,
       base_price: room.base_price,
+      adjusted_price, // tampilkan hasil akhir total dari semua malam
       capacity: room.capacity,
       size: room.size,
       image: room.roomImages[0]?.path || null,

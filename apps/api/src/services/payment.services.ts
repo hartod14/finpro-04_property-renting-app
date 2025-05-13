@@ -3,6 +3,7 @@ import { PrismaClient, BookingStatus } from '@prisma/client';
 import { validateImage } from '../utils/validation';
 import cron from 'node-cron';
 import { cloudinaryUpload } from '@/helpers/cloudinary';
+import { sendConfirmationEmail } from '@/utils/email';
 const midtransClient = require('midtrans-client');
 
 const prisma = new PrismaClient();
@@ -145,7 +146,15 @@ export const updatePaymentStatus = async (midtransPayload: any) => {
 
   const booking = await prisma.booking.findFirst({
     where: { order_number: order_id },
-    include: { payment: true },
+    include: {
+      payment: true,
+      user: true,
+      room: {
+        include: {
+          property: true,
+        },
+      },
+    },
   });
 
   if (!booking || !booking.payment) throw new Error('Booking not found');
@@ -172,15 +181,29 @@ export const updatePaymentStatus = async (midtransPayload: any) => {
     },
   });
 
-  await prisma.booking.update({
+  const updatedBooking = await prisma.booking.update({
     where: { id: booking.id },
     data: {
       status: newStatus,
     },
+    include: {
+      user: true,
+      room: {
+        include: {
+          property: true,
+        },
+      },
+    },
   });
+
+  // ✅ Kirim email konfirmasi jika sukses bayar
+  if (transaction_status === 'DONE') {
+    await sendConfirmationEmail(updatedBooking.user.email, updatedBooking);
+  }
 
   return { message: 'Payment status updated successfully.' };
 };
+
 
 export const updatePaymentStatusByOrderId = async (orderId: string) => {
   const booking = await prisma.booking.findFirst({

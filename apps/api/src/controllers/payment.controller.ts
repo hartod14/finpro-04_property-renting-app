@@ -48,6 +48,7 @@ export const initiateMidtransPayment = async (req: Request, res: Response) => {
 
 export const midtransCallback = async (req: Request, res: Response) => {
   try {
+    console.log("Midtrans Callback Received:", req.body); // Log request payload for debugging
     const result = await paymentService.updatePaymentStatus(req.body);
     res.status(200).json(result);
   } catch (error: any) {
@@ -55,7 +56,6 @@ export const midtransCallback = async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message || 'Failed to update payment status' });
   }
 };
-
 
 export const updateMidtransStatus = async (req: Request, res: Response) => {
   try {
