@@ -7,14 +7,12 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "baseUrl": ".",
+    "rootDir": "src",
+    "baseUrl": "./",   
     "paths": {
-      "@/*": ["./src/*"]
-    },
-    "resolveJsonModule": true,
-    "allowJs": true,
-    "noImplicitAny": false
+      "@/*": ["src/*"]
+    }
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules"]
 }
