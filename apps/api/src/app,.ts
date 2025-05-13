@@ -44,7 +44,7 @@ export default class App {
       cors({
         origin: [
           'http://localhost:3000',
-          'https://stayza-renting-property.vercel.app/',
+          'https://stayza-renting-property.vercel.app',
         ],
         credentials: true,
       }),
@@ -52,7 +52,7 @@ export default class App {
     this.app.options('*', (req, res) => {
       res.header(
         'Access-Control-Allow-Origin',
-        'https://stayza-renting-property.vercel.app/',
+        'https://stayza-renting-property.vercel.app',
       );
       res.header(
         'Access-Control-Allow-Methods',
