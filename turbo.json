@@ -2,9 +2,37 @@
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local"],
   "tasks": {
-    "build": {
+    "api#build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]      
+      "env": [
+        "NODE_ENV",
+        "PORT",
+        "DATABASE_URL",
+        "CLOUDINARY_URL",
+        "SECRET",
+        "REFRESH_SECRET",
+        "FRONTEND_URL",
+        "JWT_SECRET",
+        "NODEMAILER_USER",
+        "NODEMAILER_PASS"
+      ],
+      "outputs": ["dist/**"]
+    },
+    "web#build": {
+      "dependsOn": ["^build"],
+      "env": [
+        "NEXT_PUBLIC_API",
+        "AUTH_TRUST_HOST",
+        "AUTH_DOMAIN",
+        "AUTH_URL",
+        "AUTH_SECRET",
+        "GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET",
+        "FACEBOOK_CLIENT_ID",
+        "FACEBOOK_CLIENT_SECRET",
+        "NEXT_PUBLIC_OPENCAGE_API_KEY"
+      ],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "lint": {},
     "test": {},
