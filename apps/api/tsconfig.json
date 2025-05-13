@@ -12,7 +12,6 @@
       "@/*": ["./src/*"]
     }
   },
-  // "include": ["src/**/*"],
-  "include": ["**/*.ts", "../web/next.config.ts"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules"]
 }
