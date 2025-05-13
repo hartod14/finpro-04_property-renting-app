@@ -1,9 +1,12 @@
 {
-  "extends": ["//"],
-  "tasks": {
-    "prisma": {},
+  "pipeline": {
     "build": {
-      "outputs": ["dist/**"]
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
     }
   }
 }

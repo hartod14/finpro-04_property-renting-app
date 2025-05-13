@@ -111,8 +111,18 @@ export default class App {
   }
 
   public start(): void {
-    this.app.listen(PORT, () => {
-      console.log(` ➜  [API] Local:   http://localhost:${PORT}/`);
-    });
+    if (process.env.NODE_ENV !== 'production') {
+      this.app.listen(PORT, () => {
+        console.log(` ➜  [API] Local:   http://localhost:${PORT}/`);
+      });
+    }
+
+    if (process.env.NODE_ENV === 'local') {
+      this.app.listen(PORT, () => {
+        console.log(` ➜  [API] Local:   http://localhost:${PORT}/`);
+      });
+    }
   }
+
+  
 }
