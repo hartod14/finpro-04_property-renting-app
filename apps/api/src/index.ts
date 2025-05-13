@@ -1,7 +1,10 @@
 import App from './app';
 
-const app = new App();
-app.start();
+const main = () => {
+  // init db here
 
-// Export the Express app for Vercel serverless functions
-export default app.getApp();
+  const app = new App();
+  app.start();
+};
+
+main();

@@ -28,7 +28,6 @@ import { tenantRoomAvailabilityRouter } from './routers/tenant-room-availability
 import { tenantSeasonRateRouter } from './routers/tenant-season-rate.router';
 import reviewRouter from './routers/review.router';
 import reportRouter from './routers/report.router';
-import { createServer } from 'http';
 
 export default class App {
   private app: Application;
@@ -93,7 +92,7 @@ export default class App {
       verifyUser,
       tenantRoomAvailabilityRouter(),
     );
-
+    
     this.app.use(
       '/api/tenant-season-rate',
       verifyUser,
@@ -102,7 +101,7 @@ export default class App {
 
     // review
     this.app.use('/api/review', reviewRouter());
-
+    
     // report
     this.app.use('/api/report', reportRouter());
 
@@ -112,37 +111,18 @@ export default class App {
   }
 
   public start(): void {
-    // For Vercel serverless environment
-    if (process.env.VERCEL === '1') {
-      console.log('Running on Vercel, skipping explicit server start');
-      return;
+    if (process.env.NODE_ENV !== 'production') {
+      this.app.listen(PORT, () => {
+        console.log(` ➜  [API] Production:   http://localhost:${PORT}/`);
+      });
     }
 
-    // Try to use the configured port
-    const preferredPort = parseInt(process.env.PORT || '8000', 10);
-    let currentPort = preferredPort;
-    
-    // Create server and handle port conflicts
-    const startServer = (port: number) => {
-      const server = this.app.listen(port, () => {
-        console.log(` ➜  [API] Local:   http://localhost:${port}/`);
-      }).on('error', (err: any) => {
-        if (err.code === 'EADDRINUSE') {
-          console.log(`Port ${port} is already in use, trying port ${port + 1}...`);
-          server.close();
-          // Try next port
-          startServer(port + 1);
-        } else {
-          console.error('Server error:', err);
-        }
+    if (process.env.NODE_ENV === 'local') {
+      this.app.listen(PORT, () => {
+        console.log(` ➜  [API] Local:   http://localhost:${PORT}/`);
       });
-    };
-    
-    startServer(currentPort);
+    }
   }
 
-  // For serverless environments like Vercel
-  public getApp(): Application {
-    return this.app;
-  }
+  
 }
