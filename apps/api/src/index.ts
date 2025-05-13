@@ -1,4 +1,4 @@
-import 'module-alias/register';
+// Import app without module-alias
 import App from './app';
 
 // Create app instance

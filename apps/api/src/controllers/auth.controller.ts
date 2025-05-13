@@ -2,8 +2,8 @@
 
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler, responseHandler } from '../helpers/response.handler';
-import authService from '@/services/auth.service';
-import { decodeVerificationJwt } from '@/helpers/verification.jwt';
+import authService from '../services/auth.service';
+import { decodeVerificationJwt } from '../helpers/verification.jwt';
 
 class AuthController {
   async signIn(req: Request, res: Response, next: NextFunction) {
