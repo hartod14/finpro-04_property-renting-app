@@ -197,19 +197,26 @@ export const updatePaymentStatus = async (midtransPayload: any) => {
   });
 
   // ✅ Kirim email konfirmasi jika sukses bayar
-  if (transaction_status === 'DONE') {
+  if (transaction_status === 'settlement') {
     await sendConfirmationEmail(updatedBooking.user.email, updatedBooking);
   }
 
   return { message: 'Payment status updated successfully.' };
 };
 
-
 export const updatePaymentStatusByOrderId = async (orderId: string) => {
   const booking = await prisma.booking.findFirst({
-  where: { order_number: orderId },
-  include: { payment: true },
-});
+    where: { order_number: orderId },
+    include: {
+      payment: true,
+      user: true,
+      room: {
+        include: {
+          property: true,
+        },
+      },
+    },
+  });
 
   if (!booking || !booking.payment) {
     throw new Error('Invalid order number');
@@ -227,7 +234,18 @@ export const updatePaymentStatusByOrderId = async (orderId: string) => {
     data: {
       status: BookingStatus.DONE,
     },
+    include: {
+      user: true,
+      room: {
+        include: {
+          property: true,
+        },
+      },
+    },
   });
+
+  // ✅ Kirim email konfirmasi pembayaran
+  await sendConfirmationEmail(updatedBooking.user.email, updatedBooking);
 
   return {
     message: 'Payment status updated successfully',
@@ -235,4 +253,5 @@ export const updatePaymentStatusByOrderId = async (orderId: string) => {
     status: updatedBooking.status,
   };
 };
+
 

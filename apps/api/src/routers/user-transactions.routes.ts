@@ -45,10 +45,10 @@ export class UserTransactionRouter {
       paymentController.initiateMidtransPayment,
     );
 
-    this.router.post(
-      '/payments/midtrans/callback',
-      paymentController.midtransCallback,
-    );
+    // this.router.post(
+    //   '/payments/midtrans/callback',
+    //   paymentController.midtransCallback,
+    // );
 
     this.router.patch(
       '/payments/midtrans/:orderId',
