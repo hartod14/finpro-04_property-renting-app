@@ -1,10 +1,13 @@
+import 'module-alias/register';
 import App from './app';
 
-const main = () => {
-  // init db here
+// Create app instance
+const app = new App();
 
-  const app = new App();
+// Start server for local development (not needed for Vercel)
+if (process.env.NODE_ENV === 'local') {
   app.start();
-};
+}
 
-main();
+// Export Express app for Vercel
+export default app.getApp();

@@ -31,12 +31,27 @@ import reportRouter from './routers/report.router';
 
 export default class App {
   private app: Application;
+  private static expressApp: Application;
 
   constructor() {
     this.app = express();
+    App.expressApp = this.app;
     this.configure();
     this.routes();
     this.handleError();
+  }
+
+  // Static method to get Express app for Vercel serverless functions
+  public static getExpressApp(): Application {
+    if (!App.expressApp) {
+      const app = new App();
+    }
+    return App.expressApp;
+  }
+
+  // Method to get the Express app instance
+  public getApp(): Application {
+    return this.app;
   }
 
   private configure(): void {
@@ -111,16 +126,16 @@ export default class App {
   }
 
   public start(): void {
-    if (process.env.NODE_ENV === 'production') {
-      this.app.listen(3000, () => {
+    // if (process.env.NODE_ENV === 'production') {
+      this.app.listen(3001, () => {
         console.log('Server ready on port 3000.');
       });
-    }
+    // }
 
-    if (process.env.NODE_ENV === 'local') {
-      this.app.listen(PORT, () => {
-        console.log(` ➜  [API] Local:   http://localhost:${PORT}/`);
-      });
-    }
+    // if (process.env.NODE_ENV === 'local') {
+    //   this.app.listen(PORT, () => {
+    //     console.log(` ➜  [API] Local:   http://localhost:${PORT}/`);
+    //   });
+    // }
   }
 }
