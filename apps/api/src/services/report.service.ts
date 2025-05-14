@@ -38,28 +38,20 @@ export class ReportService {
       },
     });
 
-    // Hitung amount berdasarkan durasi menginap * harga kamar
+    // Hitung total amount berdasarkan payment.amount pada tabel payment
     const enrichedBookings = bookings.map((b) => {
-      const checkin = b.checkin_date ? new Date(b.checkin_date) : null;
-      const checkout = b.checkout_date ? new Date(b.checkout_date) : null;
-
-      let days = 1;
-      if (checkin && checkout) {
-        days = Math.max(1, differenceInDays(checkout, checkin));
-      }
-
-      const calculatedAmount = days * b.room.base_price.toNumber();
+      const totalAmount = b.payment.amount.toNumber();  // Ambil amount dari payment
 
       return {
         ...b,
-        calculatedAmount,
+        totalAmount,
       };
     });
 
-    // Urutkan jika berdasarkan calculatedAmount atau payment date
+    // Urutkan jika berdasarkan total sales atau payment date
     if (sortBy === "total_sales") {
       enrichedBookings.sort((a, b) => {
-        const diff = a.calculatedAmount - b.calculatedAmount;
+        const diff = a.totalAmount - b.totalAmount;
         return order === "asc" ? diff : -diff;
       });
     } else {
@@ -70,8 +62,9 @@ export class ReportService {
       });
     }
 
+    // Hitung total income berdasarkan payment.amount
     const totalIncome = enrichedBookings.reduce(
-      (acc, b) => acc + b.calculatedAmount,
+      (acc, b) => acc + b.totalAmount,
       0
     );
 
@@ -83,11 +76,12 @@ export class ReportService {
         user: b.user.name,
         property: b.room.property.name,
         room: b.room.name,
-        amount: b.calculatedAmount,
+        amount: b.totalAmount,
         paymentDate: b.payment.payment_date,
       })),
     };
   }
+
 
   async getPropertyCalendar(tenantId: number) {
     const properties = await prisma.property.findMany({

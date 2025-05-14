@@ -5,11 +5,11 @@ import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import { FaSearch } from 'react-icons/fa';
 import BookingTable from '@/components/orders/BookingTable';
-import PaymentProofModal from '@/components/orders/PaymentProofModal'; // Import komponen modal baru
+import PaymentProofModal from '@/components/orders/PaymentProofModal';
 import { X } from 'lucide-react';
 import Swal from 'sweetalert2';
 import ReplyReviewModal from '@/components/orders/ReviewReplyModal';
-import { PanelPagination } from '@/components/common/pagination/panelPagination'; // Assuming this is a pagination component.
+import { PanelPagination } from '@/components/common/pagination/panelPagination';
 
 export default function TenantPropertyListOrderPage() {
   const { data: session } = useSession();
@@ -28,33 +28,39 @@ export default function TenantPropertyListOrderPage() {
   const [total, setTotal] = useState(0);
   const [totalPage, setTotalPage] = useState(0);
 
-  useEffect(() => {
-    const fetchAllOrders = async () => {
-      if (!session?.user?.id) return;
-      try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API}/tenant/${session.user.id}/orders`,
-          {
-            params: {
-              search,
-              page,
-              limit,
-            },
-            headers: {
-              Authorization: `Bearer ${session.user.access_token}`,
-            },
+  // Fetch orders with calculations
+  const fetchAllOrders = async () => {
+    if (!session?.user?.id) return;
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API}/tenant/${session.user.id}/orders`,
+        {
+          params: {
+            search,
+            page,
+            limit,
           },
-        );
-        setBookings(res.data.bookings); // assuming res.data.bookings contains the booking data
-        setTotal(res.data.total); // assuming res.data.total contains the total count of items
-        setTotalPage(Math.ceil(res.data.total / limit)); // Calculate the total pages
-      } catch (err) {
-        console.error('Failed to fetch orders:', err);
-      }
-    };
+          headers: {
+            Authorization: `Bearer ${session.user.access_token}`,
+          },
+        }
+      );
+      const bookingsWithCalculatedPrices = res.data.bookings.map((booking: any) => {
+        // Example calculation based on base price
+        const totalPrice = booking.room.base_price * booking.room.nights;
+        return { ...booking, total_price: totalPrice };
+      });
+      setBookings(bookingsWithCalculatedPrices);
+      setTotal(res.data.total);
+      setTotalPage(Math.ceil(res.data.total / limit));
+    } catch (err) {
+      console.error('Failed to fetch orders:', err);
+    }
+  };
 
+  useEffect(() => {
     fetchAllOrders();
-  }, [session, search, page, limit]); // Trigger fetching on search, page, or limit change
+  }, [session, search, page, limit]);
 
   const handleOpenModal = (proofUrl: string) => {
     setProofImage(proofUrl);
@@ -75,10 +81,10 @@ export default function TenantPropertyListOrderPage() {
           headers: {
             Authorization: `Bearer ${session?.user.access_token}`,
           },
-        },
+        }
       );
       setBookings((prev) =>
-        prev.map((b) => (b.id === bookingId ? { ...b, status: 'DONE' } : b)),
+        prev.map((b) => (b.id === bookingId ? { ...b, status: 'DONE' } : b))
       );
     } catch (err) {
       console.error('Failed to approve booking:', err);
@@ -94,12 +100,12 @@ export default function TenantPropertyListOrderPage() {
           headers: {
             Authorization: `Bearer ${session?.user.access_token}`,
           },
-        },
+        }
       );
       setBookings((prev) =>
         prev.map((b) =>
-          b.id === bookingId ? { ...b, status: 'REJECTED' } : b,
-        ),
+          b.id === bookingId ? { ...b, status: 'REJECTED' } : b
+        )
       );
     } catch (err) {
       console.error('Failed to reject booking:', err);
@@ -110,7 +116,7 @@ export default function TenantPropertyListOrderPage() {
     try {
       setLoading(true);
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API}/review/property/${propertyId}`,
+        `${process.env.NEXT_PUBLIC_API}/review/property/${propertyId}`
       );
       const review = res.data.data.find((r: any) => r.user.id === userId);
 
@@ -138,7 +144,7 @@ export default function TenantPropertyListOrderPage() {
           headers: {
             Authorization: `Bearer ${session?.user.access_token}`,
           },
-        },
+        }
       );
       Swal.fire('Success', 'Reply submitted successfully!', 'success');
       setShowReplyModal(false);
@@ -146,7 +152,7 @@ export default function TenantPropertyListOrderPage() {
       Swal.fire(
         'Error',
         error?.response?.data?.message || 'Failed to submit reply.',
-        'error',
+        'error'
       );
     }
   };
