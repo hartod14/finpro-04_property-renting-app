@@ -22,7 +22,7 @@ export class UserTransactionRouter {
 
     this.router.get(
       '/bookings/room/:roomId',
-      verifyUser,
+      verifyUser, // Pastikan verifikasi user dilakukan di sini
       bookingController.getBookingSummaryByRoomId,
     );
 
@@ -45,10 +45,10 @@ export class UserTransactionRouter {
       paymentController.initiateMidtransPayment,
     );
 
-    this.router.post(
-      '/payments/midtrans/callback',
-      paymentController.midtransCallback,
-    );
+    // this.router.post(
+    //   '/payments/midtrans/callback',
+    //   paymentController.midtransCallback,
+    // );
 
     this.router.patch(
       '/payments/midtrans/:orderId',

@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { BookingStatus, PaymentMethod } from '@prisma/client';
-import { sendConfirmationEmail, sendReminderEmail } from '../utils/email';
+import { sendConfirmationEmail } from '../utils/email';
 
 const prisma = new PrismaClient();
 
@@ -84,30 +84,6 @@ export const tenantTransactionService = {
     }
 
     return updatedBooking;
-  },
-
-  async sendCheckinReminder() {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const bookings = await prisma.booking.findMany({
-      where: {
-        checkin_date: tomorrow,
-        status: BookingStatus.WAITING_FOR_CONFIRMATION,
-      },
-      include: {
-        user: true,
-        room: {
-          include: {
-            property: true,
-          },
-        },
-      },
-    });
-
-    for (const booking of bookings) {
-      await sendReminderEmail(booking.user.email, booking);
-    }
   },
 
   async cancelUserOrder(tenantId: number, bookingId: number) {

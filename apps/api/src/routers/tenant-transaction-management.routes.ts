@@ -26,24 +26,12 @@ export class TenantTransactionRouter {
       tenantTransactionController.confirmPayment,
     );
 
-    this.router.post(
-      '/tenant/send-checkin-reminder',
-      tenantTransactionController.sendCheckinReminder,
-    );
-
     this.router.delete(
       '/tenant/:tenantId/bookings/:bookingId/cancel',
       verifyUser,
-      authorizeTenantAction,  
+      authorizeTenantAction,
       tenantTransactionController.cancelUserOrder,
     );
-
-    // this.router.get(
-    //   '/tenant/:tenantId/properties',
-    //   verifyUser,
-    //   authorizeTenantAction,  
-    //   tenantTransactionController.getPropertyList,
-    // );
   }
 
   getRouter(): Router {

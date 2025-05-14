@@ -28,37 +28,36 @@ export const createBooking = async (req: Request, res: Response) => {
 
 export const getBookingSummaryByRoomId = async (
   req: Request,
-  res: Response,
+  res: Response
 ): Promise<any> => {
-  const { roomId } = req.params;
-  const userId = (req as any).user?.id;
+  const { roomId } = req.params; // Ambil roomId dari URL params
+  const { startDate, endDate } = req.query; // Ambil startDate dan endDate dari query params
+  const userId = (req as any).user?.id; // Ambil userId dari request user
 
   if (!userId) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
   try {
-    const bookingSummary =
-      await bookingService.getBookingSummaryByRoomIdService(
-        Number(roomId),
-        userId,
-      );
+    const bookingSummary = await bookingService.getBookingSummaryByRoomIdService(
+      Number(roomId),
+      userId,
+      startDate as string, // Kirim startDate dan endDate ke service
+      endDate as string
+    );
 
     if (!bookingSummary) {
       return res.status(404).json({ message: 'Room or user not found' });
     }
 
-    return res.status(200).json(bookingSummary);
+    return res.status(200).json(bookingSummary); // Kirimkan booking summary ke FE
   } catch (error) {
     console.error('Error fetching booking summary:', error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
 
-export const listBookings = async (
-  req: Request,
-  res: Response,
-): Promise<any> => {
+export const listBookings = async (req: Request, res: Response): Promise<any> => {
   const { userId, search = '', page = 1, limit = 10 } = req.query;
 
   if (!userId) {
@@ -111,36 +110,54 @@ export const listBookings = async (
       prisma.booking.count({ where: whereClause }),
     ]);
 
-    const formattedBookings = bookings.map((booking) => ({
-      user: {
-        name: booking.user?.name,
-        email: booking.user?.email,
-        phone: booking.user?.phone,
-      },
-      property: {
-        image: booking.room.property.propertyImages[0]?.path ?? null,
-        name: booking.room.property.name,
-        address: booking.room.property.address,
-      },
-      room: {
-        name: booking.room.name,
-        capacity: booking.room.capacity,
-        price: booking.room.base_price,
-      },
-      booking: {
-        id: booking.id,
-        order_number: booking.order_number,
-        checkinDate: booking.checkin_date,
-        checkoutDate: booking.checkout_date,
-        status: booking.status,
-        paymentMethod: booking.payment?.method ?? null,
-      },
-    }));
+    const formattedBookings = bookings.map((booking) => {
+      const room = booking.room;
+      const checkinDate = booking.checkin_date;
+      const checkoutDate = booking.checkout_date;
 
-    return res.status(200).json({ bookings: formattedBookings, total });
+      const nights = Math.ceil(
+        (checkoutDate.getTime() - checkinDate.getTime()) / (1000 * 3600 * 24),
+      );
+
+      const pricePerNight = Number(room.base_price);
+      const totalPrice = booking.payment?.amount ?? pricePerNight * nights;
+
+      return {
+        user: {
+          name: booking.user?.name,
+          email: booking.user?.email,
+          phone: booking.user?.phone,
+        },
+        property: {
+          image: room.property.propertyImages[0]?.path ?? null,
+          name: room.property.name,
+          address: room.property.address,
+        },
+        room: {
+          name: room.name,
+          capacity: room.capacity,
+          price: pricePerNight, // Per night price
+        },
+        booking: {
+          id: booking.id,
+          order_number: booking.order_number,
+          checkinDate: checkinDate,
+          checkoutDate: checkoutDate,
+          nights,
+          status: booking.status,
+          paymentMethod: booking.payment?.method ?? null,
+          amount: totalPrice,
+        },
+      };
+    });
+
+    return res.status(200).json({
+      bookings: formattedBookings,
+      total,
+    });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: 'An unknown error occurred' });
+    console.error('Error fetching bookings:', error);
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };
 

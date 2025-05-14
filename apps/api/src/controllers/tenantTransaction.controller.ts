@@ -38,15 +38,6 @@ export const tenantTransactionController = {
     }
   },
 
-  async sendCheckinReminder(req: Request, res: Response) {
-    try {
-      await tenantTransactionService.sendCheckinReminder();
-      res.json({ message: 'Check-in reminders sent successfully' });
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  },
-
   async cancelUserOrder(req: Request, res: Response) {
     try {
       const tenantId = parseInt(req.params.tenantId);
