@@ -6,6 +6,7 @@ import TenantPropertyListModel from '@/models/tenant-panel/tenantPropertyListMod
 import { PanelPagination } from '@/components/common/pagination/panelPagination';
 import Button from '@/components/common/button/button';
 import Table from '@/components/common/table/table';
+import { TenantSkeleton } from '@/components/common/tenant/tenantSkeleton';
 export default function TenantPropertyListPage() {
   const {
     router,
@@ -18,6 +19,7 @@ export default function TenantPropertyListPage() {
     setSearch,
     setLimit,
     setPage,
+    isLoading,
   } = TenantPropertyListModel();
 
   return (
@@ -50,7 +52,17 @@ export default function TenantPropertyListPage() {
         </div>
       </div>
       <div className="relative h-[calc(100vh-250px)] overflow-auto">
-        <Table body={table.body} head={table.head} />
+        {isLoading ? (
+          <TenantSkeleton />
+        ) : table.body.length === 0 ? (
+          <div className="w-full h-full flex justify-center items-center bg-white border border-gray-200 rounded">
+            <p className="text-xl font-semibold text-gray-500 mb-2">
+              No property found
+            </p>
+          </div>
+        ) : (
+          <Table body={table.body} head={table.head} />
+        )}
       </div>
       <PanelPagination
         limit={limit}

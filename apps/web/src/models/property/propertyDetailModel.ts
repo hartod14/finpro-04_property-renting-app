@@ -1035,6 +1035,10 @@ export default function PropertyDetailModel(
           // Reset time part for proper comparison
           const dateToCheck = new Date(date);
           dateToCheck.setHours(0, 0, 0, 0);
+          
+          // Reset time parts for peak dates too
+          peakStartDate.setHours(0, 0, 0, 0);
+          peakEndDate.setHours(0, 0, 0, 0);
 
           // Check if date is within peak season period
           if (dateToCheck >= peakStartDate && dateToCheck <= peakEndDate) {

@@ -3,8 +3,8 @@
 import useMediaQuery from '@mui/material/useMediaQuery';
 import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
-import { DayPicker } from 'react-day-picker';
 import { FaCalendarAlt } from 'react-icons/fa';
+import { DayPicker } from 'react-day-picker';
 
 export interface DateRangeWithPricesProps {
   startDate: Date | undefined;

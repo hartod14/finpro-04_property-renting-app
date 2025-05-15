@@ -23,7 +23,12 @@ export function DateRangePicker({
   className = '',
 }: DateRangePickerProps) {
   const handleChange = (dates: [Date | null, Date | null]) => {
-    onChange(dates);
+    // Create exact date copies to prevent timezone issues
+    const normalizedDates: [Date | null, Date | null] = [
+      dates[0] ? new Date(dates[0].setHours(12, 0, 0, 0)) : null,
+      dates[1] ? new Date(dates[1].setHours(12, 0, 0, 0)) : null,
+    ];
+    onChange(normalizedDates);
   };
 
   // Custom styles for the date picker
@@ -123,6 +128,12 @@ export function SingleDatePicker({
   className = '',
   minDate,
 }: SingleDatePickerProps) {
+  const handleDateChange = (date: Date | null) => {
+    // Create exact date copy to prevent timezone issues
+    const normalizedDate = date ? new Date(date.setHours(12, 0, 0, 0)) : null;
+    onChange(normalizedDate);
+  };
+  
   return (
     <div className={`relative flex items-center ${className}`}>
       <div className="w-8 h-8 bg-gray-100 rounded-full absolute left-2 flex items-center justify-center text-gray-500 z-10">
@@ -130,7 +141,7 @@ export function SingleDatePicker({
       </div>
       <DatePicker
         selected={selected}
-        onChange={onChange}
+        onChange={handleDateChange}
         placeholderText={placeholder}
         className="w-full py-2 pl-12 pr-2 bg-transparent text-gray-700 focus:outline-none"
         dateFormat="MMM dd, yyyy"

@@ -4,8 +4,9 @@ import Table from '@/components/common/table/table';
 import TenantCategoryListModel from '@/models/tenant-panel/tenantCategoryListModel';
 import Button from '@/components/common/button/button';
 import { PanelPagination } from '@/components/common/pagination/panelPagination';
-import { FaArrowRight, FaPlus, FaSearch } from 'react-icons/fa';
+import { FaArrowRight, FaPlus, FaSearch, FaSpinner } from 'react-icons/fa';
 import Link from 'next/link';
+import { TenantSkeleton } from '@/components/common/tenant/tenantSkeleton';
 
 export default function TenantCategoryListPage() {
   const {
@@ -19,6 +20,7 @@ export default function TenantCategoryListPage() {
     setSearch,
     setLimit,
     setPage,
+    isLoading,
   } = TenantCategoryListModel();
 
   return (
@@ -51,7 +53,17 @@ export default function TenantCategoryListPage() {
         </div>
       </div>
       <div className="relative h-[calc(100vh-250px)] overflow-auto">
-        <Table body={table.body} head={table.head} />
+        {isLoading ? (
+          <TenantSkeleton />
+        ) : table.body.length === 0 ? (
+          <div className="w-full h-full flex justify-center items-center bg-white border border-gray-200 rounded">
+            <p className="text-xl font-semibold text-gray-500 mb-2">
+              No categories found
+            </p>
+          </div>
+        ) : (
+          <Table body={table.body} head={table.head} />
+        )}
       </div>
       <PanelPagination
         limit={limit}

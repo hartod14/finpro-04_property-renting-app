@@ -14,6 +14,7 @@ export default function TenantCategoryListModel() {
   const [limit, setLimit] = useState<number>(15);
   const [total, setTotal] = useState<number>(0);
   const [totalPage, setTotalPage] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [table, setTable] = useState({
     head: ['No.', 'Name', 'Action'],
     body: [],
@@ -21,54 +22,58 @@ export default function TenantCategoryListModel() {
   const router = useRouter();
 
   async function getCategoryList() {
-    // loading?.setLoading(true);
+    setIsLoading(true);
 
     const body: any = [];
 
-    const res = await getAllCategory(search, page, limit);
-    const data: ICategory[] = res.data;
+    try {
+      const res = await getAllCategory(search, page, limit);
+      const data: ICategory[] = res.data;
+      const total_data: number = res.total_data;
 
-    const total_data: number = res.total_data;
+      if (data) {
+        data.map((row, index) => {
+          body.push([
+            index + 1,
+            row.name,
 
-    if (data) {
-      data.map((row, index) => {
-        body.push([
-          index + 1,
-          row.name,
+            <PanelButtonAction
+              key={'button'}
+              onDelete={async () => {
+                await deleteCategoryList(row.id);
+              }}
+              onUpdate={() => {
+                router.push(`/tenant/category/edit/${row.id}`);
+              }}
+            />,
+          ]);
+        });
 
-          <PanelButtonAction
-            key={'button'}
-            onDelete={async () => {
-              await deleteCategoryList(row.id);
-            }}
-            onUpdate={() => {
-              router.push(`/tenant/category/edit/${row.id}`);
-            }}
-          />,
-        ]);
-      });
-
-      setTotal(total_data);
-      setTotalPage(Math.ceil(total_data / limit));
-      setTable({
-        ...table,
-        body: body,
-      });
-      // loading?.setLoading(false);
+        // Batch state updates to reduce rendering cycles
+        setTotal(total_data);
+        setTotalPage(Math.ceil(total_data / limit));
+        setTable({
+          ...table,
+          body: body,
+        });
+      }
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
     }
   }
 
   async function deleteCategoryList(id: number) {
     try {
-      // loading?.setLoading(true);
+      setIsLoading(true);
       await deleteCategory(id.toString()).then(() => {
         getCategoryList();
       });
     } catch (error) {
-    } finally {
-      // loading?.setLoading(false);
+      setIsLoading(false);
     }
   }
+  
   useEffect(() => {
     getCategoryList();
   }, [page, limit]);
@@ -76,11 +81,11 @@ export default function TenantCategoryListModel() {
   useEffect(() => {
     const handler = setTimeout(() => {
       setPage(1);
-      getCategoryList();
     }, 300);
 
     return () => clearTimeout(handler);
   }, [search]);
+  
   return {
     setPage,
     setLimit,
@@ -92,5 +97,6 @@ export default function TenantCategoryListModel() {
     limit,
     total,
     totalPage,
+    isLoading,
   };
 }

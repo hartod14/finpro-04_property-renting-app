@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import Button from '@/components/common/button/button';
 import { FaPlus, FaSearch } from 'react-icons/fa';
@@ -6,6 +6,7 @@ import { PanelPagination } from '@/components/common/pagination/panelPagination'
 import TenantRoomAvailabilityListModel from '@/models/tenant-panel/tenantRoomAvailabilityListModel';
 import Table from '@/components/common/table/table';
 import Link from 'next/link';
+import { TenantSkeleton } from '@/components/common/tenant/tenantSkeleton';
 
 export default function TenantRoomAvailabilityPage() {
   const {
@@ -23,6 +24,7 @@ export default function TenantRoomAvailabilityPage() {
     setStatus,
     setLimit,
     setPage,
+    isLoading,
   } = TenantRoomAvailabilityListModel();
 
   return (
@@ -43,7 +45,7 @@ export default function TenantRoomAvailabilityPage() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          
+
           <div className="flex bg-white border border-gray-200 rounded-md w-full md:w-1/3 px-3 py-2">
             <input
               type="date"
@@ -53,7 +55,7 @@ export default function TenantRoomAvailabilityPage() {
               onChange={(e) => setDate(e.target.value)}
             />
           </div>
-          
+
           <div className="flex bg-white border border-gray-200 rounded-md w-full md:w-1/3 px-3 py-2">
             <select
               value={status}
@@ -68,7 +70,7 @@ export default function TenantRoomAvailabilityPage() {
             </select>
           </div>
         </div>
-        
+
         <div className="flex gap-2">
           <Link href="/tenant/room-availability/create">
             <Button
@@ -82,7 +84,17 @@ export default function TenantRoomAvailabilityPage() {
         </div>
       </div>
       <div className="relative h-[calc(100vh-250px)] overflow-auto">
-        <Table body={table.body} head={table.head} />
+        {isLoading ? (
+          <TenantSkeleton />
+        ) : table.body.length === 0 ? (
+          <div className="w-full h-full flex justify-center items-center bg-white border border-gray-200 rounded">
+            <p className="text-xl font-semibold text-gray-500 mb-2">
+              No room availability found
+            </p>
+          </div>
+        ) : (
+          <Table body={table.body} head={table.head} />
+        )}
       </div>
       <PanelPagination
         limit={limit}

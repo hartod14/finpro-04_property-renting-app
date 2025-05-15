@@ -45,36 +45,67 @@ export default function HotelRecommendation() {
     updateParams({ cityID: [cityId] });
   };
 
+  // City tabs skeleton
+  const CityTabsSkeleton = () => (
+    <div className="mb-3 flex flex-wrap gap-3">
+      {[...Array(5)].map((_, index) => (
+        <div 
+          key={index} 
+          className="h-8 w-20 bg-gray-200 animate-pulse rounded-full"
+        ></div>
+      ))}
+    </div>
+  );
+
+  // Hotel card skeleton
+  const HotelCardsSkeleton = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 py-10">
+      {[...Array(4)].map((_, index) => (
+        <div
+          key={index}
+          className="bg-white border border-gray-100 shadow-lg rounded-lg h-[380px] animate-pulse"
+        >
+          <div className="w-full h-40 bg-gray-200 rounded-t-lg"></div>
+          <div className="p-3">
+            <div className="h-6 w-20 bg-gray-200 rounded-md mb-3"></div>
+            <div className="h-5 w-full bg-gray-200 rounded-md mb-2"></div>
+            <div className="h-4 w-1/2 bg-gray-200 rounded-md mb-4"></div>
+            <div className="h-4 w-24 bg-gray-200 rounded-md mb-4"></div>
+            <div className="mt-6 h-7 w-32 bg-gray-200 rounded-md"></div>
+            <div className="mt-2 h-3 w-36 bg-gray-200 rounded-md"></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <div>
-      <div className="mb-3">
-        <ul className="flex flex-wrap gap-3 text-sm font-medium text-center text-gray-500 ">
-          {cities.map((city) => (
-            <li key={city.id}>
-              <button
-                onClick={() => handleCityClick(city.id)}
-                className={`inline-block px-3 py-2 rounded-full border ${
-                  selectedCityId === city.id
-                    ? 'text-primary border-primary bg-blue-100'
-                    : 'border-gray-100 hover:text-gray-900 hover:bg-gray-100'
-                }`}
-              >
-                {city.name}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
+      {cities.length === 0 ? (
+        <CityTabsSkeleton />
+      ) : (
+        <div className="mb-3">
+          <ul className="flex flex-wrap gap-3 text-sm font-medium text-center text-gray-500 ">
+            {cities.map((city) => (
+              <li key={city.id}>
+                <button
+                  onClick={() => handleCityClick(city.id)}
+                  className={`inline-block px-3 py-2 rounded-full border ${
+                    selectedCityId === city.id
+                      ? 'text-primary border-primary bg-blue-100'
+                      : 'border-gray-100 hover:text-gray-900 hover:bg-gray-100'
+                  }`}
+                >
+                  {city.name}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 py-10">
-          {[...Array(4)].map((_, index) => (
-            <div
-              key={index}
-              className="bg-gray-100 animate-pulse h-64 rounded-lg"
-            ></div>
-          ))}
-        </div>
+        <HotelCardsSkeleton />
       ) : (
         <Swiper
           modules={[Navigation, Pagination]}
@@ -93,9 +124,12 @@ export default function HotelRecommendation() {
             properties.map((property) => (
               <SwiperSlide
                 key={property.id}
-                className="bg-white border border-gray-200 shadow-lg rounded-lg w-[250px]"
+                className="bg-white border border-gray-200 shadow-lg rounded-lg w-[250px] h-[380px] flex flex-col"
               >
-                <Link href={`/property/${property.slug}`} className="">
+                <Link
+                  href={`/property/${property.slug}`}
+                  className="flex flex-col h-[380px]"
+                >
                   <figure>
                     <Image
                       src={
@@ -109,12 +143,16 @@ export default function HotelRecommendation() {
                       className="w-full h-40 object-cover rounded-t-lg brightness-95"
                     />
                   </figure>
-                  <div className="">
-                    <div className="p-2">
-                      <span className="inline-block bg-primary/10 text-primary text-xs px-2 py-1 rounded-xl mb-1">
-                        {property.category.name}
-                      </span>
-                      <p className="font-semibold">{property.name}</p>
+                  <div className="flex flex-col flex-grow">
+                    <div className="p-3 flex flex-col h-full">
+                      <div>
+                        <span className="inline-block bg-primary/10 text-primary text-xs px-2 py-1 rounded-xl mb-1">
+                          {property.category.name}
+                        </span>
+                      </div>
+                      <p className="font-semibold line-clamp-2">
+                        {property.name}
+                      </p>
                       <div className="flex items-center text-gray-500 text-sm mt-1">
                         <FaMapMarkerAlt className="mr-1" />
                         <span>{property.city.name}</span>
@@ -157,36 +195,38 @@ export default function HotelRecommendation() {
                           </div>
                         )}
                       </div>
-                      {property.lowestPrice && (
-                        <>
-                          {property.adjusted_price &&
-                          property.adjusted_price !== property.lowestPrice ? (
-                            <>
-                              <p className="text-primary font-bold text-lg mt-5">
-                                IDR{' '}
-                                {Number(property.adjusted_price).toLocaleString(
-                                  'id-ID',
-                                )}
-                              </p>
-                              <p className="text-gray-400 text-xs">
-                                not including tax and fees
-                              </p>
-                            </>
-                          ) : (
-                            <>
-                              <p className="text-primary font-bold text-lg mt-5">
-                                IDR{' '}
-                                {Number(property.lowestPrice).toLocaleString(
-                                  'id-ID',
-                                )}
-                              </p>
-                              <p className="text-gray-400 text-xs">
-                                not including tax and fees
-                              </p>
-                            </>
-                          )}
-                        </>
-                      )}
+                      <div className="mt-auto">
+                        {property.lowestPrice && (
+                          <>
+                            {property.adjusted_price &&
+                            property.adjusted_price !== property.lowestPrice ? (
+                              <>
+                                <p className="text-primary font-bold text-lg mt-3">
+                                  IDR{' '}
+                                  {Number(
+                                    property.adjusted_price,
+                                  ).toLocaleString('id-ID')}
+                                </p>
+                                <p className="text-gray-400 text-xs">
+                                  not including tax and fees
+                                </p>
+                              </>
+                            ) : (
+                              <>
+                                <p className="text-primary font-bold text-lg mt-3">
+                                  IDR{' '}
+                                  {Number(property.lowestPrice).toLocaleString(
+                                    'id-ID',
+                                  )}
+                                </p>
+                                <p className="text-gray-400 text-xs">
+                                  not including tax and fees
+                                </p>
+                              </>
+                            )}
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </Link>

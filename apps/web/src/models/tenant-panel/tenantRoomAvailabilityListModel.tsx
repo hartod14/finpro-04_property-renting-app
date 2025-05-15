@@ -33,6 +33,7 @@ export default function TenantRoomAvailabilityListModel() {
   const [status, setStatus] = useState<string>('');
   const [total, setTotal] = useState<number>(0);
   const [totalPage, setTotalPage] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [table, setTable] = useState({
     head: ['No.', 'Unavailable Date', 'Room', 'Status', 'Note', 'Action'],
     body: [],
@@ -40,103 +41,112 @@ export default function TenantRoomAvailabilityListModel() {
   const router = useRouter();
 
   async function getRoomList() {
-    // loading?.setLoading(true);
+    setIsLoading(true);
 
     const body: any = [];
 
-    const res = await getAllRoomAvailability(search, page, limit, date, status);
+    try {
+      const res = await getAllRoomAvailability(
+        search,
+        page,
+        limit,
+        date,
+        status,
+      );
+      const data: IRoomAvailability[] = res.data;
+      const total_data: number = res.total_data;
 
-    const data: IRoomAvailability[] = res.data;
+      if (data) {
+        data.map((row, index) => {
+          body.push([
+            index + 1,
+            <p className="font-bold text-primary">
+              {`${formatDateOnly(row.start_date)} - ${formatDateOnly(row.end_date)}`}
+            </p>,
+            <div>
+              {(() => {
+                const roomsByProperty = row.roomHasUnavailableDates.reduce(
+                  (acc: any, item: any) => {
+                    const propertyId = item.room.property.id;
+                    const propertyName = item.room.property.name;
 
-    const total_data: number = res.total_data;
+                    if (!acc[propertyId]) {
+                      acc[propertyId] = {
+                        name: propertyName,
+                        city: item.room.property.city,
+                        rooms: [],
+                      };
+                    }
 
-    if (data) {
-      data.map((row, index) => {
-        body.push([
-          index + 1,
-          <p className="font-bold text-primary">
-            {`${formatDateOnly(row.start_date)} - ${formatDateOnly(row.end_date)}`}
-          </p>,
-          <div>
-            {(() => {
-              const roomsByProperty = row.roomHasUnavailableDates.reduce(
-                (acc: any, item: any) => {
-                  const propertyId = item.room.property.id;
-                  const propertyName = item.room.property.name;
+                    acc[propertyId].rooms.push(item.room);
+                    return acc;
+                  },
+                  {},
+                );
 
-                  if (!acc[propertyId]) {
-                    acc[propertyId] = {
-                      name: propertyName,
-                      city: item.room.property.city,
-                      rooms: [],
-                    };
-                  }
-
-                  acc[propertyId].rooms.push(item.room);
-                  return acc;
-                },
-                {},
-              );
-
-              return (
-                <div>
-                  {Object.values(roomsByProperty).map((property: any) => (
-                    <div key={property.name} className="mb-2">
-                      <div className="font-semibold text-primary2">
-                        {property.name}{' '}
-                        <span className="text-gray-500 font-normal">
-                          - {property.city.name}
-                        </span>
+                return (
+                  <div>
+                    {Object.values(roomsByProperty).map((property: any) => (
+                      <div key={property.name} className="mb-2">
+                        <div className="font-semibold text-primary2">
+                          {property.name}{' '}
+                          <span className="text-gray-500 font-normal">
+                            - {property.city.name}
+                          </span>
+                        </div>
+                        <ul
+                          style={{ listStyleType: 'disc', paddingLeft: '20px' }}
+                        >
+                          {property.rooms.map((room: any) => (
+                            <li key={room.id}>{room.name}</li>
+                          ))}
+                        </ul>
                       </div>
-                      <ul
-                        style={{ listStyleType: 'disc', paddingLeft: '20px' }}
-                      >
-                        {property.rooms.map((room: any) => (
-                          <li key={room.id}>{room.name}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                  {Object.keys(roomsByProperty).length === 0 && 'No rooms'}
-                </div>
-              );
-            })()}
-          </div>,
-          <div className="flex">
-            <StatusBadge status={row.status} />
-          </div>,
-          row.description,
-          <PanelButtonAction
-            key={'button'}
-            onDelete={async () => {
-              await deleteRoomAvailability(String(row.id));
-            }}
-            onUpdate={() => {
-              router.push(`/tenant/room-availability/edit/${row.id}`);
-            }}
-          />,
-        ]);
-      });
+                    ))}
+                    {Object.keys(roomsByProperty).length === 0 && 'No rooms'}
+                  </div>
+                );
+              })()}
+            </div>,
+            <div className="flex">
+              <StatusBadge status={row.status} />
+            </div>,
+            row.description,
+            <PanelButtonAction
+              key={'button'}
+              onDelete={async () => {
+                await deleteRoomAvailability(String(row.id));
+              }}
+              onUpdate={() => {
+                router.push(`/tenant/room-availability/edit/${row.id}`);
+              }}
+            />,
+          ]);
+        });
 
-      setTotal(total_data);
-      setTotalPage(Math.ceil(total_data / limit));
-      setTable({
-        ...table,
-        body: body,
-      });
-      // loading?.setLoading(false);
+        setTotal(total_data);
+        setTotalPage(Math.ceil(total_data / limit));
+        setTable({
+          ...table,
+          body: body,
+        });
+        // loading?.setLoading(false);
+      }
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
     }
   }
 
   async function deleteRoomAvailability(id: string) {
     try {
-      // loading?.setLoading(true);
+      setIsLoading(true);
       await deleteRoomAvailabilityData(id).then(() => {
         getRoomList();
       });
     } catch (error) {
     } finally {
-      // loading?.setLoading(false);
+      setIsLoading(false);
     }
   }
   useEffect(() => {
@@ -176,5 +186,6 @@ export default function TenantRoomAvailabilityListModel() {
     limit,
     total,
     totalPage,
+    isLoading,
   };
 }

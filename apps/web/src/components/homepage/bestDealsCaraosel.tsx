@@ -16,7 +16,26 @@ const images = [
   { image: "/homepage/bestdeals/banner5.png" },
 ];
 
-export default function BestDealsCarousel() {
+interface BestDealsCarouselProps {
+  loading?: boolean;
+}
+
+export default function BestDealsCarousel({ loading = false }: BestDealsCarouselProps) {
+  if (loading) {
+    return (
+      <div className="relative mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(3)].map((_, index) => (
+            <div 
+              key={index} 
+              className="bg-gray-200 animate-pulse h-52 rounded-lg"
+            ></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative">
       <Swiper

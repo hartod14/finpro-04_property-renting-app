@@ -34,6 +34,23 @@ export default function Home() {
     handleDateRangePickerChange,
   } = HomeModel();
 
+  // Loading states for different sections
+  const [pageLoading, setPageLoading] = useState(true);
+  const [dealsLoading, setDealsLoading] = useState(true);
+  
+  // Simulate data loading
+  useEffect(() => {
+    // Deals section loads second
+    setTimeout(() => {
+      setDealsLoading(false);
+    }, 1800);
+    
+    // Full page load complete
+    setTimeout(() => {
+      setPageLoading(false);
+    }, 2200);
+  }, []);
+
   // Setup click outside handler for dropdowns
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -76,7 +93,7 @@ export default function Home() {
         <div className="relative h-full pt-24 md:pt-32 sm:px-12 md:px-20 lg:px-30">
           <h1 className="mb-2 text-white text-center sm:text-left text-md sm:text-3xl font-bold">
             <p className="tracking-wide ps-6 sm:ps-0">
-              Find the right hotel today
+              Find the right property today
             </p>
           </h1>
           <div className="bg-primary2 p-4 sm:p-8 rounded-lg text-white">
@@ -207,6 +224,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      
       <section className="px-6 md:px-24 py-12">
         <div className="flex items-center gap-2">
           <Image
@@ -217,8 +235,9 @@ export default function Home() {
           />
           <h1 className="font-bold text-xl">Best deals for you</h1>
         </div>
-        <BestDealsCaraosel />
+        <BestDealsCaraosel loading={dealsLoading} />
       </section>
+      
       <section className="px-6 md:px-24">
         <div className="mb-2">
           <h1 className="font-bold text-xl mb-2">
@@ -231,6 +250,7 @@ export default function Home() {
         </div>
         <HotelRecommendation />
       </section>
+      
       <section className="px-6 md:px-24 py-12">
         <h1 className="font-bold text-xl mb-3">Why book with Stayza?</h1>
         <div className="lg:flex gap-5 w-full">
