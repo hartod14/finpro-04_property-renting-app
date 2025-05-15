@@ -1,4 +1,4 @@
-import { ErrorHandler } from '@/helpers/response.handler';
+import { ErrorHandler } from '../helpers/response.handler';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();

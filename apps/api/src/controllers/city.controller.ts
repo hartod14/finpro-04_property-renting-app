@@ -1,5 +1,5 @@
-import { responseHandler } from '@/helpers/response.handler';
-import cityService from '@/services/city.service';
+import { responseHandler } from '../helpers/response.handler';
+import cityService from '../services/city.service';
 import { NextFunction, Request, Response } from 'express';
 
 class CityController {

@@ -2,8 +2,8 @@ import { NextFunction, Request, Response } from 'express';
 import {
   responseHandler,
   responseHandlerPagination,
-} from '@/helpers/response.handler';
-import tenantSeasonRateService from '@/services/tenant-season-rate.service';
+} from '../helpers/response.handler';
+import tenantSeasonRateService from '../services/tenant-season-rate.service';
 
 class TenantSeasonRateController {
   async getAllData(req: Request, res: Response, next: NextFunction) {

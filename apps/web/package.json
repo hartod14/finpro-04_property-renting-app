@@ -35,7 +35,8 @@
     "sweetalert2": "^11.6.13",
     "swiper": "^11.1.15",
     "yup": "^1.6.1",
-    "yup-password": "^0.4.0"
+    "yup-password": "^0.4.0",
+    "axios": "^1.9.0"
   },
   "devDependencies": {
     "@types/node": "^20",

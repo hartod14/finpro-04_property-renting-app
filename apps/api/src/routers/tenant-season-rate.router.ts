@@ -1,4 +1,4 @@
-import tenantSeasonRateController from '@/controllers/tenant-season-rate.controller';
+import tenantSeasonRateController from '../controllers/tenant-season-rate.controller';
 import { Router } from 'express';
 
 export const tenantSeasonRateRouter = () => {

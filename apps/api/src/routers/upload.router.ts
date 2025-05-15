@@ -1,7 +1,7 @@
 /** @format */
 
-import uploadController from '@/controllers/upload.controller';
-import { uploadSingleFile } from '@/helpers/multer';
+import uploadController from '../controllers/upload.controller';
+import { uploadSingleFile } from '../helpers/multer';
 import { Router } from 'express';
 
 export const uploadRouter = () => {

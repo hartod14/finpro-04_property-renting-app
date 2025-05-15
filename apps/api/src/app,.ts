@@ -40,9 +40,30 @@ export default class App {
   }
 
   private configure(): void {
+    this.app.use(
+      cors({
+        origin: [
+          'http://localhost:3000',
+          'https://stayza-renting-property.vercel.app',
+        ],
+        credentials: true,
+      }),
+    );
+    this.app.options('*', (req, res) => {
+      res.header(
+        'Access-Control-Allow-Origin',
+        'https://stayza-renting-property.vercel.app',
+      );
+      res.header(
+        'Access-Control-Allow-Methods',
+        'GET, POST, PUT, DELETE, OPTIONS',
+      );
+      res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      res.header('Access-Control-Allow-Credentials', 'true');
+      res.sendStatus(204);
+    });
     this.app.use(express.json());
-    this.app.use(cors());
-    // this.app.use(urlencoded({ extended: true }));
+    this.app.use(urlencoded({ extended: true }));
   }
 
   private handleError() {
@@ -92,7 +113,7 @@ export default class App {
       verifyUser,
       tenantRoomAvailabilityRouter(),
     );
-    
+
     this.app.use(
       '/api/tenant-season-rate',
       verifyUser,
@@ -101,7 +122,7 @@ export default class App {
 
     // review
     this.app.use('/api/review', reviewRouter());
-    
+
     // report
     this.app.use('/api/report', reportRouter());
 

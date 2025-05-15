@@ -1,6 +1,6 @@
-import { prisma } from '@/config';
+import { prisma } from '../config';
 import { Request } from 'express';
-import { pagination } from '@/helpers/pagination';
+import { pagination } from '../helpers/pagination';
 import { log } from 'console';
 
 class PropertyService {

@@ -1,8 +1,8 @@
 import {
   responseHandler,
   responseHandlerPagination,
-} from '@/helpers/response.handler';
-import categoryService from '@/services/category.service';
+} from '../helpers/response.handler';
+import categoryService from '../services/category.service';
 import { NextFunction, Request, Response } from 'express';
 
 class CategoryController {

@@ -7,8 +7,8 @@
     "test": "turbo run test",
     "serve": "turbo run serve",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "prepare": "husky install",
-    "postprepare": "bash -c 'chmod ug+x .husky/*'"
+    "prepare": "node -e \"if(process.env.VERCEL) process.exit(0); require('husky').install()\"",
+    "postprepare": "node -e \"if(process.env.VERCEL) process.exit(0); require('child_process').execSync('bash -c \\'chmod ug+x .husky/*\\'')\""
   },
   "devDependencies": {
     "@commitlint/cli": "^18.4.2",

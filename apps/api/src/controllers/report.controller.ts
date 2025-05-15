@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ReportService } from "@/services/report.service";
+import { ReportService } from "../services/report.service";
 
 const reportService = new ReportService();
 

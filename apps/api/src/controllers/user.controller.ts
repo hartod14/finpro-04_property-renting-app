@@ -1,5 +1,5 @@
-import { responseHandler } from "@/helpers/response.handler";
-import userService from "@/services/user.service";
+import { responseHandler } from "../helpers/response.handler";
+import userService from "../services/user.service";
 import { NextFunction, Request, Response } from "express";
 
 class UserController {

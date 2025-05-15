@@ -1,8 +1,8 @@
 import {
   responseHandler,
   responseHandlerPagination,
-} from '@/helpers/response.handler';
-import tenantPropertyService from '@/services/tenant-property.service';
+} from '../helpers/response.handler';
+import tenantPropertyService from '../services/tenant-property.service';
 import { NextFunction, Request, Response } from 'express';
 
 class TenantPropertyController {

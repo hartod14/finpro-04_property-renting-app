@@ -1,8 +1,8 @@
 /** @format */
 
 import { Request } from 'express';
-import { cloudinaryUpload } from '@/helpers/cloudinary';
-import { ErrorHandler } from '@/helpers/response.handler';
+import { cloudinaryUpload } from '../helpers/cloudinary';
+import { ErrorHandler } from '../helpers/response.handler';
 
 class UploadImageService {
   async uploadImage(req: Request) {

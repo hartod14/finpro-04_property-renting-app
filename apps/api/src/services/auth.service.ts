@@ -13,7 +13,7 @@ import { hbs } from '../helpers/handlebars';
 import {
   decodeVerificationJwt,
   verificationJwt,
-} from '@/helpers/verification.jwt';
+} from '../helpers/verification.jwt';
 import { decode } from 'jsonwebtoken';
 
 interface AuthenticatedRequest extends Request {

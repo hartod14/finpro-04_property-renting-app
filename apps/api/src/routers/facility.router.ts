@@ -1,4 +1,4 @@
-import facilityController from "@/controllers/facility.controller"
+import facilityController from "../controllers/facility.controller"
 import { Router } from "express"
 
 export const facilityRouter = () => {

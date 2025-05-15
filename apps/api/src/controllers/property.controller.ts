@@ -1,5 +1,5 @@
-import { responseHandler } from '@/helpers/response.handler';
-import propertyService from '@/services/property.service';
+import { responseHandler } from '../helpers/response.handler';
+import propertyService from '../services/property.service';
 import { NextFunction, Request, Response } from 'express';
 
 class PropertyController {

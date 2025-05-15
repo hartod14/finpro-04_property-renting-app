@@ -1,5 +1,5 @@
-import { responseHandler } from '@/helpers/response.handler';
-import facilityService from '@/services/facility.service';
+import { responseHandler } from '../helpers/response.handler';
+import facilityService from '../services/facility.service';
 import { NextFunction, Request, Response } from 'express';
 
 class FacilityController {

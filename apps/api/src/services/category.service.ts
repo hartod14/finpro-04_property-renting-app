@@ -1,9 +1,4 @@
-import { prisma } from '@/config';
-import { pagination } from '@/helpers/pagination';
-import { ErrorHandler } from '@/helpers/response.handler';
-import { decodeVerificationJwt } from '@/helpers/verification.jwt';
-import { Request } from 'express';
-import { decode } from 'jsonwebtoken';
+import { prisma } from '../config';
 
 class CategoryService {
   async getAllData() {
