@@ -7,7 +7,7 @@ import TenantSidebar from '@/components/common/sidebar/tenantSidebar';
 import { forgetPassword, sendOnlyVerificationEmail } from '@/handlers/auth';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import Swal from 'sweetalert2';
 
 type Props = {
@@ -16,8 +16,10 @@ type Props = {
 
 export default function TenantPanelTemplate({ children }: Props) {
   return (
-    <div className="bg-[#F4F7FE] px-4 md:px-8 pt-24 md:pt-28 pb-6 md:pb-10">
-      <TenantSidebar>{children}</TenantSidebar>
-    </div>
+    <Suspense fallback={<div></div>}>
+      <div className="bg-[#F4F7FE] px-4 md:px-8 pt-24 md:pt-28 pb-6 md:pb-10">
+        <TenantSidebar>{children}</TenantSidebar>
+      </div>
+    </Suspense>
   );
 }
