@@ -28,6 +28,7 @@ import { tenantRoomAvailabilityRouter } from './routers/tenant-room-availability
 import { tenantSeasonRateRouter } from './routers/tenant-season-rate.router';
 import reviewRouter from './routers/review.router';
 import reportRouter from './routers/report.router';
+import { expireUnpaidBookings } from './services/payment.services';
 
 export default class App {
   private app: Application;
@@ -88,6 +89,19 @@ export default class App {
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send('Hello, Purwadhika Student API!');
+    });
+
+    this.app.get('/api/cron', async (req: Request, res: Response) => {
+      try {
+        const result = await expireUnpaidBookings();
+        if (result.count > 0) {
+          console.log(
+            `${result.count} unpaid booking(s) have been marked as EXPIRED.`,
+          );
+        }
+      } catch (error) {
+        console.error('Error in scheduled expireUnpaidBookings:', error);
+      }
     });
 
     //global
