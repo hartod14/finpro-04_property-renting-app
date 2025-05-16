@@ -19,18 +19,23 @@ import { IProperty, IRoom } from '@/interfaces/property.interface';
 import { IRoomAvailability } from '@/interfaces/room-availability.interface';
 import { formatDateOnly, formatTimeOnly } from '@/utils/formatters';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 import React, { useContext, useEffect, useState } from 'react';
 import { FaUser } from 'react-icons/fa';
 
 export default function TenantRoomAvailabilityListModel() {
-  // const loading = useContext(LoadingContext);
-  const [page, setPage] = useState<number>(1);
-  const [search, setSearch] = useState<string>('');
-  const [limit, setLimit] = useState<number>(15);
-  const [date, setDate] = useState<string>('');
-  const [status, setStatus] = useState<string>('');
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  
+  // Initialize state from URL query params
+  const [page, setPage] = useState<number>(Number(searchParams.get('page')) || 1);
+  const [search, setSearch] = useState<string>(searchParams.get('search') || '');
+  const [limit, setLimit] = useState<number>(Number(searchParams.get('limit')) || 15);
+  const [date, setDate] = useState<string>(searchParams.get('date') || '');
+  const [status, setStatus] = useState<string>(searchParams.get('status') || '');
   const [total, setTotal] = useState<number>(0);
   const [totalPage, setTotalPage] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -38,7 +43,51 @@ export default function TenantRoomAvailabilityListModel() {
     head: ['No.', 'Unavailable Date', 'Room', 'Status', 'Note', 'Action'],
     body: [],
   });
-  const router = useRouter();
+
+  // Update URL when filters change
+  const updateUrlWithFilters = () => {
+    let params = new URLSearchParams(searchParams.toString());
+    params.set('page', page.toString());
+    params.set('limit', limit.toString());
+    if (search) {
+      params.set('search', search);
+    } else {
+      params.delete('search');
+    }
+    if (date) {
+      params.set('date', date);
+    } else {
+      params.delete('date');
+    }
+    if (status) {
+      params.set('status', status);
+    } else {
+      params.delete('status');
+    }
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  // Custom setter functions that update URL
+  const handleSetPage = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleSetLimit = (newLimit: number) => {
+    setLimit(newLimit);
+    setPage(1); // Reset to first page when changing limit
+  };
+
+  const handleSetSearch = (newSearch: string) => {
+    setSearch(newSearch);
+  };
+
+  const handleSetDate = (newDate: string) => {
+    setDate(newDate);
+  };
+
+  const handleSetStatus = (newStatus: string) => {
+    setStatus(newStatus);
+  };
 
   async function getRoomList() {
     setIsLoading(true);
@@ -130,9 +179,9 @@ export default function TenantRoomAvailabilityListModel() {
           ...table,
           body: body,
         });
-        // loading?.setLoading(false);
       }
     } catch (error) {
+      console.error("Error fetching room availability:", error);
     } finally {
       setIsLoading(false);
     }
@@ -145,38 +194,27 @@ export default function TenantRoomAvailabilityListModel() {
         getRoomList();
       });
     } catch (error) {
-    } finally {
+      console.error("Error deleting room availability:", error);
       setIsLoading(false);
     }
   }
-  useEffect(() => {
-    getRoomList();
-  }, [page, limit]);
 
+  // Consolidated useEffect to handle all filter changes
   useEffect(() => {
     const handler = setTimeout(() => {
-      setPage(1);
+      updateUrlWithFilters();
       getRoomList();
     }, 300);
 
     return () => clearTimeout(handler);
-  }, [search]);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setPage(1);
-      getRoomList();
-    }, 300);
-
-    return () => clearTimeout(handler);
-  }, [date, status]);
+  }, [page, limit, search, date, status]);
 
   return {
-    setPage,
-    setLimit,
-    setSearch,
-    setDate,
-    setStatus,
+    setPage: handleSetPage,
+    setLimit: handleSetLimit,
+    setSearch: handleSetSearch,
+    setDate: handleSetDate,
+    setStatus: handleSetStatus,
     search,
     date,
     status,

@@ -7,6 +7,7 @@ import TenantRoomAvailabilityListModel from '@/models/tenant-panel/tenantRoomAva
 import Table from '@/components/common/table/table';
 import Link from 'next/link';
 import { TenantSkeleton } from '@/components/common/tenant/tenantSkeleton';
+import { SetStateAction, Dispatch } from 'react';
 
 export default function TenantRoomAvailabilityPage() {
   const {
@@ -99,8 +100,8 @@ export default function TenantRoomAvailabilityPage() {
       <PanelPagination
         limit={limit}
         page={page}
-        setPage={setPage}
-        setLimit={setLimit}
+        setPage={setPage as Dispatch<SetStateAction<number>>}
+        setLimit={setLimit as Dispatch<SetStateAction<number>>}
         total={total}
         totalPage={totalPage}
         totalPerPage={table.body.length}

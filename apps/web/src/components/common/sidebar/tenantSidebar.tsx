@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import DefaultImage from '@/../public/default_avatar.jpg';
 import Image from 'next/image';
-import { FaList, FaHotel, FaLock, FaSignOutAlt, FaUser, FaCalendar, FaCalendarCheck, FaProjectDiagram } from 'react-icons/fa';
+import { FaList, FaHotel, FaLock, FaSignOutAlt, FaUser, FaCalendar, FaCalendarCheck, FaProjectDiagram, FaArrowLeft } from 'react-icons/fa';
 
 type Props = {
   children: React.ReactNode;
@@ -24,7 +24,7 @@ export default function TenantSidebar({ children }: Props) {
 
     // { href: '/user/booking', icon: <FaShoppingBag />, label: 'My Booking' },
     { href: '/tenant/property', icon: <FaHotel />, label: 'Property' },
-    { href: '/tenant/room-availability', icon: <FaLock />, label: 'Room Availability' },
+    { href: '/tenant/room-availability', icon: <FaLock />, label: 'Room Unvailability' },
     { href: '/tenant/season-rate', icon: <FaCalendar />, label: 'Season Rate' },
     { href: '/tenant/orders', icon: <FaCalendarCheck />, label: 'Orders' },
     { href: '/tenant/report', icon: <FaProjectDiagram />, label: 'Report' },
@@ -62,24 +62,8 @@ export default function TenantSidebar({ children }: Props) {
                   href={'/'}
                   className="flex items-center gap-2 hover:bg-gray-700 p-2 rounded mb-3"
                 >
-                  <svg
-                    className="w-6 h-6 text-white"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 12h14M5 12l4-4m-4 4 4 4"
-                    />
-                  </svg>
-                  <span className="text-lg">Homepage</span>
+                  <FaArrowLeft />
+                  <span className="text">Back to Homepage</span>
                 </Link>
               </li>
             </ul>

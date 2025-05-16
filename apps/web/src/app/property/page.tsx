@@ -32,11 +32,11 @@ import ErrorPage from '@/components/common/error/errorPage';
 // Helper function to format dates for URL consistently
 const formatDateForUrl = (date: Date): string => {
   if (!date) return '';
-  
+
   // Normalize the date to avoid timezone issues
   const normalizedDate = new Date(date);
   normalizedDate.setHours(0, 0, 0, 0);
-  
+
   // Return ISO string format for consistent parsing
   return normalizedDate.toISOString();
 };
@@ -86,8 +86,8 @@ export default function PropertyPage() {
     setLimit,
     totalItems,
     totalPages,
+    clearFilters,
   } = PropertyModel();
-
 
   if (error) {
     return (
@@ -142,7 +142,7 @@ export default function PropertyPage() {
                   : 'Number of people'}
               </span>
             </button>
-  
+
             {/* Dropdown menu */}
             <div
               id="guestDropdown"
@@ -188,6 +188,14 @@ export default function PropertyPage() {
         <div className="flex flex-col md:flex-row">
           {/* Mobile Filter Buttons */}
           <div className="md:hidden w-full mb-6">
+            <div className="mb-3">
+              <button
+                onClick={clearFilters}
+                className="text-primary underline font-medium hover:text-primary/80 transition-colors"
+              >
+                Clear All Filters
+              </button>
+            </div>
             <div className="grid grid-cols-2 gap-2">
               {/* Category Button */}
               <button
@@ -418,6 +426,16 @@ export default function PropertyPage() {
 
           {/* Sidebar - Desktop Only */}
           <div className="hidden md:block md:w-1/4 md:pr-4 mb-6 md:mb-0">
+            {/* Clear Filters Button */}
+            <div className="mb-3">
+              <button
+                onClick={clearFilters}
+                className="text-primary underline font-medium hover:text-primary/80 transition-colors"
+              >
+                Clear All Filters
+              </button>
+            </div>
+
             {/* Category Section */}
             <div className="border rounded p-4 mb-4 bg-white shadow-sm">
               <h2 className="font-bold mb-3 flex items-center">
@@ -689,7 +707,9 @@ export default function PropertyPage() {
                     href={`/property/${property.slug}${
                       dateRange.from || dateRange.to || searchAdults
                         ? `?${dateRange.from ? `startDate=${formatDateForUrl(dateRange.from)}` : ''}${
-                            dateRange.to ? `${dateRange.from ? '&' : ''}endDate=${formatDateForUrl(dateRange.to)}` : ''
+                            dateRange.to
+                              ? `${dateRange.from ? '&' : ''}endDate=${formatDateForUrl(dateRange.to)}`
+                              : ''
                           }${
                             searchAdults
                               ? `${dateRange.from || dateRange.to ? '&' : ''}adults=${searchAdults}&capacity=${searchAdults}`
@@ -751,33 +771,49 @@ export default function PropertyPage() {
                                   />
                                 </div>
                                 <div className="pt-2">
-                                  {property.reviews && property.reviews.length > 0 ? (
+                                  {property.reviews &&
+                                  property.reviews.length > 0 ? (
                                     <>
                                       <span className="font-semibold text-gray-700">
-                                        {(property.reviews.reduce((acc, review) => acc + review.rating, 0) / property.reviews.length).toFixed(1)}
+                                        {(
+                                          property.reviews.reduce(
+                                            (acc, review) =>
+                                              acc + review.rating,
+                                            0,
+                                          ) / property.reviews.length
+                                        ).toFixed(1)}
                                       </span>
                                       /5
                                     </>
                                   ) : (
-                                    <span className="font-semibold text-gray-700">No ratings yet</span>
+                                    <span className="font-semibold text-gray-700">
+                                      No ratings yet
+                                    </span>
                                   )}
                                 </div>
                                 <div className="pt-2">
-                                  {property.reviews && property.reviews.length > 0 
-                                    ? `(${property.reviews.length} ${property.reviews.length === 1 ? 'review' : 'reviews'})` 
+                                  {property.reviews &&
+                                  property.reviews.length > 0
+                                    ? `(${property.reviews.length} ${property.reviews.length === 1 ? 'review' : 'reviews'})`
                                     : '(No reviews yet)'}
                                 </div>
                               </div>
                               {property.lowestPriceRoom && (
                                 <>
-                                  {property.lowestPriceRoom.adjusted_price && 
-                                    Number(property.lowestPriceRoom.adjusted_price) !== Number(property.lowestPriceRoom.base_price) ? (
+                                  {property.lowestPriceRoom.adjusted_price &&
+                                  Number(
+                                    property.lowestPriceRoom.adjusted_price,
+                                  ) !==
+                                    Number(
+                                      property.lowestPriceRoom.base_price,
+                                    ) ? (
                                     <>
                                       <div className="flex items-center mt-6">
                                         <p className="text-primary font-bold text-lg">
                                           IDR{' '}
                                           {Number(
-                                            property.lowestPriceRoom.adjusted_price,
+                                            property.lowestPriceRoom
+                                              .adjusted_price,
                                           ).toLocaleString('id-ID')}
                                         </p>
                                       </div>

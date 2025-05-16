@@ -8,10 +8,12 @@ import { PropertyFilterParams, getAllProperty } from '@/handlers/property';
 import { ICategory } from '@/interfaces/category.interface';
 import { ICity } from '@/interfaces/city.interface';
 import { IFacility } from '@/interfaces/facility.interface';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 
 export default function PropertyModel() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
 
   type FilterName = 'category' | 'propertyName' | 'facility' | 'city';
   type SortDirection = 'asc' | 'desc';
@@ -38,8 +40,8 @@ export default function PropertyModel() {
   const [error, setError] = useState('');
 
   // Pagination states
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [page, setPage] = useState(parseInt(searchParams.get('page') || '1', 10));
+  const [limit, setLimit] = useState(parseInt(searchParams.get('limit') || '10', 10));
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -73,16 +75,66 @@ export default function PropertyModel() {
     to: endDate,
   });
 
-  const [selectedCategoryNames, setSelectedCategoryNames] = useState<string[]>([]);
-  const [selectedTenants, setSelectedTenants] = useState<number[]>([]);
-  const [selectedFacilities, setSelectedFacilities] = useState<number[]>([]);
-  const [selectedCities, setSelectedCities] = useState<number[]>([]);
+  // Initialize filter states from URL parameters
+  const [selectedCategoryNames, setSelectedCategoryNames] = useState<string[]>(
+    searchParams.get('categoryName')?.split(',') || []
+  );
+  
+  const [selectedTenants, setSelectedTenants] = useState<number[]>(
+    searchParams.get('tenantID')?.split(',').map(Number) || []
+  );
+  
+  const [selectedFacilities, setSelectedFacilities] = useState<number[]>(
+    searchParams.get('facilityID')?.split(',').map(Number) || []
+  );
+  
+  const [selectedCities, setSelectedCities] = useState<number[]>(
+    searchParams.get('cityID')?.split(',').map(Number) || []
+  );
 
-  const [sortValue, setSortValue] = useState<SortDirection>('asc');
-  const [priceValue, setPriceValue] = useState<PriceDirection>('low-to-high');
+  const [sortValue, setSortValue] = useState<SortDirection>(
+    (searchParams.get('sortBy') === 'name' && searchParams.get('sortOrder') as SortDirection) || 'asc'
+  );
+  
+  const [priceValue, setPriceValue] = useState<PriceDirection>(
+    searchParams.get('sortBy') === 'price' 
+      ? (searchParams.get('sortOrder') === 'asc' ? 'low-to-high' : 'high-to-low')
+      : 'low-to-high'
+  );
 
   const sortRef = useRef<HTMLDivElement>(null);
   const priceRef = useRef<HTMLDivElement>(null);
+
+  // Function to update URL with current filter parameters
+  const updateURL = (filters: PropertyFilterParams) => {
+    // Create a URLSearchParams object
+    const params = new URLSearchParams();
+    
+    // Add all filters to the URL
+    if (Array.isArray(filters.categoryName) && filters.categoryName.length) {
+      params.set('categoryName', filters.categoryName.join(','));
+    }
+    if (Array.isArray(filters.tenantID) && filters.tenantID.length) {
+      params.set('tenantID', filters.tenantID.join(','));
+    }
+    if (Array.isArray(filters.facilityID) && filters.facilityID.length) {
+      params.set('facilityID', filters.facilityID.join(','));
+    }
+    if (Array.isArray(filters.cityID) && filters.cityID.length) {
+      params.set('cityID', filters.cityID.join(','));
+    }
+    if (filters.sortBy) params.set('sortBy', filters.sortBy);
+    if (filters.sortOrder) params.set('sortOrder', filters.sortOrder);
+    if (filters.searchTerm) params.set('searchTerm', filters.searchTerm);
+    if (filters.startDate) params.set('startDate', filters.startDate);
+    if (filters.endDate) params.set('endDate', filters.endDate);
+    if (filters.capacity) params.set('capacity', filters.capacity.toString());
+    if (filters.page) params.set('page', filters.page.toString());
+    if (filters.limit) params.set('limit', filters.limit.toString());
+    
+    // Update the URL without refreshing the page
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   const fetchProperties = async () => {
     try {
@@ -124,6 +176,9 @@ export default function PropertyModel() {
       // Add pagination parameters
       filters.page = page;
       filters.limit = limit;
+
+      // Update URL with current filters
+      updateURL(filters);
 
       const data = await getAllProperty(filters);
 
@@ -196,6 +251,55 @@ export default function PropertyModel() {
     searchTerm,
     searchAdults,
   ]);
+
+  // Handle URL changes (back/forward navigation)
+  useEffect(() => {
+    const handleRouteChange = () => {
+      const newSearchParams = new URLSearchParams(window.location.search);
+      
+      // Update state from URL parameters
+      setPage(parseInt(newSearchParams.get('page') || '1', 10));
+      setLimit(parseInt(newSearchParams.get('limit') || '10', 10));
+      setSearchTerm(newSearchParams.get('searchTerm') || '');
+      setSearchAdults(newSearchParams.get('capacity') || '2');
+      
+      const newCategories = newSearchParams.get('categoryName')?.split(',') || [];
+      const newTenants = newSearchParams.get('tenantID')?.split(',').map(Number) || [];
+      const newFacilities = newSearchParams.get('facilityID')?.split(',').map(Number) || [];
+      const newCities = newSearchParams.get('cityID')?.split(',').map(Number) || [];
+      
+      setSelectedCategoryNames(newCategories);
+      setSelectedTenants(newTenants);
+      setSelectedFacilities(newFacilities);
+      setSelectedCities(newCities);
+      
+      const newSortBy = newSearchParams.get('sortBy') || 'name';
+      const newSortOrder = newSearchParams.get('sortOrder') || 'asc';
+      
+      if (newSortBy === 'price') {
+        setPriceValue(newSortOrder === 'asc' ? 'low-to-high' : 'high-to-low');
+      } else {
+        setSortValue(newSortOrder as SortDirection);
+        setPriceValue(null as any);
+      }
+      
+      // Update date range
+      const newStartDate = newSearchParams.get('startDate');
+      const newEndDate = newSearchParams.get('endDate');
+      
+      setDateRange({
+        from: newStartDate ? new Date(newStartDate) : undefined,
+        to: newEndDate ? new Date(newEndDate) : undefined,
+      });
+    };
+
+    // Set up event listener for URL changes
+    window.addEventListener('popstate', handleRouteChange);
+    
+    return () => {
+      window.removeEventListener('popstate', handleRouteChange);
+    };
+  }, []);
 
   async function getCityList() {
     const cities = await getAllCity();
@@ -446,6 +550,14 @@ export default function PropertyModel() {
     fetchProperties();
   };
 
+  const clearFilters = () => {
+    setSelectedCategoryNames([]);
+    setSelectedTenants([]);
+    setSelectedFacilities([]);
+    setSelectedCities([]);
+    setPage(1);
+  };
+
   return {
     openFilters,
     openDropdown,
@@ -483,6 +595,7 @@ export default function PropertyModel() {
     handleDateRangeChange,
     handleDateRangePickerChange,
     setOpenFilters,
+    clearFilters,
     // Pagination props
     page,
     setPage,

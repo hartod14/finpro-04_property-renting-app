@@ -7,6 +7,8 @@ import { use } from 'react';
 import { FaArrowLeft, FaPlus, FaSearch } from 'react-icons/fa';
 import Table from '@/components/common/table/table';
 import Link from 'next/link';
+import { TenantSkeleton } from '@/components/common/tenant/tenantSkeleton';
+import { SetStateAction, Dispatch } from 'react';
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -25,6 +27,7 @@ export default function TenantPropertyRoomPage({ params }: Props) {
     limit,
     total,
     totalPage,
+    isLoading,
   } = TenantPropertyRoomListModel(resolvedParams.id);
 
   return (
@@ -64,13 +67,23 @@ export default function TenantPropertyRoomPage({ params }: Props) {
         </div>
       </div>
       <div className="relative h-[calc(100vh-250px)] overflow-auto">
-        <Table body={table.body} head={table.head} />
+        {isLoading ? (
+          <TenantSkeleton />
+        ) : table.body.length === 0 ? (
+          <div className="w-full h-full flex justify-center items-center bg-white border border-gray-200 rounded">
+            <p className="text-xl font-semibold text-gray-500 mb-2">
+              No rooms found
+            </p>
+          </div>
+        ) : (
+          <Table body={table.body} head={table.head} />
+        )}
       </div>
       <PanelPagination
         limit={limit}
         page={page}
-        setPage={setPage}
-        setLimit={setLimit}
+        setPage={setPage as Dispatch<SetStateAction<number>>}
+        setLimit={setLimit as Dispatch<SetStateAction<number>>}
         total={total}
         totalPage={totalPage}
         totalPerPage={table.body.length}

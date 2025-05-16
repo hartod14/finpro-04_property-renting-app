@@ -152,7 +152,7 @@ export default function Home() {
                     htmlFor="guest-room"
                     className="block mb-2 font-medium"
                   >
-                    Guest & rooms
+                    Guest
                   </label>
                   <div className="relative bg-gray-50 border border-gray-300 text-gray-900 rounded-l-lg sm:rounded-l-none rounded-r-lg focus:outline-none focus:ring-0 focus:border-gray-300 block w-full px-3 py-[14px]">
                     <button

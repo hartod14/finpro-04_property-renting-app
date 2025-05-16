@@ -59,10 +59,7 @@ class PropertyService {
         { address: { contains: String(searchTerm), mode: 'insensitive' } },
       ];
     }
-    // const totalProperties = await prisma.property.count({
-    //   where: filters,
-    // });
-
+    
     const properties = await prisma.property.findMany({
       where: filters,
       include: {
@@ -113,18 +110,15 @@ class PropertyService {
         sortBy === 'name'
           ? { name: sortOrder === 'asc' ? 'asc' : 'desc' }
           : undefined,
-      ...pagination(pageNumber, limitNumber),
     });
 
-    // Filter out rooms that are unavailable during the requested dates
+    // Filter unavailable date
     let filteredProperties = properties;
 
     if (startDate && endDate) {
-      // Convert query parameters to Date objects and set to start of day
       const requestStartDate = new Date(String(startDate));
       const requestEndDate = new Date(String(endDate));
 
-      // Remove time component for cleaner comparison
       const normalizeDate = (date: Date): string => {
         return date.toISOString().split('T')[0];
       };
@@ -132,12 +126,10 @@ class PropertyService {
       const requestStartStr = normalizeDate(requestStartDate);
       const requestEndStr = normalizeDate(requestEndDate);
 
-      // Get all dates in the range excluding checkout date
       const getDatesInRange = (start: Date, end: Date): string[] => {
         const dates: string[] = [];
         const currentDate = new Date(start);
 
-        // End date is exclusive (checkout date)
         const endDateExclusive = new Date(end);
 
         while (currentDate < endDateExclusive) {
@@ -150,7 +142,6 @@ class PropertyService {
       filteredProperties = filteredProperties.map((property) => {
         // Filter out unavailable rooms (from unavailable dates or fully booked)
         const availableRooms = property.rooms.filter((room) => {
-          // First check unavailable dates
           const hasUnavailableDates = room.roomHasUnavailableDates.some(
             (unavailable) => {
               const roomStartDate = new Date(
@@ -163,7 +154,6 @@ class PropertyService {
               const roomStartStr = normalizeDate(roomStartDate);
               const roomEndStr = normalizeDate(roomEndDate);
 
-              // If start date of request falls on any day in the unavailable range
               if (
                 requestStartStr >= roomStartStr &&
                 requestStartStr <= roomEndStr
@@ -171,7 +161,6 @@ class PropertyService {
                 return true;
               }
 
-              // If end date of request falls on any day in the unavailable range
               if (
                 requestEndStr >= roomStartStr &&
                 requestEndStr <= roomEndStr
@@ -179,7 +168,6 @@ class PropertyService {
                 return true;
               }
 
-              // If request period completely contains the unavailable period
               if (
                 requestStartStr <= roomStartStr &&
                 requestEndStr >= roomEndStr
@@ -191,37 +179,29 @@ class PropertyService {
             },
           );
 
-          // If room has unavailable dates during the requested period, exclude it
           if (hasUnavailableDates) {
             return false;
           }
 
-          // Now check bookings to calculate available rooms
           if (room.bookings && room.bookings.length > 0) {
-            // Create a map to store booked room count for each date
             const dateBookingMap: Record<string, number> = {};
 
-            // Calculate all dates in request range (excluding checkout date)
             const requestDates = getDatesInRange(
               requestStartDate,
               requestEndDate,
             );
 
-            // Initialize booking count for each date
             requestDates.forEach((date) => {
               dateBookingMap[date] = 0;
             });
 
-            // Count bookings for each date in the requested range
             for (const booking of room.bookings) {
-              // Only consider DONE bookings
               if (booking.status !== 'DONE') continue;
 
               const bookingStart = new Date(booking.checkin_date);
               const bookingEnd = new Date(booking.checkout_date);
               const bookingDates = getDatesInRange(bookingStart, bookingEnd);
 
-              // Increase booking count for each date that overlaps with the request
               bookingDates.forEach((date) => {
                 if (requestDates.includes(date)) {
                   dateBookingMap[date] = (dateBookingMap[date] || 0) + 1;
@@ -229,17 +209,13 @@ class PropertyService {
               });
             }
 
-            // Find the maximum number of bookings on any single day
             const maxBookings = Math.max(...Object.values(dateBookingMap), 0);
 
-            // Calculate rooms left
             const roomsLeft = room.total_room - maxBookings;
 
-            // Include the room only if there are rooms left
             return roomsLeft > 0;
           }
 
-          // If no bookings or no unavailable dates, room is available
           return true;
         });
 
@@ -249,12 +225,10 @@ class PropertyService {
         };
       });
 
-      // Filter out properties with no available rooms
       filteredProperties = filteredProperties.filter(
         (property) => property.rooms.length > 0,
       );
     } else {
-      // If no date filter, just ensure properties have at least one room
       filteredProperties = filteredProperties.filter(
         (property) => property.rooms.length > 0,
       );
@@ -263,8 +237,8 @@ class PropertyService {
     if (facilityID) {
       const facilityIds = String(facilityID).split(',').map(Number);
       filteredProperties = filteredProperties.filter((property) => {
-        return property.propertyHasFacilities.some((pf) =>
-          facilityIds.includes(pf.facility_id),
+        return facilityIds.every(id => 
+          property.propertyHasFacilities.some(pf => pf.facility_id === id)
         );
       });
     }
@@ -283,8 +257,7 @@ class PropertyService {
       });
     }
 
-    if (sortBy === 'price') {
-      // When sorting by price, ensure we compare based on the adjusted price when available
+    if (sortBy == 'price') {
       filteredProperties.sort((a, b) => {
         const aRooms = capacity
           ? a.rooms.filter((room) => room.capacity >= Number(capacity))
@@ -294,25 +267,20 @@ class PropertyService {
           ? b.rooms.filter((room) => room.capacity >= Number(capacity))
           : b.rooms;
 
-        // Helper function to get the effective price of a room
         const getEffectivePrice = (room: any) => {
           if (!room) return Number.MAX_SAFE_INTEGER;
 
-          // Start with base price
           let price = Number(room.base_price);
 
-          // If we have date filters and the room has peak season rates, calculate adjusted price
           if (startDate && endDate && room.roomHasPeakSeasonRates?.length > 0) {
             const requestStartDate = new Date(String(startDate));
             const requestEndDate = new Date(String(endDate));
 
-            // Look for applicable peak season rates
             for (const relation of room.roomHasPeakSeasonRates) {
               const rate = relation.peakSeasonRate;
               const rateStartDate = new Date(rate.start_date);
               const rateEndDate = new Date(rate.end_date);
 
-              // Check if dates overlap
               if (
                 requestStartDate <= rateEndDate &&
                 requestEndDate >= rateStartDate
@@ -332,7 +300,6 @@ class PropertyService {
                     price -= Number(rate.value);
                   }
                 }
-                // Only apply the first matching rate
                 break;
               }
             }
@@ -341,7 +308,6 @@ class PropertyService {
           return price;
         };
 
-        // Find the lowest effective price for each property's rooms
         const getLowestPriceRoom = (rooms: any[]) => {
           if (rooms.length === 0) return null;
 
@@ -370,28 +336,32 @@ class PropertyService {
       });
     }
 
-    const formattedProperties = filteredProperties.map((property) => {
-      // First calculate adjusted prices for all rooms
+    // Store the total count before applying pagination
+    const filteredTotalCount = filteredProperties.length;
+    
+    // Apply pagination
+    const paginatedProperties = filteredProperties.slice(
+      (pageNumber - 1) * limitNumber, 
+      pageNumber * limitNumber
+    );
+
+    const formattedProperties = paginatedProperties.map((property) => {
       const roomsWithCalculatedPrices = property.rooms.map((room) => {
         let calculatedPrice = Number(room.base_price);
         let roomsLeft = room.total_room;
 
-        // Calculate room availability if dates are provided
         if (startDate && endDate && room.bookings && room.bookings.length > 0) {
           const requestStartDate = new Date(String(startDate));
           const requestEndDate = new Date(String(endDate));
 
-          // Reuse the normalizeDate function from above
           const normalizeDate = (date: Date): string => {
             return date.toISOString().split('T')[0];
           };
 
-          // Reuse the getDatesInRange function logic
           const getDatesInRange = (start: Date, end: Date): string[] => {
             const dates: string[] = [];
             const currentDate = new Date(start);
 
-            // End date is exclusive (checkout date)
             const endDateExclusive = new Date(end);
 
             while (currentDate < endDateExclusive) {
@@ -401,30 +371,24 @@ class PropertyService {
             return dates;
           };
 
-          // Calculate all dates in request range (excluding checkout date)
           const requestDates = getDatesInRange(
             requestStartDate,
             requestEndDate,
           );
 
-          // Create a map to store booked room count for each date
           const dateBookingMap: Record<string, number> = {};
 
-          // Initialize booking count for each date
           requestDates.forEach((date: string) => {
             dateBookingMap[date] = 0;
           });
 
-          // Count bookings for each date in the requested range
           for (const booking of room.bookings) {
-            // Only consider DONE bookings
             if (booking.status !== 'DONE') continue;
 
             const bookingStart = new Date(booking.checkin_date);
             const bookingEnd = new Date(booking.checkout_date);
             const bookingDates = getDatesInRange(bookingStart, bookingEnd);
 
-            // Increase booking count for each date that overlaps with the request
             bookingDates.forEach((date: string) => {
               if (requestDates.includes(date)) {
                 dateBookingMap[date] = (dateBookingMap[date] || 0) + 1;
@@ -432,14 +396,11 @@ class PropertyService {
             });
           }
 
-          // Find the maximum number of bookings on any single day
           const maxBookings = Math.max(...Object.values(dateBookingMap), 0);
 
-          // Calculate rooms left
           roomsLeft = room.total_room - maxBookings;
         }
 
-        // Calculate adjusted price if dates are provided
         if (
           startDate &&
           endDate &&
@@ -454,12 +415,10 @@ class PropertyService {
             const peakStartDate = new Date(peakRate.start_date);
             const peakEndDate = new Date(peakRate.end_date);
 
-            // Check if dates overlap
             if (
               requestStartDate <= peakEndDate &&
               requestEndDate >= peakStartDate
             ) {
-              // Apply rate adjustment
               const basePrice = Number(room.base_price);
               if (peakRate.value_type === 'PERCENTAGE') {
                 const percentValue = Number(peakRate.value) / 100;
@@ -476,7 +435,6 @@ class PropertyService {
                 }
               }
 
-              // Only consider the first applicable peak rate
               break;
             }
           }
@@ -489,7 +447,6 @@ class PropertyService {
         };
       });
 
-      // Filter for capacity
       let eligibleRooms = roomsWithCalculatedPrices;
       if (capacity) {
         const requiredCapacity = Number(capacity);
@@ -498,10 +455,8 @@ class PropertyService {
         );
       }
 
-      // Sort by calculated price to find true lowest price
       eligibleRooms.sort((a, b) => a.calculatedPrice - b.calculatedPrice);
 
-      // Get the lowest price room after adjustments
       const lowestPriceRoom =
         eligibleRooms.length > 0 ? eligibleRooms[0] : null;
 
@@ -545,10 +500,6 @@ class PropertyService {
         reviews: property.reviews,
       };
     });
-
-    // Calculate the accurate total count of filteredProperties to fix pagination display
-    const filteredTotalCount =
-      filteredProperties.length > 0 ? filteredProperties.length : 0;
 
     return {
       properties: formattedProperties,

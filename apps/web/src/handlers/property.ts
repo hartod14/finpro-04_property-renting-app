@@ -3,7 +3,7 @@ import { api } from './_api';
 export interface PropertyFilterParams {
   categoryID?: number | number[];
   categoryName?: string | string[];
-  tenantID?: number | number[];
+  tenantID?: number | number[] | null;
   facilityID?: number | number[];
   cityID?: number | number[];
   sortBy?: 'name' | 'price';

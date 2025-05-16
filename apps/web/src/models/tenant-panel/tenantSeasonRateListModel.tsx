@@ -8,7 +8,8 @@ import {
 } from '@/handlers/tenant-season-rate';
 import { ISeasonRate } from '@/interfaces/season-rate.interface';
 import { formatCurrency, formatDateOnly } from '@/utils/formatters';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import {
   FaArrowAltCircleDown,
@@ -18,11 +19,16 @@ import {
 import { FaArrowUp } from 'react-icons/fa';
 
 export default function TenantSeasonRateListModel() {
-  const [page, setPage] = useState<number>(1);
-  const [search, setSearch] = useState<string>('');
-  const [limit, setLimit] = useState<number>(15);
-  const [date, setDate] = useState<string>('');
-  const [status, setStatus] = useState<string>('');
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  
+  // Initialize state from URL query params
+  const [page, setPage] = useState<number>(Number(searchParams.get('page')) || 1);
+  const [search, setSearch] = useState<string>(searchParams.get('search') || '');
+  const [limit, setLimit] = useState<number>(Number(searchParams.get('limit')) || 15);
+  const [date, setDate] = useState<string>(searchParams.get('date') || '');
+  const [status, setStatus] = useState<string>(searchParams.get('status') || '');
   const [total, setTotal] = useState<number>(0);
   const [totalPage, setTotalPage] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -39,7 +45,51 @@ export default function TenantSeasonRateListModel() {
     ],
     body: [],
   });
-  const router = useRouter();
+
+  // Update URL when filters change
+  const updateUrlWithFilters = () => {
+    let params = new URLSearchParams(searchParams.toString());
+    params.set('page', page.toString());
+    params.set('limit', limit.toString());
+    if (search) {
+      params.set('search', search);
+    } else {
+      params.delete('search');
+    }
+    if (date) {
+      params.set('date', date);
+    } else {
+      params.delete('date');
+    }
+    if (status) {
+      params.set('status', status);
+    } else {
+      params.delete('status');
+    }
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  // Custom setter functions that update URL
+  const handleSetPage = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleSetLimit = (newLimit: number) => {
+    setLimit(newLimit);
+    setPage(1); // Reset to first page when changing limit
+  };
+
+  const handleSetSearch = (newSearch: string) => {
+    setSearch(newSearch);
+  };
+
+  const handleSetDate = (newDate: string) => {
+    setDate(newDate);
+  };
+
+  const handleSetStatus = (newStatus: string) => {
+    setStatus(newStatus);
+  };
 
   async function getSeasonRateList() {
     setIsLoading(true);
@@ -148,6 +198,7 @@ export default function TenantSeasonRateListModel() {
         });
       }
     } catch (error) {
+      console.error("Error fetching season rates:", error);
     } finally {
       setIsLoading(false);
     }
@@ -155,41 +206,32 @@ export default function TenantSeasonRateListModel() {
 
   async function deleteSeasonRate(id: string) {
     try {
+      setIsLoading(true);
       await deleteSeasonRateData(id).then(() => {
         getSeasonRateList();
       });
     } catch (error) {
-      console.error(error);
+      console.error("Error deleting season rate:", error);
+      setIsLoading(false);
     }
   }
 
-  useEffect(() => {
-    getSeasonRateList();
-  }, [page, limit]);
-
+  // Consolidated useEffect to handle all filter changes
   useEffect(() => {
     const handler = setTimeout(() => {
-      setPage(1);
+      updateUrlWithFilters();
       getSeasonRateList();
     }, 300);
 
     return () => clearTimeout(handler);
-  }, [search]);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setPage(1);
-    }, 300);
-
-    return () => clearTimeout(handler);
-  }, [date, status]);
+  }, [page, limit, search, date, status]);
 
   return {
-    setPage,
-    setLimit,
-    setSearch,
-    setDate,
-    setStatus,
+    setPage: handleSetPage,
+    setLimit: handleSetLimit,
+    setSearch: handleSetSearch,
+    setDate: handleSetDate,
+    setStatus: handleSetStatus,
     search,
     date,
     status,

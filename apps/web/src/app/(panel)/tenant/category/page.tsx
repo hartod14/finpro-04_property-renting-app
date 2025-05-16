@@ -7,6 +7,7 @@ import { PanelPagination } from '@/components/common/pagination/panelPagination'
 import { FaArrowRight, FaPlus, FaSearch, FaSpinner } from 'react-icons/fa';
 import Link from 'next/link';
 import { TenantSkeleton } from '@/components/common/tenant/tenantSkeleton';
+import { SetStateAction, Dispatch } from 'react';
 
 export default function TenantCategoryListPage() {
   const {
@@ -68,8 +69,8 @@ export default function TenantCategoryListPage() {
       <PanelPagination
         limit={limit}
         page={page}
-        setPage={setPage}
-        setLimit={setLimit}
+        setPage={setPage as Dispatch<SetStateAction<number>>}
+        setLimit={setLimit as Dispatch<SetStateAction<number>>}
         total={total}
         totalPage={totalPage}
         totalPerPage={table.body.length}

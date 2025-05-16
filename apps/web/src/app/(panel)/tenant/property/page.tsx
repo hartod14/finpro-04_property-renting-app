@@ -7,6 +7,8 @@ import { PanelPagination } from '@/components/common/pagination/panelPagination'
 import Button from '@/components/common/button/button';
 import Table from '@/components/common/table/table';
 import { TenantSkeleton } from '@/components/common/tenant/tenantSkeleton';
+import { SetStateAction, Dispatch } from 'react';
+
 export default function TenantPropertyListPage() {
   const {
     router,
@@ -67,8 +69,8 @@ export default function TenantPropertyListPage() {
       <PanelPagination
         limit={limit}
         page={page}
-        setPage={setPage}
-        setLimit={setLimit}
+        setPage={setPage as Dispatch<SetStateAction<number>>}
+        setLimit={setLimit as Dispatch<SetStateAction<number>>}
         total={total}
         totalPage={totalPage}
         totalPerPage={table.body.length}

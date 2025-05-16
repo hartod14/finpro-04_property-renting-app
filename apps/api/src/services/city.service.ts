@@ -7,7 +7,9 @@ class CityService {
         id: true,
         name: true,
       },
-      
+      orderBy: {
+        name: 'asc',
+      },
     });
   }
 }

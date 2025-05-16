@@ -1,5 +1,5 @@
-import PropertyPageSkeleton from "@/components/property/propertyPageSkeleton";
-import { Suspense } from "react";
+import PropertyPageSkeleton from '@/components/property/propertyPageSkeleton';
+import { Suspense } from 'react';
 
 export default function PropertyTemplate({
   children,

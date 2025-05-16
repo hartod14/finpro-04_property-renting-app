@@ -6,15 +6,20 @@ import { deleteProperty, getAllProperty } from '@/handlers/tenant-property';
 import { ICategory } from '@/interfaces/category.interface';
 import { IProperty } from '@/interfaces/property.interface';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 import React, { useContext, useEffect, useState } from 'react';
 
 export default function TenantPropertyListModel() {
-  // const loading = useContext(LoadingContext);
-  const [page, setPage] = useState<number>(1);
-  const [search, setSearch] = useState<string>('');
-  const [limit, setLimit] = useState<number>(15);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Initialize state from URL query params
+  const [page, setPage] = useState<number>(Number(searchParams.get('page')) || 1);
+  const [search, setSearch] = useState<string>(searchParams.get('search') || '');
+  const [limit, setLimit] = useState<number>(Number(searchParams.get('limit')) || 15);
   const [total, setTotal] = useState<number>(0);
   const [totalPage, setTotalPage] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -22,7 +27,33 @@ export default function TenantPropertyListModel() {
     head: ['No.', 'Image', 'Name', 'Category', 'City', 'Room type', 'Action'],
     body: [],
   });
-  const router = useRouter();
+
+  // Update URL when filters change
+  const updateUrlWithFilters = () => {
+    let params = new URLSearchParams(searchParams.toString());
+    params.set('page', page.toString());
+    params.set('limit', limit.toString());
+    if (search) {
+      params.set('search', search);
+    } else {
+      params.delete('search');
+    }
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  // Custom setter functions that update URL
+  const handleSetPage = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleSetLimit = (newLimit: number) => {
+    setLimit(newLimit);
+    setPage(1); // Reset to first page when changing limit
+  };
+
+  const handleSetSearch = (newSearch: string) => {
+    setSearch(newSearch);
+  };
 
   async function getPropertyList() {
     setIsLoading(true);
@@ -98,22 +129,21 @@ export default function TenantPropertyListModel() {
       setIsLoading(false);
     }
   }
-  useEffect(() => {
-    getPropertyList();
-  }, [page, limit]);
 
+  // Consolidated useEffect to handle all filter changes
   useEffect(() => {
     const handler = setTimeout(() => {
-      setPage(1);
+      updateUrlWithFilters();
+      getPropertyList();
     }, 300);
 
     return () => clearTimeout(handler);
-  }, [search]);
+  }, [page, limit, search]);
 
   return {
-    setPage,
-    setLimit,
-    setSearch,
+    setPage: handleSetPage,
+    setLimit: handleSetLimit,
+    setSearch: handleSetSearch,
     search,
     table,
     router,
