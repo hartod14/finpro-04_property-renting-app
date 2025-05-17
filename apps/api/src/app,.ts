@@ -99,8 +99,10 @@ export default class App {
             `${result.count} unpaid booking(s) have been marked as EXPIRED.`,
           );
         }
+        res.json({ success: true, count: result.count });
       } catch (error) {
         console.error('Error in scheduled expireUnpaidBookings:', error);
+        res.status(500).json({ success: false, error: 'An error occurred while processing unpaid bookings' });
       }
     });
 
