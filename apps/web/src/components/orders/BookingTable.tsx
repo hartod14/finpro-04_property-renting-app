@@ -92,7 +92,7 @@ const BookingTable: React.FC<BookingTableProps> = ({
                   {formatDate(booking.checkout_date)}
                 </td>
                 <td className="px-4 py-3 text-center">
-                  {formatCurrency(booking.room.base_price)}
+                  {formatCurrency(booking.payment.amount)}
                 </td>
                 <td className="px-4 py-3 text-center">{paymentMethod}</td>
 

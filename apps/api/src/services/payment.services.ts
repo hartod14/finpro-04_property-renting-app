@@ -56,7 +56,7 @@ export const expireUnpaidBookings = async () => {
   return expired;
 };
 
-cron.schedule('0 * * * *', async () => {
+cron.schedule('*/10 * * * *', async () => {
   console.log('Running scheduled job: expireUnpaidBookings');
 
   try {
@@ -70,6 +70,7 @@ cron.schedule('0 * * * *', async () => {
     console.error('Error in scheduled expireUnpaidBookings:', error);
   }
 });
+
 
 export const createMidtransPayment = async (bookingId: number) => {
   try {

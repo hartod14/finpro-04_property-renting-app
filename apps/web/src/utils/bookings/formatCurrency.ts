@@ -1,2 +1,2 @@
 export const formatCurrency = (amount: number): string =>
-  `Rp ${amount.toLocaleString('id-ID')}`;
+  new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);

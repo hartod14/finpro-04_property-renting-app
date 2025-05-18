@@ -23,6 +23,7 @@ import { getFacilityIconByName } from '@/utils/facilityIcons';
 import { formatTimeOnly } from '@/utils/formatters';
 import { IReview } from '@/interfaces/property.interface';
 import PropertyReviews from '@/components/property/PropertyReviews';
+import { format } from 'date-fns';
 
 export default function PropertyDetailPage() {
   const { slug } = useParams();
@@ -1001,8 +1002,8 @@ export default function PropertyDetailPage() {
 
                             {available ? (
                               <Link
-                                href={`/booking/${property.slug}?roomId=${room.id}&startDate=${calendarState.selectedStartDate?.toISOString()}&endDate=${calendarState.selectedEndDate?.toISOString()}&adults=${searchAdults}`}
-                              >
+  href={`/booking/${property.slug}?roomId=${room.id}&startDate=${calendarState.selectedStartDate ? format(calendarState.selectedStartDate, 'yyyy-MM-dd') : ''}&endDate=${calendarState.selectedEndDate ? format(calendarState.selectedEndDate, 'yyyy-MM-dd') : ''}&adults=${searchAdults}`}
+>
                                 <div className="mt-4 bg-primary text-white px-4 py-2 inline-block rounded hover:bg-primary/90 transition-colors">
                                   Book Now
                                 </div>
