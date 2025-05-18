@@ -32,12 +32,14 @@ const PropertyCalendar: React.FC<PropertyCalendarProps> = ({ calendar, currentMo
   const days = eachDayOfInterval({ start, end });
 
   const isInRange = (day: Date, range: DateRange[]) => {
-    return range.some(({ start, end }) => {
-      const startDate = new Date(start);
-      const endDate = new Date(end);
-      return isWithinInterval(day, { start: startDate, end: endDate });
-    });
-  };
+  return range.some(({ start, end }) => {
+    const startDate = new Date(start);
+    startDate.setDate(startDate.getDate() - 1); // mundur 1 hari
+    const endDate = new Date(end);
+    return isWithinInterval(day, { start: startDate, end: endDate });
+  });
+};
+
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mt-8 w-full max-w-7xl mx-auto">

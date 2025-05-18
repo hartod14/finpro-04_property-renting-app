@@ -90,14 +90,25 @@ export default function PurchaseListPage() {
       setPage(1);
     });
   };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setPreviewImage(URL.createObjectURL(file));
-      setPaymentProof(file);
+  
+const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (file) {
+    if (file.size > 1 * 1024 * 1024) {
+      Swal.fire({
+        icon: 'error',
+        title: 'File Too Large',
+        text: 'File size must not exceed 1MB.',
+      });
+      e.target.value = ''; // reset input supaya file yg besar tidak tersimpan
+      setPreviewImage(null);
+      setPaymentProof(null);
+      return;
     }
-  };
+    setPreviewImage(URL.createObjectURL(file));
+    setPaymentProof(file);
+  }
+};
 
   const handlePayNowClick = (
     bookingId: number,

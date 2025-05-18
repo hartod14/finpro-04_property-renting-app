@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { format, differenceInDays } from 'date-fns';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -8,6 +8,18 @@ export const generateReceipt = (booking: any) => {
   const orderNumber = booking.booking.order_number;
   const formattedDate = format(new Date(), 'dd MMM yyyy');
 
+  // Hitung durasi menginap dan total harga berdasarkan room.price
+  const checkIn = new Date(booking.booking.checkinDate);
+  const checkOut = new Date(booking.booking.checkoutDate);
+  const duration = differenceInDays(checkOut, checkIn); // ex: 3 hari
+  const pricePerNight = parseInt(booking.room.price);
+  const totalPriceByDuration = pricePerNight * duration;
+
+  // Format rupiah
+  const formatRupiah = (num: number) =>
+    `Rp ${num.toLocaleString('id-ID')}`;
+
+  // HEADER
   const headerText = 'BOOKING RECEIPT';
   doc.setFontSize(22);
   doc.setFont('helvetica', 'bold');
@@ -26,6 +38,7 @@ export const generateReceipt = (booking: any) => {
   doc.setDrawColor(200);
   doc.line(14, 42, 196, 42);
 
+  // Customer Info
   doc.setFontSize(14);
   doc.setTextColor(0);
   doc.text('Customer Information', 14, 50);
@@ -35,20 +48,20 @@ export const generateReceipt = (booking: any) => {
   doc.text(`Email : ${booking.user.email}`, 14, 64);
   doc.text(`Phone : 0${booking.user.phone}`, 14, 70);
 
+  // Check-in Table
   doc.setFontSize(14);
   doc.setTextColor(0);
   doc.text('Check-in Details', 14, 82);
 
   autoTable(doc, {
     startY: 88,
-    head: [['Property', 'Room', 'Capacity', 'Check-in', 'Price']],
+    head: [['Property', 'Room', 'Capacity', 'Check-in']],
     body: [
       [
         booking.property.name,
         booking.room.name,
         booking.room.capacity.toString(),
-        format(new Date(booking.booking.checkinDate), 'dd MMM yyyy'),  // Format check-in date
-        `Rp ${parseInt(booking.room.price).toLocaleString('id-ID')}`,
+        format(checkIn, 'dd MMM yyyy'),
       ],
     ],
     theme: 'grid',
@@ -74,25 +87,24 @@ export const generateReceipt = (booking: any) => {
       1: { halign: 'left' },
       2: { halign: 'center' },
       3: { halign: 'center' },
-      4: { halign: 'right' },
     },
     margin: { left: 14, right: 14 },
   });
 
+  // Check-out Table
   doc.setFontSize(14);
   doc.setTextColor(0);
   doc.text('Check-out Details', 14, doc.lastAutoTable.finalY + 10);
 
   autoTable(doc, {
     startY: doc.lastAutoTable.finalY + 16,
-    head: [['Property', 'Room', 'Capacity', 'Check-out', 'Price']],
+    head: [['Property', 'Room', 'Capacity', 'Check-out']],
     body: [
       [
         booking.property.name,
         booking.room.name,
         booking.room.capacity.toString(),
-        format(new Date(booking.booking.checkoutDate), 'dd MMM yyyy'),  // Format checkout date
-        `Rp ${parseInt(booking.room.price).toLocaleString('id-ID')}`,
+        format(checkOut, 'dd MMM yyyy'),
       ],
     ],
     theme: 'grid',
@@ -118,20 +130,31 @@ export const generateReceipt = (booking: any) => {
       1: { halign: 'left' },
       2: { halign: 'center' },
       3: { halign: 'center' },
-      4: { halign: 'right' },
     },
     margin: { left: 14, right: 14 },
   });
 
-  const finalY = doc.lastAutoTable.finalY + 20;
+  // Total Price
+const totalPrice = parseInt(booking.booking.amount);
+const formattedTotal = `Rp ${totalPrice.toLocaleString('id-ID')}`;
+  const finalY = doc.lastAutoTable.finalY + 10;
+
+  doc.setFontSize(13);
+  doc.setTextColor(0);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`Total Price: ${formattedTotal}`, 14, finalY);
+
+  // Footer
+  const footerY = finalY + 20;
   doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
   doc.setTextColor(80);
-  doc.text('Thank you for your booking!', 14, finalY);
+  doc.text('Thank you for your booking!', 14, footerY);
   doc.setFontSize(10);
   doc.text(
     'If you have any questions, please contact our support team.',
     14,
-    finalY + 6,
+    footerY + 6,
   );
 
   doc.save(`Booking_Receipt_${booking.user?.name}.pdf`);
