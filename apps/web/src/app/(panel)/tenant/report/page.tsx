@@ -19,10 +19,6 @@ import {
   startOfMonth,
   endOfMonth,
   eachDayOfInterval,
-  startOfWeek,
-  endOfWeek,
-  isSameDay,
-  isSameMonth,
   addMonths,
   subMonths,
 } from 'date-fns';
@@ -102,6 +98,8 @@ export default function TenantReportAnalysisPage() {
             },
           },
         );
+
+        // Pastikan data calendar sesuai tipe Property[]
         setCalendar(response.data.data);
       } catch (error) {
         console.error('Error fetching property calendar:', error);

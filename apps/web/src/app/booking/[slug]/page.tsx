@@ -5,9 +5,10 @@ import Navbar from '@/components/common/navbar/navbar';
 import { useSearchParams, useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import BookingSummary from '@/components/bookings/BookingSummary';
+
 import BookingSection from '@/components/bookings/BookingSection';
 import { format } from 'date-fns';
+import BookingSummary from '@/components/bookings/BookingSummary';
 
 interface BookingSummary {
   property: {
@@ -34,7 +35,7 @@ interface BookingSummary {
 
 const formatDisplayDate = (date: Date | null | undefined) => {
   if (!date) return '';
-  return format(date, 'dd MMMM yyyy'); // Using `date-fns` format for consistent formatting
+  return format(date, 'dd MMMM yyyy');
 };
 
 export default function BookingPage() {
@@ -64,7 +65,6 @@ export default function BookingPage() {
     }
   }, [isClient, status]);
 
-  // Date parsing and setting
   useEffect(() => {
     if (checkinParam) {
       const parsedCheckin = new Date(checkinParam);
@@ -72,7 +72,6 @@ export default function BookingPage() {
         setCheckinDate(parsedCheckin);
       }
     }
-
     if (checkoutParam) {
       const parsedCheckout = new Date(checkoutParam);
       if (!isNaN(parsedCheckout.getTime())) {
@@ -81,7 +80,6 @@ export default function BookingPage() {
     }
   }, [checkinParam, checkoutParam]);
 
-  // Fetch booking data
   useEffect(() => {
     const fetchData = async () => {
       if (!roomId || !checkinParam || !checkoutParam) return;
@@ -92,7 +90,7 @@ export default function BookingPage() {
             headers: {
               Authorization: `Bearer ${session?.user?.access_token}`,
             },
-          }
+          },
         );
 
         if (!res.ok) throw new Error('Failed to fetch booking summary');
@@ -114,7 +112,11 @@ export default function BookingPage() {
     }
 
     if (checkoutDate <= checkinDate) {
-      Swal.fire('Invalid Dates', 'Checkout date must be after checkin date.', 'error');
+      Swal.fire(
+        'Invalid Dates',
+        'Checkout date must be after checkin date.',
+        'error',
+      );
       return;
     }
 
@@ -137,20 +139,30 @@ export default function BookingPage() {
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(`Booking failed: ${errorData.message || 'Unknown error'}`);
+        throw new Error(
+          `Booking failed: ${errorData.message || 'Unknown error'}`,
+        );
       }
 
-      Swal.fire('Success', 'Booking confirmed! Check your order on profile', 'success').then(() => {
+      Swal.fire(
+        'Success',
+        'Booking confirmed! Check your order on profile',
+        'success',
+      ).then(() => {
         window.location.replace('/user/booking');
       });
     } catch (error: any) {
       console.error('Error creating booking:', error);
-      Swal.fire('Error', error.message || 'Booking failed. Please try again.', 'error');
+      Swal.fire(
+        'Error',
+        error.message || 'Booking failed. Please try again.',
+        'error',
+      );
     }
   };
 
   const calculateTotalPrice = () => {
-    return summary?.room.adjusted_price || 0;
+    return summary?.room.adjusted_price || summary?.room.base_price || 0;
   };
 
   const totalPrice = calculateTotalPrice();
@@ -160,25 +172,33 @@ export default function BookingPage() {
   return (
     <>
       <Navbar forceScrolled={true} />
-      <div className="min-h-screen pt-28 pb-10 bg-[#F9FAFB] px-4 lg:px-24 text-black mb-[-50px]">
-        <div className="max-w-6xl mx-auto mb-6">
-          <h2 className="text-3xl font-bold text-gray-800 flex justify-center items-center">
-            Booking Summary
-          </h2>
-        </div>
-        <div className="max-w-6xl mx-auto bg-white shadow-md rounded-2xl p-8 border border-gray-100 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <BookingSummary summary={summary} />
-          <BookingSection
-            checkinDate={checkinDate ? formatDisplayDate(checkinDate) : ''}
-            checkoutDate={checkoutDate ? formatDisplayDate(checkoutDate) : ''}
-            paymentMethod={paymentMethod}
-            setPaymentMethod={setPaymentMethod}
-            handleBooking={handleBooking}
-            totalPrice={totalPrice}
-            disableDateEdit={true}
-          />
-        </div>
-      </div>
+      <main className="min-h-screen pt-28 bg-gray-50 px-6 md:px-16 lg:px-32 text-gray-900">
+        <h1 className="text-4xl font-extrabold text-center mb-10 tracking-tight">
+          Booking Summary
+        </h1>
+
+       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 -mt-32">
+  <div className="max-w-7xl w-full grid gap-10 grid-cols-1 md:grid-cols-3">
+    <div className="md:col-span-1">
+      <BookingSummary summary={summary} />
+    </div>
+
+    <div className="md:col-span-2">
+      <BookingSection
+        checkinDate={checkinDate ? formatDisplayDate(checkinDate) : ''}
+        checkoutDate={checkoutDate ? formatDisplayDate(checkoutDate) : ''}
+        paymentMethod={paymentMethod}
+        setPaymentMethod={setPaymentMethod}
+        handleBooking={handleBooking}
+        totalPrice={totalPrice}
+        disableDateEdit={true}
+        summary={summary}
+      />
+    </div>
+  </div>
+</div>
+
+      </main>
       <Footer />
     </>
   );

@@ -33,8 +33,9 @@ export const UploadPaymentProofModal: React.FC<UploadPaymentProofModalProps> = (
           type="file"
           accept="image/*"
           onChange={onFileChange}
-          className="mb-4"
+          className="mb-1"
         />
+        <p className="text-sm text-red-500 mb-4">Max upload file 1MB</p>
         {previewImage && (
           <img
             src={previewImage}
