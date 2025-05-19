@@ -632,6 +632,8 @@ class PropertyService {
         tenant: true,
         propertyImages: true,
         reviews: true,
+        longitude: true,
+        latitude: true,
       },
     });
 

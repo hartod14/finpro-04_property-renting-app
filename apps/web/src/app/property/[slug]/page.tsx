@@ -13,19 +13,44 @@ import {
   FaSearch,
   FaChevronLeft,
   FaChevronRight,
+  FaMapMarkedAlt,
 } from 'react-icons/fa';
 import Image from 'next/image';
 import Link from 'next/link';
-import PropertyDetailModel from '@/models/property/propertyDetailModel';
+import PropertyDetailModel, { defaultMapCenter } from '@/models/property/propertyDetailModel';
 import PropertyDetailSkeleton from '@/components/property/propertyDetailSkeleton';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { getFacilityIconByName } from '@/utils/facilityIcons';
 import { formatTimeOnly } from '@/utils/formatters';
 import { IReview } from '@/interfaces/property.interface';
 import PropertyReviews from '@/components/property/PropertyReviews';
 import { format } from 'date-fns';
+import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
+
+// Map container style
+const mapContainerStyle = {
+  width: '100%',
+  height: '400px',
+  borderRadius: '0.5rem',
+};
 
 export default function PropertyDetailPage() {
+  // Google Maps API loader
+  const { isLoaded: mapsLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
+  });
+
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+
+  const onMapLoad = useCallback((map: google.maps.Map) => {
+    setMap(map);
+  }, []);
+
+  const onMapUnmount = useCallback(() => {
+    setMap(null);
+  }, []);
+  
   const { slug } = useParams();
   const searchParams = useSearchParams();
 
@@ -83,6 +108,8 @@ export default function PropertyDetailPage() {
     prevMonth,
     nextMonth,
     getLowestRoomPriceForDate,
+    // Google Maps related exports
+    getMapCoordinates,
   } = PropertyDetailModel(slug, {
     initialStartDate: startDate,
     initialEndDate: endDate,
@@ -670,6 +697,44 @@ export default function PropertyDetailPage() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Google Maps Section */}
+        <div className="bg-white rounded-lg p-6 shadow-md mb-8">
+          <div className="flex items-center mb-4">
+            <FaMapMarkedAlt className="text-primary mr-2 text-xl" />
+            <h2 className="text-xl font-semibold">Location</h2>
+          </div>
+          
+          <div className="mb-3">
+            <p className="text-gray-600">
+              {property.address}, {property.city.name}
+            </p>
+          </div>
+          
+          {mapsLoaded ? (
+            <div className="rounded-lg overflow-hidden border border-gray-200">
+              <GoogleMap
+                mapContainerStyle={mapContainerStyle}
+                center={getMapCoordinates()}
+                zoom={15}
+                onLoad={onMapLoad}
+                onUnmount={onMapUnmount}
+                options={{
+                  fullscreenControl: false,
+                  mapTypeControl: false,
+                  streetViewControl: false,
+                  zoomControl: true,
+                }}
+              >
+                <Marker position={getMapCoordinates()} />
+              </GoogleMap>
+            </div>
+          ) : (
+            <div className="h-[400px] bg-gray-100 rounded-lg flex items-center justify-center">
+              <p className="text-gray-500">Loading map...</p>
+            </div>
+          )}
         </div>
 
         <div className="bg-white rounded-lg p-6 shadow-md mb-8">

@@ -1,8 +1,12 @@
 /** @format */
 import multer, { FileFilterCallback } from 'multer';
 import path, { join } from 'path';
-import { type Request, Response, NextFunction } from 'express';
 import { ErrorHandler } from './response.handler';
+
+// Avoid importing Express types directly to prevent conflicts
+type GenericRequest = any;
+type GenericResponse = any;
+type GenericNextFunction = (err?: any) => void;
 
 // Extend Express Request type to include fileValidationError
 declare global {
@@ -16,11 +20,7 @@ declare global {
 const maxSize = 1048576; // 1MB
 
 const multerConfig: multer.Options = {
-  fileFilter: (
-    req: Request,
-    file: Express.Multer.File,
-    cb: FileFilterCallback,
-  ) => {
+  fileFilter: function(req: any, file: any, cb: FileFilterCallback) {
     const allowedMimeTypes = ['image/png', 'image/jpg', 'image/jpeg'];
 
     if (!allowedMimeTypes.includes(file.mimetype)) {
@@ -39,8 +39,8 @@ const multerConfig: multer.Options = {
 export const uploadSingleFile = (fieldName: string) => {
   const upload = multer(multerConfig).single(fieldName);
   
-  return (req: Request, res: Response, next: NextFunction) => {
-    upload(req, res, (err: any) => {
+  return function(req: GenericRequest, res: GenericResponse, next: GenericNextFunction) {
+    upload(req, res, function(err: any) {
       if (err) {
         if (err instanceof multer.MulterError) {
           if (err.code === 'LIMIT_FILE_SIZE') {

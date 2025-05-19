@@ -86,6 +86,8 @@ export interface IProperty {
   rooms?: IRoom[];
   propertyImages: IPropertyImage[];
   reviews: IReview[]; 
+  latitude?: string;
+  longitude?: string;
 }
 
 export interface IPropertyDetail {
