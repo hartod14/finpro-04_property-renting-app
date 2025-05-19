@@ -34,8 +34,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/tenant', request.nextUrl));
   }
 
-  if (pathname.startsWith('/booking') && session?.user?.role == 'TENANT') {
-    return NextResponse.redirect(new URL('/', request.nextUrl));
+  if (pathname.startsWith('/booking')) {
+    if (session?.user?.role == 'TENANT') {
+      return NextResponse.redirect(new URL('/', request.nextUrl));
+    }
+
+    if (session?.user?.role == 'USER' && !session?.user?.is_verified) {
+      return NextResponse.redirect(new URL('/user/account', request.nextUrl));
+    }
   }
 
   return NextResponse.next();

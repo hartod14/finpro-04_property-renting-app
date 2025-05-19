@@ -407,6 +407,19 @@ export default function PropertyDetailModel(
           );
           setActiveRoomPhoto(initialActivePhotos);
 
+          // Process each room to ensure consistent data structure
+          data.rooms.forEach((room: any) => {
+            // Map roomHasFacilities to facilities for the UI if needed
+            if (room.roomHasFacilities && !room.facilities) {
+              room.facilities = room.roomHasFacilities.map((rf: any) => rf.facility);
+            }
+            
+            // Make sure room images are properly mapped
+            if (room.roomImages && !room.images) {
+              room.images = room.roomImages;
+            }
+          });
+
           // Check for unavailable rooms and calculate rooms left if there are dates selected
           if (dateRange.from && dateRange.to) {
             const unavailableIds: number[] = [];
@@ -727,6 +740,11 @@ export default function PropertyDetailModel(
                   room.images = room.roomImages;
                 }
 
+                // Map roomHasFacilities to facilities for the UI
+                if (room.roomHasFacilities && !room.facilities) {
+                  room.facilities = room.roomHasFacilities.map((rf: any) => rf.facility);
+                }
+
                 // Check availability and rooms left if dates are selected
                 let isAvailable = true;
                 let rooms_left = room.total_room;
@@ -777,6 +795,16 @@ export default function PropertyDetailModel(
           // No filters applied, show all rooms from the current property
           const roomsWithAvailability = (currentProperty.rooms || []).map(
             (room: any) => {
+              // Map roomHasFacilities to facilities for the UI
+              if (room.roomHasFacilities && !room.facilities) {
+                room.facilities = room.roomHasFacilities.map((rf: any) => rf.facility);
+              }
+              
+              // Make sure room images are properly mapped
+              if (room.roomImages && !room.images) {
+                room.images = room.roomImages;
+              }
+              
               // Check availability and rooms left if dates are selected
               let isAvailable = true;
               let rooms_left = room.total_room;

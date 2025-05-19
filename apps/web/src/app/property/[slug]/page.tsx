@@ -912,19 +912,10 @@ export default function PropertyDetailPage() {
                               </span>
                             </div>
 
-                            {room.description && (
-                              <p className="mt-3 text-gray-600">
-                                {room.description}
-                              </p>
-                            )}
-
                             {/* Room Facilities */}
                             {room.facilities && room.facilities.length > 0 && (
                               <div className="mt-4">
-                                <h4 className="text-sm font-medium text-gray-700 mb-2">
-                                  Room Facilities:
-                                </h4>
-                                <div className="flex flex-wrap gap-3">
+                                <div className="flex flex-wrap gap-2">
                                   {room.facilities.map((facility: any) => {
                                     const facilityIcon = getFacilityIconByName(
                                       facility.name,
@@ -933,12 +924,12 @@ export default function PropertyDetailPage() {
                                     return (
                                       <div
                                         key={facility.id}
-                                        className="flex items-center bg-gray-100 px-2 py-1 rounded text-sm"
+                                        className="flex items-center bg-gray-100 px-2 py-1 rounded-md"
                                       >
-                                        <span className="text-primary mr-1">
+                                        <span className="text-primary mr-2 text-xs">
                                           {facilityIcon}
                                         </span>
-                                        <span className="text-gray-700 ">
+                                        <span className="text-gray-700 text-xs">
                                           {facility.name}
                                         </span>
                                       </div>
@@ -946,6 +937,12 @@ export default function PropertyDetailPage() {
                                   })}
                                 </div>
                               </div>
+                            )}
+
+                            {room.description && (
+                              <p className="mt-3 text-gray-600">
+                                {room.description}
+                              </p>
                             )}
 
                             <div className="mt-4">
@@ -1002,8 +999,8 @@ export default function PropertyDetailPage() {
 
                             {available ? (
                               <Link
-  href={`/booking/${property.slug}?roomId=${room.id}&startDate=${calendarState.selectedStartDate ? format(calendarState.selectedStartDate, 'yyyy-MM-dd') : ''}&endDate=${calendarState.selectedEndDate ? format(calendarState.selectedEndDate, 'yyyy-MM-dd') : ''}&adults=${searchAdults}`}
->
+                                href={`/booking/${property.slug}?roomId=${room.id}&startDate=${calendarState.selectedStartDate ? format(calendarState.selectedStartDate, 'yyyy-MM-dd') : ''}&endDate=${calendarState.selectedEndDate ? format(calendarState.selectedEndDate, 'yyyy-MM-dd') : ''}&adults=${searchAdults}`}
+                              >
                                 <div className="mt-4 bg-primary text-white px-4 py-2 inline-block rounded hover:bg-primary/90 transition-colors">
                                   Book Now
                                 </div>
