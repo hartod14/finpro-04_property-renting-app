@@ -17,7 +17,9 @@ import {
 } from 'react-icons/fa';
 import Image from 'next/image';
 import Link from 'next/link';
-import PropertyDetailModel, { defaultMapCenter } from '@/models/property/propertyDetailModel';
+import PropertyDetailModel, {
+  defaultMapCenter,
+} from '@/models/property/propertyDetailModel';
 import PropertyDetailSkeleton from '@/components/property/propertyDetailSkeleton';
 import React, { useState, useEffect, useCallback } from 'react';
 import { getFacilityIconByName } from '@/utils/facilityIcons';
@@ -50,7 +52,7 @@ export default function PropertyDetailPage() {
   const onMapUnmount = useCallback(() => {
     setMap(null);
   }, []);
-  
+
   const { slug } = useParams();
   const searchParams = useSearchParams();
 
@@ -607,12 +609,6 @@ export default function PropertyDetailPage() {
                   {property.category.name}
                 </p>
               </div>
-              <div className="flex items-center mt-2 gap-1">
-                <FaMapMarkerAlt className="text-gray-400" />
-                <p className="text-gray-500">
-                  {property.address}, {property.city.name}
-                </p>
-              </div>
               <div className="flex items-center gap-1 text-sm mt-2 text-gray-400">
                 <div>
                   <Image
@@ -705,13 +701,16 @@ export default function PropertyDetailPage() {
             <FaMapMarkedAlt className="text-primary mr-2 text-xl" />
             <h2 className="text-xl font-semibold">Location</h2>
           </div>
-          
-          <div className="mb-3">
-            <p className="text-gray-600">
-              {property.address}, {property.city.name}
-            </p>
+
+          <div className="flex items-center gap-1 mb-3">
+            <FaMapMarkerAlt className="text-gray-400" />
+            <div className="">
+              <p className="text-gray-600">
+                {property.address}, {property.city.name}
+              </p>
+            </div>
           </div>
-          
+
           {mapsLoaded ? (
             <div className="rounded-lg overflow-hidden border border-gray-200">
               <GoogleMap

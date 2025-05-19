@@ -8,6 +8,8 @@ export const storePropertyInit = {
   category_id: '',
   images: [],
   facilities: [],
+  latitude: '',
+  longitude: '',
   rooms: [
     {
       name: '',
@@ -31,6 +33,8 @@ export const updatePropertyInit = {
   category_id: '',
   images: [],
   facilities: [],
+  latitude: '',
+  longitude: '',
 };
 
 export const storeRoomInit = {

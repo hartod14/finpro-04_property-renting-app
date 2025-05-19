@@ -96,6 +96,8 @@ class TenantPropertyService {
       checkout_time: property.checkout_time,
       category: property.category,
       city: property.city,
+      latitude: property.latitude,
+      longitude: property.longitude,
       tenant: {
         id: property.tenant.id,
         name: property.tenant.name,
@@ -142,6 +144,8 @@ class TenantPropertyService {
         images,
         facilities,
         rooms,
+        latitude,
+        longitude,  
       } = req.body;
 
       let city: string = '';
@@ -177,6 +181,8 @@ class TenantPropertyService {
           category_id: Number(category_id),
           tenant_id: user.id,
           slug,
+          latitude,
+          longitude,
         },
       });
 
@@ -256,6 +262,8 @@ class TenantPropertyService {
       category_id,
       images,
       facilities,
+      latitude,
+      longitude,
     } = req.body;
 
     const result = await prisma.$transaction(async (tx) => {
@@ -277,6 +285,8 @@ class TenantPropertyService {
           address,
           city_id: Number(city_id),
           category_id: Number(category_id),
+          latitude,
+          longitude,
         },
       });
 

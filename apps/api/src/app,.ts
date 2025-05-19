@@ -91,18 +91,18 @@ export default class App {
       res.send('Hello, Purwadhika Student API!');
     });
 
-    this.app.get('/api/cron', async (req: Request, res: Response) => {
-      try {
-        const result = await expireUnpaidBookings();
-        if (result.count > 0) {
-          console.log(
-            `${result.count} unpaid booking(s) have been marked as EXPIRED.`,
-          );
-        }
-      } catch (error) {
-        console.error('Error in scheduled expireUnpaidBookings:', error);
-      }
-    });
+    // this.app.get('/api/cron', async (req: Request, res: Response) => {
+    //   try {
+    //     const result = await expireUnpaidBookings();
+    //     if (result.count > 0) {
+    //       console.log(
+    //         `${result.count} unpaid booking(s) have been marked as EXPIRED.`,
+    //       );
+    //     }
+    //   } catch (error) {
+    //     console.error('Error in scheduled expireUnpaidBookings:', error);
+    //   }
+    // });
 
     //global
     this.app.use('/api/auth', authRouter());

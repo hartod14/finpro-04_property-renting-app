@@ -9,6 +9,7 @@ import { ICategory } from '@/interfaces/category.interface';
 import { uploadImage } from '@/handlers/upload';
 import { getAllFacility } from '@/handlers/facility';
 import { IFacility } from '@/interfaces/facility.interface';
+import { useJsApiLoader } from '@react-google-maps/api';
 
 export default function TenantPropertyCreateModel() {
   const [isLoading, setIsLoading] = useState(false);
@@ -24,6 +25,157 @@ export default function TenantPropertyCreateModel() {
   const router = useRouter();
 
   const roomImageRefs = useRef<Array<HTMLInputElement | null>>([]);
+
+  // Google Maps API loader
+  const { isLoaded: mapsLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
+    libraries: ['places'],
+  });
+
+  // Map related state
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [marker, setMarker] = useState<google.maps.Marker | null>(null);
+  const [mapCenter, setMapCenter] = useState({
+    lat: -6.2088, // Default to Jakarta, Indonesia
+    lng: 106.8456,
+  });
+
+  // Map container style
+  const mapContainerStyle = {
+    width: '100%',
+    height: '400px',
+    borderRadius: '0.5rem',
+  };
+
+  // Map functions
+  const onMapLoad = useCallback((map: google.maps.Map, formikValues?: any, setFieldValue?: any) => {
+    setMap(map);
+    
+    // Create marker from latitude and longitude if provided in formik values
+    if (formikValues && formikValues.latitude && formikValues.longitude && !marker) {
+      const position = {
+        lat: parseFloat(formikValues.latitude),
+        lng: parseFloat(formikValues.longitude)
+      };
+      
+      const newMarker = new google.maps.Marker({
+        position: position,
+        map: map,
+        draggable: true,
+      });
+      
+      setMarker(newMarker);
+      
+      // Center map on marker position
+      map.setCenter(position);
+    }
+  }, [marker]);
+
+  const onMapClick = useCallback((e: google.maps.MapMouseEvent, setFieldValue: any) => {
+    const lat = e.latLng?.lat();
+    const lng = e.latLng?.lng();
+    
+    if (lat && lng) {
+      // Update marker position
+      if (marker) {
+        marker.setPosition(e.latLng);
+      } else {
+        const newMarker = new google.maps.Marker({
+          position: e.latLng,
+          map: map,
+          draggable: true,
+        });
+        
+        // Add drag event to marker
+        newMarker.addListener('dragend', function(evt) {
+          const position = newMarker.getPosition();
+          if (position) {
+            setFieldValue('latitude', position.lat().toString());
+            setFieldValue('longitude', position.lng().toString());
+            getAddressByCoordinates(position.lat(), position.lng(), setFieldValue);
+          }
+        });
+        
+        setMarker(newMarker);
+      }
+      
+      // Update form values
+      setFieldValue('latitude', lat.toString());
+      setFieldValue('longitude', lng.toString());
+      
+      // Get address from coordinates
+      getAddressByCoordinates(lat, lng, setFieldValue);
+    }
+  }, [map, marker]);
+
+  const getAddressByCoordinates = useCallback(async (lat: number, lng: number, setFieldValue: any) => {
+    try {
+      const geocoder = new google.maps.Geocoder();
+      const response = await geocoder.geocode({
+        location: { lat, lng }
+      });
+      
+      if (response.results && response.results.length > 0) {
+        const address = response.results[0].formatted_address;
+        setFieldValue('address', address);
+      }
+    } catch (error) {
+      console.error('Error getting address:', error);
+    }
+  }, []);
+
+  const searchLocation = useCallback(async (address: string, setFieldValue: any) => {
+    if (!address) return;
+    
+    try {
+      const geocoder = new google.maps.Geocoder();
+      const response = await geocoder.geocode({
+        address: address
+      });
+      
+      if (response.results && response.results.length > 0) {
+        const location = response.results[0].geometry.location;
+        const lat = location.lat();
+        const lng = location.lng();
+        
+        // Update map center and zoom
+        if (map) {
+          map.setCenter(location);
+          map.setZoom(15);
+        }
+        
+        // Update marker
+        if (marker) {
+          marker.setPosition(location);
+        } else {
+          const newMarker = new google.maps.Marker({
+            position: location,
+            map: map,
+            draggable: true,
+          });
+          
+          newMarker.addListener('dragend', function(evt) {
+            const position = newMarker.getPosition();
+            if (position) {
+              setFieldValue('latitude', position.lat().toString());
+              setFieldValue('longitude', position.lng().toString());
+              getAddressByCoordinates(position.lat(), position.lng(), setFieldValue);
+            }
+          });
+          
+          setMarker(newMarker);
+        }
+        
+        // Update form values
+        setFieldValue('latitude', lat.toString());
+        setFieldValue('longitude', lng.toString());
+        setFieldValue('address', response.results[0].formatted_address);
+      }
+    } catch (error) {
+      console.error('Error searching location:', error);
+    }
+  }, [map, marker, getAddressByCoordinates]);
 
   async function getCityList() {
     const cities = await getAllCity();
@@ -169,11 +321,49 @@ export default function TenantPropertyCreateModel() {
     }
   }
 
+  // Effect to initialize map when coordinates are loaded
   useEffect(() => {
     getCityList();
     getCategoryList();
     getFacilityList();
   }, []);
+
+  // This function will be called by the page component to initialize the marker
+  const initializeMarker = useCallback((latitude: string, longitude: string, setFieldValue: any) => {
+    if (map && latitude && longitude) {
+      // Clear existing marker
+      if (marker) {
+        marker.setMap(null);
+      }
+      
+      const position = {
+        lat: parseFloat(latitude),
+        lng: parseFloat(longitude)
+      };
+      
+      // Create new marker
+      const newMarker = new google.maps.Marker({
+        position: position,
+        map: map,
+        draggable: true,
+      });
+      
+      // Add drag event
+      newMarker.addListener('dragend', function(evt) {
+        const newPosition = newMarker.getPosition();
+        if (newPosition && setFieldValue) {
+          setFieldValue('latitude', newPosition.lat().toString());
+          setFieldValue('longitude', newPosition.lng().toString());
+          getAddressByCoordinates(newPosition.lat(), newPosition.lng(), setFieldValue);
+        }
+      });
+      
+      setMarker(newMarker);
+      
+      // Center map on marker
+      map.setCenter(position);
+    }
+  }, [map, getAddressByCoordinates]);
 
   const handleCreateProperty = async (values: any) => {
     return Swal.fire({
@@ -234,5 +424,15 @@ export default function TenantPropertyCreateModel() {
     ensureRoomImageRefs,
     uploadImageError,
     roomImageErrors,
+    // Map related exports
+    mapsLoaded,
+    mapContainerStyle,
+    mapCenter,
+    onMapLoad,
+    onMapClick,
+    searchLocation,
+    getAddressByCoordinates,
+    initializeMarker,
+    map,
   };
 }

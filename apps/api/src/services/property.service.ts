@@ -632,8 +632,6 @@ class PropertyService {
         tenant: true,
         propertyImages: true,
         reviews: true,
-        longitude: true,
-        latitude: true,
       },
     });
 
@@ -651,6 +649,8 @@ class PropertyService {
       checkout_time: property.checkout_time,
       category: property.category,
       city: property.city,
+      longitude: property.longitude,
+      latitude: property.latitude,
       tenant: {
         id: property.tenant.id,
         name: property.tenant.name,
