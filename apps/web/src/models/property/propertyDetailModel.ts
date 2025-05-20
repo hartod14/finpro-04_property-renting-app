@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   IProperty,
   IRoom,
@@ -18,6 +18,20 @@ import {
   ICalendarState,
   CalendarRenderProps,
 } from '@/interfaces/calendar.interface';
+import { useJsApiLoader } from '@react-google-maps/api';
+
+// Map container style
+export const mapContainerStyle = {
+  width: '100%',
+  height: '400px',
+  borderRadius: '0.5rem',
+};
+
+// Default center for the map if coords are not available
+export const defaultMapCenter = {
+  lat: -6.2088,  // Default to Jakarta, Indonesia
+  lng: 106.8456,
+};
 
 export default function PropertyDetailModel(
   propertySlug: string | string[] | undefined,
@@ -28,6 +42,12 @@ export default function PropertyDetailModel(
     initialCapacity?: string | null;
   },
 ) {
+  // Google Maps API loader
+  const { isLoaded: mapsLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
+  });
+
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -48,6 +68,28 @@ export default function PropertyDetailModel(
   const [showRoomPhotoModal, setShowRoomPhotoModal] = useState(false);
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
   const [activeRoomId, setActiveRoomId] = useState<number | null>(null);
+
+  // Google Maps related state
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+
+  const onMapLoad = useCallback((map: google.maps.Map) => {
+    setMap(map);
+  }, []);
+
+  const onMapUnmount = useCallback(() => {
+    setMap(null);
+  }, []);
+
+  // Get map coordinates from property data
+  const getMapCoordinates = () => {
+    if (property && property.latitude && property.longitude) {
+      return {
+        lat: parseFloat(property.latitude),
+        lng: parseFloat(property.longitude),
+      };
+    }
+    return defaultMapCenter;
+  };
 
   // Get the capacity from URL parameters, preferring 'capacity' over 'adults'
   const initialCapacity =
@@ -1154,5 +1196,12 @@ export default function PropertyDetailModel(
     getRoomFirstImage,
     isRoomAvailable,
     getLowestRoomPriceForDate,
+    // Google Maps related exports
+    map,
+    onMapLoad,
+    onMapUnmount,
+    getMapCoordinates,
+    mapsLoaded, // Export the loading state
+    mapContainerStyle, // Export the map container style
   };
 }

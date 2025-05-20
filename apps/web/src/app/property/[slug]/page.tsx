@@ -13,17 +13,22 @@ import {
   FaSearch,
   FaChevronLeft,
   FaChevronRight,
+  FaMapMarkedAlt,
 } from 'react-icons/fa';
 import Image from 'next/image';
 import Link from 'next/link';
-import PropertyDetailModel from '@/models/property/propertyDetailModel';
+import PropertyDetailModel, {
+  defaultMapCenter,
+  mapContainerStyle,
+} from '@/models/property/propertyDetailModel';
 import PropertyDetailSkeleton from '@/components/property/propertyDetailSkeleton';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { getFacilityIconByName } from '@/utils/facilityIcons';
 import { formatTimeOnly } from '@/utils/formatters';
 import { IReview } from '@/interfaces/property.interface';
 import PropertyReviews from '@/components/property/PropertyReviews';
 import { format } from 'date-fns';
+import { GoogleMap, Marker } from '@react-google-maps/api';
 
 export default function PropertyDetailPage() {
   const { slug } = useParams();
@@ -67,9 +72,6 @@ export default function PropertyDetailPage() {
     toggleCalendar,
     formatDisplayDate,
     getNextMonth,
-    getRoomImages,
-    getRoomFirstImage,
-    isRoomAvailable,
     getDaysInMonth,
     getFirstDayOfMonth,
     handleDateClick,
@@ -83,6 +85,15 @@ export default function PropertyDetailPage() {
     prevMonth,
     nextMonth,
     getLowestRoomPriceForDate,
+    // Google Maps related exports
+    getMapCoordinates,
+    mapsLoaded,
+    mapContainerStyle,
+    onMapLoad,
+    onMapUnmount,
+    getRoomImages,
+    getRoomFirstImage,
+    isRoomAvailable,
   } = PropertyDetailModel(slug, {
     initialStartDate: startDate,
     initialEndDate: endDate,
@@ -580,12 +591,6 @@ export default function PropertyDetailPage() {
                   {property.category.name}
                 </p>
               </div>
-              <div className="flex items-center mt-2 gap-1">
-                <FaMapMarkerAlt className="text-gray-400" />
-                <p className="text-gray-500">
-                  {property.address}, {property.city.name}
-                </p>
-              </div>
               <div className="flex items-center gap-1 text-sm mt-2 text-gray-400">
                 <div>
                   <Image
@@ -670,6 +675,47 @@ export default function PropertyDetailPage() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Google Maps Section */}
+        <div className="bg-white rounded-lg p-6 shadow-md mb-8">
+          <div className="flex items-center mb-4">
+            <FaMapMarkedAlt className="text-primary mr-2 text-xl" />
+            <h2 className="text-xl font-semibold">Location</h2>
+          </div>
+
+          <div className="flex items-center gap-1 mb-3">
+            <FaMapMarkerAlt className="text-gray-400" />
+            <div className="">
+              <p className="text-gray-600">
+                {property.address}, {property.city.name}
+              </p>
+            </div>
+          </div>
+
+          {mapsLoaded ? (
+            <div className="rounded-lg overflow-hidden border border-gray-200">
+              <GoogleMap
+                mapContainerStyle={mapContainerStyle}
+                center={getMapCoordinates()}
+                zoom={15}
+                onLoad={onMapLoad}
+                onUnmount={onMapUnmount}
+                options={{
+                  fullscreenControl: false,
+                  mapTypeControl: false,
+                  streetViewControl: false,
+                  zoomControl: true,
+                }}
+              >
+                <Marker position={getMapCoordinates()} />
+              </GoogleMap>
+            </div>
+          ) : (
+            <div className="h-[400px] bg-gray-100 rounded-lg flex items-center justify-center">
+              <p className="text-gray-500">Loading map...</p>
+            </div>
+          )}
         </div>
 
         <div className="bg-white rounded-lg p-6 shadow-md mb-8">

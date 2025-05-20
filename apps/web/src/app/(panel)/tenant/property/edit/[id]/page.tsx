@@ -5,8 +5,8 @@ import { Formik } from 'formik';
 import { Form } from 'formik';
 import TenantPropertyEditModel from '@/models/tenant-panel/tenantPropertyEditModel';
 import { FaUpload } from 'react-icons/fa';
-import { use } from 'react';
-import { FaCheck, FaTrash } from 'react-icons/fa';
+import { use, useEffect } from 'react';
+import { FaCheck, FaTrash, FaSearch, FaMapMarkerAlt } from 'react-icons/fa';
 import { FieldArray } from 'formik';
 import Image from 'next/image';
 import { InputSelect } from '@/components/common/input/InputSelect';
@@ -19,6 +19,7 @@ import {
 import Button from '@/components/common/button/button';
 import { updatePropertyInit } from '@/helpers/formiks/property.formik';
 import { updatePropertyValidator } from '@/validators/property.validator';
+import { GoogleMap, Marker } from '@react-google-maps/api';
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -40,7 +41,22 @@ export default function TenantPropertyEditPage({ params }: Props) {
     deleteImage,
     uploadImageError,
     initialValues,
+    // Map related props
+    mapsLoaded,
+    mapContainerStyle,
+    mapCenter,
+    onMapLoad,
+    onMapClick,
+    searchLocation,
+    getAddressByCoordinates,
+    initializeMarker,
+    map,
   } = TenantPropertyEditModel(resolvedParams.id);
+
+  useEffect(() => {
+    // We don't need to do anything here since the marker will be created
+    // when the map loads in the TenantPropertyEditModel's useEffect
+  }, []);
 
   return (
     <div className="bg-white rounded-md p-4 border border-gray-100 shadow-md">
@@ -53,6 +69,17 @@ export default function TenantPropertyEditPage({ params }: Props) {
         }}
       >
         {(formik) => {
+          // Effect to initialize marker when coordinates change
+          useEffect(() => {
+            if (formik.values.latitude && formik.values.longitude && map) {
+              initializeMarker(
+                formik.values.latitude,
+                formik.values.longitude,
+                formik.setFieldValue
+              );
+            }
+          }, [formik.values.latitude, formik.values.longitude, map, initializeMarker]);
+
           return (
             <Form>
               <section>
@@ -82,12 +109,108 @@ export default function TenantPropertyEditPage({ params }: Props) {
                     name="description"
                     label="Description"
                   />
-                  <InputFieldTextarea
-                    id="address"
-                    name="address"
-                    label="Address"
+                  <div>
+                    <InputFieldTextarea
+                      id="address"
+                      name="address"
+                      label="Address"
+                      required
+                    />
+                    <div className="mt-2 flex">
+                      <button
+                        type="button"
+                        className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
+                        onClick={() => {
+                          if (formik.values.address) {
+                            searchLocation(formik.values.address, formik.setFieldValue);
+                          }
+                        }}
+                      >
+                        <FaSearch className="mr-1" /> Search address on map
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Hidden longitude/latitude fields */}
+                <div className="hidden">
+                  <InputField
+                    type="text"
+                    id="latitude"
+                    name="latitude"
+                    label="Latitude"
+                    placeholder=""
+                  />
+                  <InputField
+                    type="text"
+                    id="longitude"
+                    name="longitude"
+                    label="Longitude"
+                    placeholder=""
                   />
                 </div>
+
+                {/* Google Maps */}
+                <div className="mb-6">
+                  <label className="block mb-2 text-sm font-medium text-gray-900">
+                    Property Location <span className="text-xs text-gray-500">(Pin on map)</span>
+                  </label>
+                  {mapsLoaded ? (
+                    <div className="rounded-lg overflow-hidden border border-gray-200">
+                      <GoogleMap
+                        mapContainerStyle={mapContainerStyle}
+                        center={
+                          formik.values.latitude && formik.values.longitude
+                            ? {
+                                lat: parseFloat(formik.values.latitude),
+                                lng: parseFloat(formik.values.longitude),
+                              }
+                            : mapCenter
+                        }
+                        zoom={15}
+                        onLoad={(map) => onMapLoad(map)}
+                        onClick={(e) => onMapClick(e, formik.setFieldValue)}
+                        options={{
+                          fullscreenControl: false,
+                          mapTypeControl: false,
+                          streetViewControl: false,
+                          zoomControl: true,
+                        }}
+                      >
+                        {/* Only render marker if coordinates are available */}
+                        {formik.values.latitude && formik.values.longitude && (
+                          <Marker 
+                            key={`${formik.values.latitude}-${formik.values.longitude}`}
+                            position={{
+                              lat: parseFloat(formik.values.latitude),
+                              lng: parseFloat(formik.values.longitude)
+                            }}
+                            draggable={true}
+                            onDragEnd={(e) => {
+                              const lat = e.latLng?.lat();
+                              const lng = e.latLng?.lng();
+                              if (lat && lng) {
+                                formik.setFieldValue('latitude', lat.toString());
+                                formik.setFieldValue('longitude', lng.toString());
+                                getAddressByCoordinates(lat, lng, formik.setFieldValue);
+                              }
+                            }}
+                          />
+                        )}
+                      </GoogleMap>
+                    </div>
+                  ) : (
+                    <div className="h-[400px] bg-gray-100 rounded-lg flex items-center justify-center">
+                      <p className="text-gray-500">Loading map...</p>
+                    </div>
+                  )}
+                  {(formik.touched.latitude && formik.errors.latitude) || (formik.touched.longitude && formik.errors.longitude) ? (
+                    <div className="text-red-500 text-sm mt-1">
+                      Please select a location on the map
+                    </div>
+                  ) : null}
+                </div>
+
                 <div className="grid gap-6 mb-6 md:grid-cols-2">
                   <InputField
                     type="time"
@@ -295,7 +418,9 @@ export default function TenantPropertyEditPage({ params }: Props) {
                       !(formik.isValid && formik.dirty) ||
                       formik.isSubmitting ||
                       images.length < 3 ||
-                      formik.values.facilities.length === 0
+                      formik.values.facilities.length === 0 ||
+                      !formik.values.latitude ||
+                      !formik.values.longitude
                     }
                   >
                     <Button
@@ -303,7 +428,9 @@ export default function TenantPropertyEditPage({ params }: Props) {
                         !(formik.isValid && formik.dirty) ||
                         formik.isSubmitting ||
                         images.length < 3 ||
-                        formik.values.facilities.length === 0
+                        formik.values.facilities.length === 0 ||
+                        !formik.values.latitude ||
+                        !formik.values.longitude
                           ? 'lightGray'
                           : 'primaryOrange'
                       }`}

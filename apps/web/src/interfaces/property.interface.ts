@@ -86,6 +86,8 @@ export interface IProperty {
   rooms?: IRoom[];
   propertyImages: IPropertyImage[];
   reviews: IReview[]; 
+  latitude?: string;
+  longitude?: string;
 }
 
 export interface IPropertyDetail {
@@ -99,6 +101,8 @@ export interface IPropertyDetail {
   category_id: string;
   images: IPropertyImage[] | string[];
   facilities: IFacility[] | number[];
+  latitude?: string;
+  longitude?: string;
   rooms?: {
     id?: number;
     name: string;
@@ -122,6 +126,8 @@ export interface IPropertyCreate {
   category_id: string;
   images: string[];
   facilities: number[];
+  latitude: string;
+  longitude: string;
   rooms: {
     name: string;
     base_price: string;
@@ -144,6 +150,8 @@ export interface IPropertyUpdate {
   category_id: string;
   images: string[];
   facilities: number[];
+  latitude: string;
+  longitude: string;
 }
 
 // Extend IRoom to include availability status

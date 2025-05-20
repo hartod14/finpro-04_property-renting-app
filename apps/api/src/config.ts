@@ -18,6 +18,7 @@ export const prisma = new PrismaClient();
 export const jwt_secret = process.env.SECRET || '';
 export const refresh_jwt_secret = process.env.REFRESH_SECRET || '';
 
+
 export const cloudinary_config = process.env.CLOUDINARY_URL || '';
 
 const midtransClient = require('midtrans-client');

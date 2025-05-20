@@ -127,6 +127,8 @@ model Property {
   slug          String?   @unique @db.Text
   description   String?   @db.Text
   address       String    @db.Text
+  longitude     String?
+  latitude      String?
   checkin_time  DateTime? @db.Time()
   checkout_time DateTime? @db.Time()
   created_at    DateTime  @default(now())
