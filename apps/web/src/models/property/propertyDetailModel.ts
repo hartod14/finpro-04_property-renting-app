@@ -18,6 +18,14 @@ import {
   ICalendarState,
   CalendarRenderProps,
 } from '@/interfaces/calendar.interface';
+import { useJsApiLoader } from '@react-google-maps/api';
+
+// Map container style
+export const mapContainerStyle = {
+  width: '100%',
+  height: '400px',
+  borderRadius: '0.5rem',
+};
 
 // Default center for the map if coords are not available
 export const defaultMapCenter = {
@@ -34,6 +42,12 @@ export default function PropertyDetailModel(
     initialCapacity?: string | null;
   },
 ) {
+  // Google Maps API loader
+  const { isLoaded: mapsLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
+  });
+
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -1187,5 +1201,7 @@ export default function PropertyDetailModel(
     onMapLoad,
     onMapUnmount,
     getMapCoordinates,
+    mapsLoaded, // Export the loading state
+    mapContainerStyle, // Export the map container style
   };
 }

@@ -19,6 +19,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import PropertyDetailModel, {
   defaultMapCenter,
+  mapContainerStyle,
 } from '@/models/property/propertyDetailModel';
 import PropertyDetailSkeleton from '@/components/property/propertyDetailSkeleton';
 import React, { useState, useEffect, useCallback } from 'react';
@@ -27,32 +28,9 @@ import { formatTimeOnly } from '@/utils/formatters';
 import { IReview } from '@/interfaces/property.interface';
 import PropertyReviews from '@/components/property/PropertyReviews';
 import { format } from 'date-fns';
-import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
-
-// Map container style
-const mapContainerStyle = {
-  width: '100%',
-  height: '400px',
-  borderRadius: '0.5rem',
-};
+import { GoogleMap, Marker } from '@react-google-maps/api';
 
 export default function PropertyDetailPage() {
-  // Google Maps API loader
-  const { isLoaded: mapsLoaded } = useJsApiLoader({
-    id: 'google-map-script',
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
-  });
-
-  const [map, setMap] = useState<google.maps.Map | null>(null);
-
-  const onMapLoad = useCallback((map: google.maps.Map) => {
-    setMap(map);
-  }, []);
-
-  const onMapUnmount = useCallback(() => {
-    setMap(null);
-  }, []);
-
   const { slug } = useParams();
   const searchParams = useSearchParams();
 
@@ -94,9 +72,6 @@ export default function PropertyDetailPage() {
     toggleCalendar,
     formatDisplayDate,
     getNextMonth,
-    getRoomImages,
-    getRoomFirstImage,
-    isRoomAvailable,
     getDaysInMonth,
     getFirstDayOfMonth,
     handleDateClick,
@@ -112,6 +87,13 @@ export default function PropertyDetailPage() {
     getLowestRoomPriceForDate,
     // Google Maps related exports
     getMapCoordinates,
+    mapsLoaded,
+    mapContainerStyle,
+    onMapLoad,
+    onMapUnmount,
+    getRoomImages,
+    getRoomFirstImage,
+    isRoomAvailable,
   } = PropertyDetailModel(slug, {
     initialStartDate: startDate,
     initialEndDate: endDate,
