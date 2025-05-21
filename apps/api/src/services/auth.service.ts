@@ -8,7 +8,7 @@ import { ErrorHandler } from '../helpers/response.handler';
 import { IUserLogin } from '../interfaces/user.interface';
 import { generateReferralCode } from '../helpers/referral-code-generator';
 import { generateAuthToken } from '../helpers/token';
-import { transporter } from '../helpers/nodemailer';
+import { transporter, sendEmailWithRetry } from '../helpers/nodemailer';
 import { hbs } from '../helpers/handlebars';
 import {
   decodeVerificationJwt,
@@ -254,7 +254,7 @@ class AuthService {
         FRONTEND_URL: process.env.FRONTEND_URL,
       });
 
-      transporter.sendMail({
+      await sendEmailWithRetry({
         to: email,
         subject: 'Forget Password Request',
         html,
@@ -280,11 +280,12 @@ class AuthService {
         FRONTEND_URL: process.env.FRONTEND_URL,
       });
 
-      transporter.sendMail({
+      await sendEmailWithRetry({
         to: email,
         subject: 'Verification and Set Password',
         html,
       });
+      
       return 'Success send email';
     } catch (error) {
       throw new ErrorHandler('Failed send email');
@@ -300,7 +301,7 @@ class AuthService {
         FRONTEND_URL: process.env.FRONTEND_URL,
       });
 
-      transporter.sendMail({
+      await sendEmailWithRetry({
         to: email,
         subject: 'Verification',
         html,
@@ -321,7 +322,7 @@ class AuthService {
         FRONTEND_URL: process.env.FRONTEND_URL,
       });
 
-      transporter.sendMail({
+      await sendEmailWithRetry({
         to: email,
         subject: 'Change Email Verification',
         html,
